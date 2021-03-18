@@ -1,6 +1,5 @@
 # Fibonacci (Ruby)
 
-
 ## Question
 [Project Euler - Problem #2](https://projecteuler.net/problem=2)
 
@@ -10,6 +9,30 @@ By considering the terms in the Fibonacci sequence whose values do not exceed fo
 
 Instructions: 
 Construct a solution using Ruby that could be incorporated into a larger project. Consideration should be given to readability, testability, and extensibility. 
+
+## Setup
+
+I had no problems ruby 2.6.5 and 2.7.1 but i had issues with ruby 3.  So I recommend just using a version lower than 3.  I didn't fix this edge case because of the time box
+
+1. Install version of ruby between 2.0 and 3.0
+1. Install Bundler
+
+    ```sh
+    gem install bundler
+    ```
+
+1. Install the gems for this project
+
+   ```sh
+   bundle install
+   ```
+1. Run the tests
+
+   ```sh
+   bundle exec rspec
+   ```
+
+
 
 ## Solution
 I'm using a combination of caching and recursion. The speed is something around O(log n), but i'm fuzzy on the details because of the caching.
