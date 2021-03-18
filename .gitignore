@@ -1,0 +1,3 @@
+# Bundler artifacts
+.bundler
+vendor/bundle
