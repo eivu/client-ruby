@@ -99,7 +99,7 @@ DEPENDENCIES
   activesupport (~> 7.0, >= 7.0.1)
   aws-sdk-s3 (~> 1.111, >= 1.111.1)
   dry-struct (~> 1.4)
-  oj
+  oj (~> 3.3, >= 3.3.5)
   pry (~> 0.14.1)
   rest-client (~> 2.1)
   rspec (~> 3.10)
