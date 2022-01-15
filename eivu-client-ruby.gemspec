@@ -11,7 +11,7 @@ Gem::Specification.new do |s|
   s.homepage         = 'https://github.com/eivu/client-ruby'
 
   s.platform = Gem::Platform::RUBY
-  s.summary = 'Ruby wrapper for the AcoustID service'
+  s.summary = 'Ruby client for the eivu service'
 #   s.description = <<-EOD
 # Ruby client for the eivu service
 #   EOD
