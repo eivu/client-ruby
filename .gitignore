@@ -1,3 +1,16 @@
 # Bundler artifacts
 .bundler
 vendor/bundle
+
+.DS_Store
+*.gem
+*.rbc
+/.config
+/coverage/
+/InstalledFiles
+/pkg/
+/spec/reports/
+/spec/examples.txt
+/test/tmp/
+/test/version_tmp/
+/tmp/
