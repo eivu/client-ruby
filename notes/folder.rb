@@ -47,6 +47,7 @@ class Folder < ApplicationRecord
     def create_from_path(path_to_file)
       #save file in "root" of folder if ignore is blank
       return nil if @@ignore.blank?
+
       @folder = @parent = nil
       # bucket = @@bucket || Bucket.ensure(bucket)
       path_name = Pathname.new(path_to_file.gsub(@@ignore,""))   
