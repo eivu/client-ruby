@@ -6,14 +6,13 @@ module Eivu
       class << self
         def traverse(path_to_dir, options: {})
           options[:ignore] = path_to_dir.strip
-          options[:ignore] += '/' unless options[:ignore].ends_with?('/' )
+          options[:ignore] += '/' unless options[:ignore].ends_with?('/')
 
-          Dir.glob("#{path_to_dir}/**/*").each do |path_to_item|
+          Dir.glob("#{path_to_dir}/**/*").collect do |path_to_item|
             next if skippable?(path_to_item, **options.slice(:skipable_filetypes))
 
             yield path_to_item
-          end
-          nil
+          end.compact
         end
 
         def skippable?(path_to_item, skipable_filetypes: [])
