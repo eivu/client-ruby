@@ -9,7 +9,7 @@ module Eivu
           options[:ignore] += '/' unless options[:ignore].ends_with?('/' )
 
           Dir.glob("#{path_to_dir}/**/*").each do |path_to_item|
-            next if skippable?(path_to_item, options[:skipable_filetypes])
+            next if skippable?(path_to_item, **options.slice(:skipable_filetypes))
 
             yield path_to_item
           end
@@ -18,7 +18,7 @@ module Eivu
 
         def skippable?(path_to_item, skipable_filetypes: [])
           path_to_item.starts_with?('.') ||
-            options[:skipable_filetypes].any? {|ext| path_to_item.ends_with?(ext) } ||
+            skipable_filetypes.any? { |ext| path_to_item.ends_with?(ext) } ||
             File.directory?(path_to_item)
         end
       end
