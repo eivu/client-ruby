@@ -15,14 +15,15 @@ Gem::Specification.new do |s|
 #   s.description = <<-EOD
 # Ruby client for the eivu service
 #   EOD
-  s.files         = ['lib/eivu-client-ruby.rb']
+  s.files         = ['lib/eivu.rb']
   s.require_paths = ['lib']
 
   s.add_dependency 'activesupport', '~> 7.0', '>= 7.0.1'
   s.add_dependency 'aws-sdk-s3', '~> 1.111', '>= 1.111.1'
   s.add_dependency 'dry-struct', '~> 1.4' # structs with default values
+  s.add_dependency 'nokogiri', '~> 1.13', '>= 1.13.1' # xml parser
   s.add_dependency 'oj', '~> 3.3', '>= 3.3.5' # faster json parsing
-  s.add_dependency 'pry', '~> 0.14.1' # Debugger 
+  s.add_dependency 'pry', '~> 0.14.1' # Debugger
   s.add_dependency 'rest-client', '~> 2.1' # A simple HTTP and REST client for Ruby, inspired by the Sinatra microframework style of specifying actions
   s.add_dependency 'rspec', '~> 3.10' # testing lib
   s.add_dependency 'vcr', '~> 6.0' # VCR for testing
