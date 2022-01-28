@@ -8,11 +8,19 @@ require 'dry-struct'
 module Eivu
   class Client
     class CloudFile < Dry::Struct
+      SERVER = ENV['EIVU_SERVER_HOST']
+      USER_TOKEN = ENV['EIVU_SERVER_TOKEN']
       # attribute :name, Types::String.optional
       # attribute :age, Types::Coercible::Integer
 
       def fetch(md5)
-        RestClient.get("#{EIVU_SERVER}/api/cloud_files/#{md5}")
+# '1'.rjust(32,'0')
+# 0000000000000000000000000000001
+# A4FFA621BC8334B4C7F058161BDBABBF
+# md5='A4FFA621BC8334B4C7F058161BDBABBF'
+# RestClient.get 'http://example.com/resource', {:Authorization => 'Bearer cT0febFoD5lxAlNAXHo6g'}
+RestClient.get("#{SERVER}/api/v1/cloud_files/#{md5}", {'Authorization' => "Token #{USER_TOKEN}"})
+RestClient.get("#{SERVER}/api/v1/cloud_files/#{md5}", {:Authorization => "Token #{USER_TOKEN}"})
       end
 
       def online?(uri)
@@ -23,7 +31,11 @@ module Eivu
 
       def write_to_s3; end
 
-      def reserve(md5:, bucket_id:, fullpath:, peepy: nil, nsfw: nil); end
+      def reserve(md5:, bucket_id:, fullpath:, peepy: nil, nsfw: nil)
+        token = 'f50327ce-4b69-4784-9f82-e47b696ea60d'
+
+        RestClient.post("#{EIVU_SERVER}/api/v1/cloud_files/#{md5}/reserve", {'Authorization' => "Token #{ENV['EIVU_SERVER_TOKEN']}"})
+      end
 
       def transfer(content_type:, asset:, filesize:); end
 
