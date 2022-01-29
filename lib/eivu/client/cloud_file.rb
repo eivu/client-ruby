@@ -5,14 +5,61 @@ require 'pry'
 require 'oj'
 require 'dry-struct'
 
+
+
 module Eivu
   class Client
+
+
+
     class CloudFile < Dry::Struct
-      # attribute :name, Types::String.optional
-      # attribute :age, Types::Coercible::Integer
+
+
+
+      # binding.pry
+
+      attribute  :md5, Types::Coercible::String
+      # attribute  :created_at, 
+      attribute? :name, Types::String.optional
+      attribute? :asset, Types::String.optional
+      attribute? :content_type, Types::String.optional
+      attribute? :filesize, Types::Coercible::Integer.optional
+      attribute? :description, Types::String.optional
+      attribute? :rating, Types::Coercible::Float.optional
+      # attribute? :nsfw, Types::Boolean.default(false)
+
+
+# => {"name"=>"Piano_brokencrash-Brandondorf-1164520478.mp3",
+#  ""=>"Piano_brokencrash-Brandondorf-1164520478.mp3",
+#  "md5"=>"A4FFA621BC8334B4C7F058161BDBABBF",
+#  "content_type"=>"audio/mpeg",
+#  "filesize"=>134899,
+#  "description"=>nil,
+#  "rating"=>nil,
+#  "nsfw"=>false,
+#  "peepy"=>false,
+#  "created_at"=>Thu, 14 May 2015 05:40:25.870345000 UTC +00:00,
+#  "updated_at"=>Thu, 14 May 2015 05:40:25.870345000 UTC +00:00,
+#  "folder_id"=>nil,
+#  "info_url"=>nil,
+#  "bucket_id"=>2,
+#  "duration"=>0,
+#  "settings"=>0,
+#  "ext_id"=>nil,
+#  "data_source_id"=>nil,
+#  "release_id"=>nil,
+#  "year"=>nil,
+#  "release_pos"=>nil,
+#  "user_id"=>nil,
+#  "num_plays"=>0,
+#  "state"=>"empty"}
+
 
 
       def self.fetch(md5)
+
+# {"id"=>285, "name"=>"Piano_brokencrash-Brandondorf-1164520478.mp3", "asset"=>"Piano_brokencrash-Brandondorf-1164520478.mp3", "md5"=>"A4FFA621BC8334B4C7F058161BDBABBF", "content_type"=>"audio/mpeg", "filesize"=>134899, "description"=>nil, "rating"=>nil, "nsfw"=>false, "peepy"=>false, "created_at"=>Thu, 14 May 2015 05:40:25.870345000 UTC +00:00, "updated_at"=>Thu, 14 May 2015 05:40:25.870345000 UTC +00:00, "folder_id"=>nil, "info_url"=>nil, "bucket_id"=>2, "duration"=>0, "settings"=>0, "ext_id"=>nil, "data_source_id"=>nil, "release_id"=>nil, "year"=>nil, "release_pos"=>nil, "user_id"=>nil, "num_plays"=>0, "state"=>"empty"}
+# md5='A4FFA621BC8334B4C7F058161BDBABBF'
         binding.pry
 # '1'.rjust(32,'0')
 # 0000000000000000000000000000001

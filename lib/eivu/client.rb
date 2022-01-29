@@ -6,6 +6,11 @@ require 'oj'
 
 module Eivu
   class Client
+
+    module Types
+      include Dry.Types()
+    end
+
     class << self
       attr_accessor :configuration
     end
