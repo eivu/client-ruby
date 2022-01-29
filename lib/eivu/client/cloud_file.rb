@@ -8,19 +8,19 @@ require 'dry-struct'
 module Eivu
   class Client
     class CloudFile < Dry::Struct
-      SERVER = ENV['EIVU_SERVER_HOST']
-      USER_TOKEN = ENV['EIVU_SERVER_TOKEN']
       # attribute :name, Types::String.optional
       # attribute :age, Types::Coercible::Integer
 
-      def fetch(md5)
+
+      def self.fetch(md5)
+        binding.pry
 # '1'.rjust(32,'0')
 # 0000000000000000000000000000001
 # A4FFA621BC8334B4C7F058161BDBABBF
 # md5='A4FFA621BC8334B4C7F058161BDBABBF'
 # RestClient.get 'http://example.com/resource', {:Authorization => 'Bearer cT0febFoD5lxAlNAXHo6g'}
-RestClient.get("#{SERVER}/api/v1/cloud_files/#{md5}", {'Authorization' => "Token #{USER_TOKEN}"})
-RestClient.get("#{SERVER}/api/v1/cloud_files/#{md5}", {:Authorization => "Token #{USER_TOKEN}"})
+RestClient.get("#{Eivu::Client.configuration.host}/api/v1/cloud_files/#{md5}", {'Authorization' => "Token #{Eivu::Client.configuration.user_token}"})
+# RestClient.get("#{SERVER}/api/v1/cloud_files/#{md5}", {:Authorization => "Token #{USER_TOKEN}"})
       end
 
       def online?(uri)
@@ -43,6 +43,7 @@ RestClient.get("#{SERVER}/api/v1/cloud_files/#{md5}", {:Authorization => "Token 
 
       def url
         raise "Region Not Defined for bucket: #{self.bucket.name}" if self.bucket.region_id.blank?
+
         @url ||= "http://#{self.bucket.name}.#{self.bucket.region.endpoint}/#{media_type}/#{md5.scan(/.{2}|.+/).join("/")}/#{self.asset}"
       end
 

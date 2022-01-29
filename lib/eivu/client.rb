@@ -6,6 +6,21 @@ require 'oj'
 
 module Eivu
   class Client
+    class << self
+      attr_accessor :configuration
+    end
+
+    def self.configuration
+      @configuration ||= Configuration.new
+    end
+
+    def self.reset
+      @configuration = Configuration.new
+    end
+
+    def self.configure
+      yield(configuration)
+    end
     # def initialize(
     #   host: ENV['EIVU_SERVER_HOST'],
     #   access_key_id: ENV['EIVU_SECRET_ACCESS_KEY'],
@@ -25,8 +40,6 @@ module Eivu
 
     def ingest!(path_to_dir:)
       Folder.traverse(path_to_dir) do |path_to_item|
-
-
 
         upload(path_to_item)
       end
