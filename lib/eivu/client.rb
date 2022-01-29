@@ -15,7 +15,13 @@ module Eivu
     end
 
     def self.reset
-      @configuration = Configuration.new
+      Eivu::Client.configuration.access_key_id = nil
+      Eivu::Client.configuration.secret_key    = nil
+      Eivu::Client.configuration.bucket_name   = nil
+      Eivu::Client.configuration.region        = nil
+      Eivu::Client.configuration.user_token    = nil
+      Eivu::Client.configuration.host          = nil
+      configuration
     end
 
     def self.configure
