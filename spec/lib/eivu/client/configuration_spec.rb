@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 require 'spec_helper'
-
 require 'eivu'
 
 describe Eivu::Client::Configuration do
@@ -28,7 +27,7 @@ describe Eivu::Client::Configuration do
     end
 
     it 'returns the correct secret_key' do
-      expect(Eivu::Client.configuration.secret_key).to eq(secret_key)
+      expect(Eivu::Client.configuration.secret_key).to eq(secret_access_key)
     end
 
     it 'returns the correct bucket_name' do
@@ -44,44 +43,55 @@ describe Eivu::Client::Configuration do
     end
 
     it 'returns the correct host' do
-      expect(Eivu::Client.configuration.host).to eq(host)
+      expect(Eivu::Client.configuration.host).to eq(server_host)
     end
   end
 
-  context 'without configuration block' do
+  context 'with no values set' do
     before do
-      Ravelry.reset
+      Eivu::Client.reset
     end
 
-    it 'raises a configuration error for access_key' do
-      expect { Eivu::Client.configuration.access_key }.to raise_error(Ravelry::Errors::Configuration)
+    it 'raises a configuration error for access_key_id' do
+      expect { Eivu::Client.configuration.access_key_id }.to raise_error(Eivu::Client::Errors::Configuration)
     end
 
     it 'raises a configuration error for secret_key' do
-      expect { Eivu::Client.configuration.secret_key }.to raise_error(Ravelry::Errors::Configuration)
+      expect { Eivu::Client.configuration.secret_key }.to raise_error(Eivu::Client::Errors::Configuration)
     end
 
-    it 'raises a configuration error for personal_key' do
-      expect { Eivu::Client.configuration.personal_key }.to raise_error(Ravelry::Errors::Configuration)
+    it 'raises a configuration error for bucket_name' do
+      expect { Eivu::Client.configuration.bucket_name }.to raise_error(Eivu::Client::Errors::Configuration)
     end
 
-    it 'raises a configuration error for callback_url' do
-      expect { Eivu::Client.configuration.callback_url }.to raise_error(Ravelry::Errors::Configuration)
+    it 'raises a configuration error for region' do
+      expect { Eivu::Client.configuration.region }.to raise_error(Eivu::Client::Errors::Configuration)
+    end
+
+    it 'raises a configuration error for user_token' do
+      expect { Eivu::Client.configuration.user_token }.to raise_error(Eivu::Client::Errors::Configuration)
+    end
+
+    it 'raises a configuration error for host' do
+      expect { Eivu::Client.configuration.host }.to raise_error(Eivu::Client::Errors::Configuration)
     end
   end
 
   context '#reset' do
     it 'resets configured values' do
-      expect(Eivu::Client.configuration.access_key).to eq(ENV['RAV_ACCESS'])
-      expect(Eivu::Client.configuration.secret_key).to eq(ENV['RAV_SECRET'])
-      expect(Eivu::Client.configuration.personal_key).to eq(ENV['RAV_PERSONAL'])
-      expect(Eivu::Client.configuration.callback_url).to eq(@callback_url)
-
-      Ravelry.reset
-      expect { Eivu::Client.configuration.access_key }.to raise_error(Ravelry::Errors::Configuration)
-      expect { Eivu::Client.configuration.secret_key }.to raise_error(Ravelry::Errors::Configuration)
-      expect { Eivu::Client.configuration.personal_key }.to raise_error(Ravelry::Errors::Configuration)
-      expect { Eivu::Client.configuration.callback_url }.to raise_error(Ravelry::Errors::Configuration)
+      expect(Eivu::Client.configuration.access_key_id).to eq(access_key_id)
+      expect(Eivu::Client.configuration.secret_key).to eq(secret_access_key)
+      expect(Eivu::Client.configuration.bucket_name).to eq(bucket_name)
+      expect(Eivu::Client.configuration.region).to eq(region)
+      expect(Eivu::Client.configuration.user_token).to eq(user_token)
+      expect(Eivu::Client.configuration.host).to eq(server_host)
+      Eivu::Client.reset
+      expect { Eivu::Client.configuration.access_key_id }.to raise_error(Eivu::Client::Errors::Configuration)
+      expect { Eivu::Client.configuration.secret_key }.to raise_error(Eivu::Client::Errors::Configuration)
+      expect { Eivu::Client.configuration.bucket_name }.to raise_error(Eivu::Client::Errors::Configuration)
+      expect { Eivu::Client.configuration.region }.to raise_error(Eivu::Client::Errors::Configuration)
+      expect { Eivu::Client.configuration.user_token }.to raise_error(Eivu::Client::Errors::Configuration)
+      expect { Eivu::Client.configuration.host }.to raise_error(Eivu::Client::Errors::Configuration)
     end
   end
 end
