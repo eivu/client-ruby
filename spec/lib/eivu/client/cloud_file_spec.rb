@@ -7,9 +7,11 @@ describe Eivu::Client::CloudFile do
     context 'when md5 exists' do
       let(:md5) { 'A4FFA621BC8334B4C7F058161BDBABBF' }
 
-      it { is_expected.to be_kind_of(described_class) }
+      it 'returns a CloudFile instance', vcr: true do
+        expect(instance).to be_kind_of(described_class)
+      end
 
-      it 'has the correct attributes' do
+      it 'has the correct attributes', vcr: true do
         aggregate_failures do
           expect(instance.md5).to eq(md5)
           expect(instance.name).to eq('Piano_brokencrash-Brandondorf-1164520478.mp3')

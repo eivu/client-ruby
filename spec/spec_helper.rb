@@ -1,16 +1,18 @@
 # frozen_string_literal: true
 
 require_relative '../config/environment'
-# require 'vcr'
+require 'vcr'
 # require 'support/shared_examples/base_class_functionality_spec'
 
-# VCR.configure do |config|
-#   config.cassette_library_dir = 'spec/fixtures/vcr'
-#   config.default_cassette_options = { match_requests_on: %i[method uri body], record: :once }
-#   config.filter_sensitive_data('<ACOUSTID_CLIENT_ID>') { ENV['ACOUSTID_CLIENT_ID'] }
-#   config.configure_rspec_metadata! # enables :vcr tag
-#   config.hook_into :webmock
-# end
+VCR.configure do |config|
+  config.cassette_library_dir = 'spec/fixtures/vcr'
+  config.default_cassette_options = { match_requests_on: %i[method uri body], record: :once }
+  %w[EIVU_ACCESS_KEY_ID EIVU_SECRET_ACCESS_KEY EIVU_BUCKET_NAME EIVU_REGION EIVU_USER_TOKEN EIVU_SERVER_HOST].each do |value|
+    config.filter_sensitive_data("<#{value}>") { ENV[value] }
+  end
+  config.configure_rspec_metadata! # enables :vcr tag
+  config.hook_into :webmock
+end
 
 RSpec.configure do |config|
   config.expect_with :rspec do |expectations|

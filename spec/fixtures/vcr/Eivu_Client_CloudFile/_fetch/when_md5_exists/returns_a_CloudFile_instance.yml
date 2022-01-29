@@ -1,0 +1,62 @@
+---
+http_interactions:
+- request:
+    method: get
+    uri: "<EIVU_SERVER_HOST>/api/v1/cloud_files/A4FFA621BC8334B4C7F058161BDBABBF"
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      Accept:
+      - "*/*"
+      User-Agent:
+      - rest-client/2.1.0 (darwin20 x86_64) ruby/3.0.2p107
+      Authorization:
+      - Token <EIVU_USER_TOKEN>
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Host:
+      - localhost:3000
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Xss-Protection:
+      - 1; mode=block
+      X-Content-Type-Options:
+      - nosniff
+      X-Download-Options:
+      - noopen
+      X-Permitted-Cross-Domain-Policies:
+      - none
+      Referrer-Policy:
+      - strict-origin-when-cross-origin
+      Content-Type:
+      - application/json; charset=utf-8
+      Cache-Control:
+      - no-store, must-revalidate, private, max-age=0
+      X-Request-Id:
+      - d645381c-a480-43f9-9081-02c2f6e0a1a1
+      X-Runtime:
+      - '0.114092'
+      Server-Timing:
+      - start_processing.action_controller;dur=0.14404296875, sql.active_record;dur=28.5498046875,
+        instantiation.active_record;dur=0.31103515625, process_action.action_controller;dur=91.8740234375
+      Vary:
+      - Origin
+      X-Miniprofiler-Original-Cache-Control:
+      - max-age=0, private, must-revalidate
+      X-Miniprofiler-Ids:
+      - ruzvt1gp1hy1yqtsrp75,qfbskbfsdyab27djfgrx,xv85ivtrpcdci6sy43iu,6b8m696kwzwypay98hlg,6b5pjjp4kf4n3h5dllnr,emsm2uwa42gjf8fllzqd,8yh1sf8dnlx8sj8q2v6m,ffy6c0z8yi0d3radj680,rthjel81wlgi5bppjp1v,is57w1byhkezluonla7k,jh89weip8485ncjqov0h,wdqycioov00w0mrthtwx,35ndk0cm0marp9z01zm1,gou2dn6nbz34sosqkbzw,g13b7p424v9n7etlenqr,m2muxw4fp3nuoyzg58tr,bqfewnewxs3rn0fdhvmj,x7zzk79inp33p17fcjh4,b64la7mch06x8e4x0bim,bh6v1ucynxqqcyy3ukcx
+      Set-Cookie:
+      - __profilin=p%3Dt; path=/; HttpOnly; SameSite=Lax
+      Transfer-Encoding:
+      - chunked
+    body:
+      encoding: UTF-8
+      string: '{"name":"Piano_brokencrash-Brandondorf-1164520478.mp3","asset":"Piano_brokencrash-Brandondorf-1164520478.mp3","md5":"A4FFA621BC8334B4C7F058161BDBABBF","content_type":"audio/mpeg","filesize":134899,"description":null,"rating":null,"nsfw":false,"peepy":false,"created_at":"2015-05-14T05:40:25.870Z","updated_at":"2015-05-14T05:40:25.870Z","folder_id":null,"info_url":null,"bucket_id":2,"duration":0,"ext_id":null,"data_source_id":null,"release_id":null,"year":null,"release_pos":null,"num_plays":0,"state":"empty"}'
+  recorded_at: Sat, 29 Jan 2022 17:00:08 GMT
+recorded_with: VCR 6.0.0
