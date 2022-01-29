@@ -9,65 +9,42 @@ require 'dry-struct'
 
 module Eivu
   class Client
-
-
-
     class CloudFile < Dry::Struct
-
-
-
-      # binding.pry
-
-      attribute  :md5, Types::Coercible::String
-      # attribute  :created_at, 
+      attribute  :md5, Types::String
+      attribute  :state, Types::String
+      # attribute  :created_at, Types::Coercible::DateTime
+      # attribute  :updated_at, Types::Coercible::DateTime
       attribute? :name, Types::String.optional
       attribute? :asset, Types::String.optional
       attribute? :content_type, Types::String.optional
       attribute? :filesize, Types::Coercible::Integer.optional
       attribute? :description, Types::String.optional
       attribute? :rating, Types::Coercible::Float.optional
-      # attribute? :nsfw, Types::Boolean.default(false)
-
-
-# => {"name"=>"Piano_brokencrash-Brandondorf-1164520478.mp3",
-#  ""=>"Piano_brokencrash-Brandondorf-1164520478.mp3",
-#  "md5"=>"A4FFA621BC8334B4C7F058161BDBABBF",
-#  "content_type"=>"audio/mpeg",
-#  "filesize"=>134899,
-#  "description"=>nil,
-#  "rating"=>nil,
-#  "nsfw"=>false,
-#  "peepy"=>false,
-#  "created_at"=>Thu, 14 May 2015 05:40:25.870345000 UTC +00:00,
-#  "updated_at"=>Thu, 14 May 2015 05:40:25.870345000 UTC +00:00,
-#  "folder_id"=>nil,
-#  "info_url"=>nil,
-#  "bucket_id"=>2,
-#  "duration"=>0,
-#  "settings"=>0,
-#  "ext_id"=>nil,
-#  "data_source_id"=>nil,
-#  "release_id"=>nil,
-#  "year"=>nil,
-#  "release_pos"=>nil,
-#  "user_id"=>nil,
-#  "num_plays"=>0,
-#  "state"=>"empty"}
-
+      attribute? :nsfw, Types::Bool.default(false)
+      attribute? :peepy, Types::Bool.default(false)
+      attribute? :folder_id, Types::Coercible::Integer.optional
+      attribute? :bucket_id, Types::Coercible::Integer.optional
+      attribute? :ext_id, Types::Coercible::Integer.optional
+      attribute? :data_source_id, Types::Coercible::Integer.optional
+      attribute? :release_id, Types::Coercible::Integer.optional
+      attribute? :release_pos, Types::Coercible::Integer.optional
+      attribute? :num_plays, Types::Coercible::Integer.optional
+      attribute? :year, Types::Coercible::Integer.optional
+      attribute? :duration, Types::Coercible::Integer.optional
+      attribute? :info_url, Types::String.optional
 
 
       def self.fetch(md5)
+        response = RestClient.get(
+          "#{Eivu::Client.configuration.host}/api/v1/cloud_files/#{md5}",
+          {'Authorization' => "Token #{Eivu::Client.configuration.user_token}"}
+        )
 
-# {"id"=>285, "name"=>"Piano_brokencrash-Brandondorf-1164520478.mp3", "asset"=>"Piano_brokencrash-Brandondorf-1164520478.mp3", "md5"=>"A4FFA621BC8334B4C7F058161BDBABBF", "content_type"=>"audio/mpeg", "filesize"=>134899, "description"=>nil, "rating"=>nil, "nsfw"=>false, "peepy"=>false, "created_at"=>Thu, 14 May 2015 05:40:25.870345000 UTC +00:00, "updated_at"=>Thu, 14 May 2015 05:40:25.870345000 UTC +00:00, "folder_id"=>nil, "info_url"=>nil, "bucket_id"=>2, "duration"=>0, "settings"=>0, "ext_id"=>nil, "data_source_id"=>nil, "release_id"=>nil, "year"=>nil, "release_pos"=>nil, "user_id"=>nil, "num_plays"=>0, "state"=>"empty"}
-# md5='A4FFA621BC8334B4C7F058161BDBABBF'
-        binding.pry
-# '1'.rjust(32,'0')
-# 0000000000000000000000000000001
-# A4FFA621BC8334B4C7F058161BDBABBF
-# md5='A4FFA621BC8334B4C7F058161BDBABBF'
-# RestClient.get 'http://example.com/resource', {:Authorization => 'Bearer cT0febFoD5lxAlNAXHo6g'}
-RestClient.get("#{Eivu::Client.configuration.host}/api/v1/cloud_files/#{md5}", {'Authorization' => "Token #{Eivu::Client.configuration.user_token}"})
-# RestClient.get("#{SERVER}/api/v1/cloud_files/#{md5}", {:Authorization => "Token #{USER_TOKEN}"})
+        if response.code != 200
+          raise Errors::Connection, "Failed to connected received: #{response.code}"
+        end
+
+        CloudFile.new Oj.load(response.body).symbolize_keys
       end
 
       def online?(uri)
@@ -99,6 +76,15 @@ RestClient.get("#{Eivu::Client.configuration.host}/api/v1/cloud_files/#{md5}", {
       end
 
       private
+
+      # def self.make_request(md5:, method: :post, action: nil, payload: {})
+      #   RestClient.send(
+      #     method,
+      #     "#{Eivu::Client.configuration.host}/api/v1/cloud_files/#{md5}#{action}",
+      #     {'Authorization' => "Token #{Eivu::Client.configuration.user_token}"}
+      #   )
+      # end
+
 
       def sanitize(name)
         name = name.tr('\\', '/') # work-around for IE
