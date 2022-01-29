@@ -7,8 +7,13 @@ describe Eivu::Client::CloudFile do
     context 'when md5 exists' do
       let(:md5) { 'A4FFA621BC8334B4C7F058161BDBABBF' }
 
-      it 'returns a CloudFile instance' do
-        expect(instance).to be_kind_of(described_class)
+      it { is_expected.to be_kind_of(described_class) }
+
+      it 'has the correct attributes' do
+        aggregate_failures do
+          expect(instance.md5).to eq(md5)
+          expect(instance.name).to eq('Piano_brokencrash-Brandondorf-1164520478.mp3')
+        end
       end
     end
   end
@@ -43,4 +48,31 @@ describe Eivu::Client::CloudFile do
   #     end
   #   end
   # end
+  
+# {
+#   "name": "Piano_brokencrash-Brandondorf-1164520478.mp3",
+#   "asset": "Piano_brokencrash-Brandondorf-1164520478.mp3",
+#   "md5": "A4FFA621BC8334B4C7F058161BDBABBF",
+#   "content_type": "audio/mpeg",
+#   "filesize": 134899,
+#   "description": null,
+#   "rating": null,
+#   "nsfw": false,
+#   "peepy": false,
+#   "created_at": "2015-05-14T05:40:25.870Z",
+#   "updated_at": "2015-05-14T05:40:25.870Z",
+#   "folder_id": null,
+#   "info_url": null,
+#   "bucket_id": 2,
+#   "duration": 0,
+#   "ext_id": null,
+#   "data_source_id": null,
+#   "release_id": null,
+#   "year": null,
+#   "release_pos": null,
+#   "num_plays": 0,
+#   "state": "empty"
+# }
+
 end
+
