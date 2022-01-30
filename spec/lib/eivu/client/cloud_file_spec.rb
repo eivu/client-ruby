@@ -1,21 +1,29 @@
 # frozen_string_literal: true
 
 describe Eivu::Client::CloudFile do
-  describe '.fetch' do
+  describe '.fetch', vcr: true do
     subject(:instance) { described_class.fetch(md5) }
 
     context 'when md5 exists' do
       let(:md5) { 'A4FFA621BC8334B4C7F058161BDBABBF' }
 
-      it 'returns a CloudFile instance', vcr: true do
+      it 'returns a CloudFile instance' do
         expect(instance).to be_kind_of(described_class)
       end
 
-      it 'has the correct attributes', vcr: true do
+      it 'has the correct attributes' do
         aggregate_failures do
           expect(instance.md5).to eq(md5)
           expect(instance.name).to eq('Piano_brokencrash-Brandondorf-1164520478.mp3')
         end
+      end
+    end
+
+    context 'when md5 does not exist' do
+      let(:md5) { '==============ERROR=============' }
+
+      it 'raises an error' do
+        expect { instance }.to raise_error(RestClient::NotFound)
       end
     end
   end

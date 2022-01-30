@@ -1,0 +1,58 @@
+---
+http_interactions:
+- request:
+    method: get
+    uri: "<EIVU_SERVER_HOST>/api/v1/cloud_files/==============ERROR============="
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      Accept:
+      - "*/*"
+      User-Agent:
+      - rest-client/2.1.0 (darwin20 x86_64) ruby/3.0.2p107
+      Authorization:
+      - Token <EIVU_USER_TOKEN>
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Host:
+      - localhost:3000
+  response:
+    status:
+      code: 404
+      message: Not Found
+    headers:
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Xss-Protection:
+      - 1; mode=block
+      X-Content-Type-Options:
+      - nosniff
+      X-Download-Options:
+      - noopen
+      X-Permitted-Cross-Domain-Policies:
+      - none
+      Referrer-Policy:
+      - strict-origin-when-cross-origin
+      Content-Type:
+      - application/json; charset=utf-8
+      Cache-Control:
+      - no-cache
+      X-Request-Id:
+      - dc31349b-365f-4ca7-a35a-c1229001b2bc
+      X-Runtime:
+      - '0.057227'
+      Server-Timing:
+      - start_processing.action_controller;dur=0.20703125, sql.active_record;dur=5.0458984375,
+        instantiation.active_record;dur=0.085205078125, process_action.action_controller;dur=12.15869140625
+      Vary:
+      - Origin
+      Set-Cookie:
+      - __profilin=p%3Dt; path=/; HttpOnly; SameSite=Lax
+      Transfer-Encoding:
+      - chunked
+    body:
+      encoding: UTF-8
+      string: '{"message":"no cloud file exists with that md5"}'
+  recorded_at: Sun, 30 Jan 2022 03:15:44 GMT
+recorded_with: VCR 6.0.0
