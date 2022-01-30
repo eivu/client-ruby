@@ -5,8 +5,6 @@ require 'pry'
 require 'oj'
 require 'dry-struct'
 
-
-
 module Eivu
   class Client
     class CloudFile < Dry::Struct
@@ -33,18 +31,30 @@ module Eivu
       attribute? :duration, Types::Coercible::Integer.optional
       attribute? :info_url, Types::String.optional
 
+      class << self
+        def fetch(md5)
+          response = RestClient.get(
+            "#{Eivu::Client.configuration.host}/api/v1/cloud_files/#{md5}",
+            {'Authorization' => "Token #{Eivu::Client.configuration.user_token}"}
+          )
 
-      def self.fetch(md5)
-        response = RestClient.get(
-          "#{Eivu::Client.configuration.host}/api/v1/cloud_files/#{md5}",
-          {'Authorization' => "Token #{Eivu::Client.configuration.user_token}"}
-        )
+          if response.code != 200
+            raise Errors::Connection, "Failed to connected received: #{response.code}"
+          end
 
-        if response.code != 200
-          raise Errors::Connection, "Failed to connected received: #{response.code}"
+          CloudFile.new Oj.load(response.body).symbolize_keys
         end
 
-        CloudFile.new Oj.load(response.body).symbolize_keys
+        def reserve(bucket_id:, fullpath:, peepy: false, nsfw: false)
+          payload = { bucket_id: bucket_id, fullpath: fullpath, peepy: peepy, nsfw: nsfw }
+          response = post_request(action: :reserve, payload: payload)
+
+          if response.code != 200
+            raise Errors::Connection, "Failed to connected received: #{response.code}"
+          end
+
+          CloudFile.new Oj.load(response.body).symbolize_keys
+        end
       end
 
       def online?(uri)
@@ -54,12 +64,6 @@ module Eivu
       end
 
       def write_to_s3; end
-
-      def reserve(md5:, bucket_id:, fullpath:, peepy: nil, nsfw: nil)
-        token = 'f50327ce-4b69-4784-9f82-e47b696ea60d'
-
-        RestClient.post("#{EIVU_SERVER}/api/v1/cloud_files/#{md5}/reserve", {'Authorization' => "Token #{ENV['EIVU_SERVER_TOKEN']}"})
-      end
 
       def transfer(content_type:, asset:, filesize:); end
 
@@ -77,13 +81,19 @@ module Eivu
 
       private
 
-      # def self.make_request(md5:, method: :post, action: nil, payload: {})
-      #   RestClient.send(
-      #     method,
-      #     "#{Eivu::Client.configuration.host}/api/v1/cloud_files/#{md5}#{action}",
-      #     {'Authorization' => "Token #{Eivu::Client.configuration.user_token}"}
-      #   )
-      # end
+      def post_request(action:, md5:, payload:)
+        response = RestClient.post(
+          "#{Eivu::Client.configuration.host}/api/v1/cloud_files/#{md5}/#{action}",
+          payload,
+          { 'Authorization' => "Token #{Eivu::Client.configuration.user_token}" }
+        )
+
+        if response.code != 200
+          raise Errors::Connection, "Failed to connected received: #{response.code}"
+        end
+
+        response
+      end
 
 
       def sanitize(name)
