@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-describe Eivu::Client::CloudFile do
-  describe '.fetch', vcr: true do
+describe Eivu::Client::CloudFile, vcr: true do
+  describe '.fetch' do
     subject(:instance) { described_class.fetch(md5) }
 
     context 'when md5 exists' do
@@ -15,6 +15,7 @@ describe Eivu::Client::CloudFile do
         aggregate_failures do
           expect(instance.md5).to eq(md5)
           expect(instance.name).to eq('Piano_brokencrash-Brandondorf-1164520478.mp3')
+          expect(instance.bucket_uuid).to eq('3b746ff6-82b3-4340-a745-ae6d5d375381')
         end
       end
     end
@@ -27,6 +28,17 @@ describe Eivu::Client::CloudFile do
       end
     end
   end
+
+  describe '.reserve' do
+    subject(:instance) { described_class.reserve(bucket_id: 1, fullpath: fullpath) }
+
+
+    
+    context 'when md5 does not exist' do
+      let(:md5) { '00000000000000000000000000000000' }
+    end
+  end
+
 
 
 # reserve(md5:, bucket_id:, fullpath:, peepy: nil, nsfw: nil); end
