@@ -50,13 +50,11 @@ module Eivu
         end
 
         def reserve(bucket_id:, path_to_file:, peepy: false, nsfw: false)
-          md5      = generate_md5(path_to_file)
-          payload  = { bucket_id: bucket_id, peepy: peepy, nsfw: nsfw }
-          response = post_request(action: :reserve, md5: md5, payload: payload)
-          CloudFile.new Oj.load(response.body).symbolize_keys
+          md5         = generate_md5(path_to_file)
+          payload     = { bucket_id: bucket_id, peepy: peepy, nsfw: nsfw }
+          parsed_body = post_request(action: :reserve, md5: md5, payload: payload)
+          CloudFile.new parsed_body
         end
-
-        private
 
         def post_request(action:, md5:, payload:)
           response = RestClient.post(
@@ -69,9 +67,8 @@ module Eivu
             raise Errors::Connection, "Failed to connected received: #{response.code}"
           end
 
-          response
+          Oj.load(response.body).symbolize_keys
         end
-
       end
 
       def online?(uri)
@@ -82,15 +79,14 @@ module Eivu
 
       def write_to_s3; end
 
-      def transfer(path_to_file)
-        asset    = File.basename(path_to_file)
-        mime     = MimeMagic.by_magic(File.open(path_to_file))
-        filesize = File.size(path_to_file)
-        payload  = { content_type: mime.type, asset: asset, filesize: filesize }
-        # will raise an error if there is a problem
-        post_request(action: :transfer, md5: md5, payload: payload)
-
-        binding.pry
+      def transfer(path_to_file:)
+        asset       = File.basename(path_to_file)
+        mime        = MimeMagic.by_magic(File.open(path_to_file))
+        filesize    = File.size(path_to_file)
+        payload     = { content_type: mime.type, asset: asset, filesize: filesize }
+        # post_request will raise an error if there is a problem
+        parsed_body = post_request(action: :transfer, payload: payload)
+        CloudFile.new parsed_body
       end
 
       def complete(year: nil, rating: nil, release_pos: nil, metadata_list: {}, matched_recording: nil); end
@@ -108,7 +104,7 @@ module Eivu
       private
 
       def post_request(action:, payload:)
-        CloudFile.post_request(action: action, md5: md5, payload: payload)
+        self.class.post_request(action: action, md5: md5, payload: payload)
       end
 
       def sanitize(name)

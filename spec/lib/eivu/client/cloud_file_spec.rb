@@ -88,20 +88,30 @@ describe Eivu::Client::CloudFile, vcr: true do
     end
   end
 
-  # describe '#transfer' do
-  #   subject(:transference) { instance.transfer(path_to_file: path_to_file) }
+  describe '#transfer' do
+    subject(:transference) { instance.transfer(path_to_file: path_to_file) }
 
-  #   let(:instance) { described_class.fetch(md5) }
-  #   let(:md5) { generate_md5(path_to_file) }
+    let(:instance) { described_class.fetch(md5) }
+    let(:md5) { described_class.generate_md5(path_to_file) }
+    let(:asset) { File.basename(path_to_file) }
+    let(:mime) { MimeMagic.by_magic(File.open(path_to_file)) }
+    let(:filesize) { File.size(path_to_file) }
 
+    context 'when working with a reserved file' do
+      let(:path_to_file) { File.expand_path('../../../fixtures/samples/test.mp3', __dir__) }
 
-  #   context 'when working with a reserved file' do
-  #     let(:path_to_file) { File.expand_path('../../../fixtures/samples/test.mp3', __dir__) }
-
-  #     it 'returns the proper object' do
-  #     end
-  #   end
-  # end
+      it 'has the correct attributes' do
+        aggregate_failures do
+          expect(transference).to be_kind_of(described_class)
+          expect(transference.md5).to eq(md5)
+          expect(transference.asset).to eq(File.basename(path_to_file))
+          expect(transference.content_type).to eq(mime.type)
+          expect(transference.filesize).to eq(filesize)
+          expect(transference.state).to eq('transfered')
+        end
+      end
+    end
+  end
 
 
 
