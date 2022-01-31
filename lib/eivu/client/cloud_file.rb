@@ -71,13 +71,6 @@ module Eivu
         end
       end
 
-      def online?(uri)
-        url = URI.parse(uri)
-        req = Net::HTTP.new(url.host, url.port)
-        req.request_head(url.path).code == '200'
-      end
-
-      def write_to_s3; end
 
       def transfer(path_to_file:)
         asset       = File.basename(path_to_file)
@@ -91,12 +84,6 @@ module Eivu
 
       def complete(year: nil, rating: nil, release_pos: nil, metadata_list: {}, matched_recording: nil); end
 
-      def url
-        raise "Region Not Defined for bucket: #{self.bucket.name}" if self.bucket.region_id.blank?
-
-        @url ||= "http://#{self.bucket.name}.#{self.bucket.region.endpoint}/#{media_type}/#{md5.scan(/.{2}|.+/).join("/")}/#{self.asset}"
-      end
-
       def visit
         system "open #{url}"
       end
@@ -105,15 +92,6 @@ module Eivu
 
       def post_request(action:, payload:)
         self.class.post_request(action: action, md5: md5, payload: payload)
-      end
-
-      def sanitize(name)
-        name = name.tr('\\', '/') # work-around for IE
-        name = File.basename(name)
-        name = name.gsub(/[^a-zA-Z0-9\.\-\+_]/, "_")
-        name = "_#{name}" if name =~ /\A\.+\z/
-        name = 'unnamed' if name.size == 0
-        return name.mb_chars.to_s
       end
     end
   end
