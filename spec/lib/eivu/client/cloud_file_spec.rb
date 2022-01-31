@@ -111,6 +111,14 @@ describe Eivu::Client::CloudFile, vcr: true do
         end
       end
     end
+
+    context 'when working with a file NOT reserved' do
+      let(:path_to_file) { File.expand_path('../../../fixtures/samples/Piano_brokencrash-Brandondorf-1164520478.mp3', __dir__) }
+
+      it 'will raise an exception' do
+        expect { transference } .to raise_error(RestClient::UnprocessableEntity)
+      end
+    end
   end
 
 

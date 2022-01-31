@@ -1,0 +1,121 @@
+---
+http_interactions:
+- request:
+    method: get
+    uri: "<EIVU_SERVER_HOST>/api/v1/cloud_files/A4FFA621BC8334B4C7F058161BDBABBF"
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      Accept:
+      - "*/*"
+      User-Agent:
+      - rest-client/2.1.0 (darwin20 x86_64) ruby/3.0.2p107
+      Authorization:
+      - Token <EIVU_USER_TOKEN>
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Host:
+      - localhost:3000
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Xss-Protection:
+      - 1; mode=block
+      X-Content-Type-Options:
+      - nosniff
+      X-Download-Options:
+      - noopen
+      X-Permitted-Cross-Domain-Policies:
+      - none
+      Referrer-Policy:
+      - strict-origin-when-cross-origin
+      Content-Type:
+      - application/json; charset=utf-8
+      Cache-Control:
+      - no-store, must-revalidate, private, max-age=0
+      X-Request-Id:
+      - 1636dd5b-5b4c-40ca-bf8f-05e8c45f07c8
+      X-Runtime:
+      - '0.031746'
+      Server-Timing:
+      - start_processing.action_controller;dur=0.183837890625, sql.active_record;dur=7.7998046875,
+        instantiation.active_record;dur=0.34375, process_action.action_controller;dur=14.614013671875
+      Vary:
+      - Origin
+      X-Miniprofiler-Original-Cache-Control:
+      - max-age=0, private, must-revalidate
+      X-Miniprofiler-Ids:
+      - rg9d96lezlbnbp1u125j,kr0oy6axro4bnu8x01oj,bt4x5awh6jdd5epqsole,gnerzb4iyv7yrkfjxe3z,ju3ja0bobukpyuvyh33d,cdg19dqihqh5vpq5oar0,1vf96wi24c30l5yfdx7u,8t3ecvj7th69x4ggjqap,sdgzkbf1qaawpofa4jpa,6v74tpyniamv30ohy3a6,mykbyvfd9hfmflf46vrt,fb2mkzhnci1b2rilb34f,i166y87cpam6tajs1l2f,y7r6s9pwiduf37ilssub,sdv9v9mqk6j3u17kup1v,4high2xnae54bgy8uo8l,2fszplq14htpcot834ub,34590054l8augnzpbpg3,hngl5xiis36lbp2xh4fa,ajrr6krdpalzfvg0e7l9
+      Set-Cookie:
+      - __profilin=p%3Dt; path=/; HttpOnly; SameSite=Lax
+      Transfer-Encoding:
+      - chunked
+    body:
+      encoding: UTF-8
+      string: '{"name":"Piano_brokencrash-Brandondorf-1164520478.mp3","asset":"Piano_brokencrash-Brandondorf-1164520478.mp3","md5":"A4FFA621BC8334B4C7F058161BDBABBF","content_type":"audio/mpeg","filesize":134899,"description":null,"rating":null,"nsfw":false,"peepy":false,"created_at":"2015-05-14T05:40:25.870Z","updated_at":"2022-01-31T19:31:04.054Z","folder_id":null,"info_url":null,"bucket_id":2,"duration":0,"ext_id":null,"data_source_id":null,"release_id":null,"year":null,"release_pos":null,"num_plays":0,"state":"completed","bucket_uuid":"3b746ff6-82b3-4340-a745-ae6d5d375381"}'
+  recorded_at: Mon, 31 Jan 2022 19:49:23 GMT
+- request:
+    method: post
+    uri: "<EIVU_SERVER_HOST>/api/v1/cloud_files/A4FFA621BC8334B4C7F058161BDBABBF/transfer"
+    body:
+      encoding: UTF-8
+      string: content_type=audio%2Fmpeg&asset=Piano_brokencrash-Brandondorf-1164520478.mp3&filesize=134899
+    headers:
+      Accept:
+      - "*/*"
+      User-Agent:
+      - rest-client/2.1.0 (darwin20 x86_64) ruby/3.0.2p107
+      Authorization:
+      - Token <EIVU_USER_TOKEN>
+      Content-Length:
+      - '92'
+      Content-Type:
+      - application/x-www-form-urlencoded
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Host:
+      - localhost:3000
+  response:
+    status:
+      code: 422
+      message: Unprocessable Entity
+    headers:
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Xss-Protection:
+      - 1; mode=block
+      X-Content-Type-Options:
+      - nosniff
+      X-Download-Options:
+      - noopen
+      X-Permitted-Cross-Domain-Policies:
+      - none
+      Referrer-Policy:
+      - strict-origin-when-cross-origin
+      Content-Type:
+      - application/json; charset=utf-8
+      Cache-Control:
+      - no-cache
+      X-Request-Id:
+      - 7fa1a3b5-a00c-4969-bfdc-11dad1d08b44
+      X-Runtime:
+      - '0.024844'
+      Server-Timing:
+      - start_processing.action_controller;dur=0.2421875, sql.active_record;dur=4.7412109375,
+        instantiation.active_record;dur=0.268310546875, process_action.action_controller;dur=9.616943359375
+      Vary:
+      - Origin
+      Set-Cookie:
+      - __profilin=p%3Dt; path=/; HttpOnly; SameSite=Lax
+      Transfer-Encoding:
+      - chunked
+    body:
+      encoding: UTF-8
+      string: '{"message":"md5 is not for a reserved file"}'
+  recorded_at: Mon, 31 Jan 2022 19:49:23 GMT
+recorded_with: VCR 6.0.0
