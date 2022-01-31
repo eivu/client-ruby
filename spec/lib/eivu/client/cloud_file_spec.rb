@@ -48,6 +48,16 @@ describe Eivu::Client::CloudFile, vcr: true do
         end
       end
     end
+
+    context 'when md5 DOES exist' do
+      let(:path_to_file) { File.expand_path('../../../fixtures/samples/mov_bbb.mp4', __dir__) }
+
+      it 'raises an error' do
+        aggregate_failures do
+          expect{ instance }.to raise_error(RestClient::UnprocessableEntity)
+        end
+      end
+    end
   end
 
 
