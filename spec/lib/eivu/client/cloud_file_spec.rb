@@ -37,16 +37,13 @@ describe Eivu::Client::CloudFile, vcr: true do
 
     context 'when md5 does not exist' do
       let(:md5) { 'F45C04D717F3ED6720AE0A3A67981FE4' }
-      let(:path_to_file) { File.expand_path('../../../../fixtures/samples/test.mp3', __FILE__) }
+      let(:path_to_file) { File.expand_path('../../../fixtures/samples/test.mp3', __dir__) }
 
-      it 'returns a CloudFile instance' do
-        expect(instance).to be_kind_of(described_class)
-      end
-
-      it 'has the correct attributes' do
+      it 'returns the proper object' do
         aggregate_failures do
+          expect(instance).to be_kind_of(described_class)
           expect(instance.md5).to eq(md5)
-          expect(instance.bucket_uuid).to eq(bucket_uuid)
+          expect(instance.bucket_id).to eq(bucket_id)
           expect(instance.state).to eq('reserved')
         end
       end
