@@ -35,7 +35,7 @@ module Eivu
         def fetch(md5)
           response = RestClient.get(
             "#{Eivu::Client.configuration.host}/api/v1/cloud_files/#{md5}",
-            {'Authorization' => "Token #{Eivu::Client.configuration.user_token}"}
+            { 'Authorization' => "Token #{Eivu::Client.configuration.user_token}" }
           )
 
           if response.code != 200
@@ -45,8 +45,12 @@ module Eivu
           CloudFile.new Oj.load(response.body).symbolize_keys
         end
 
+        def generate_md5(path_to_file)
+          Digest::MD5.file(path_to_file).hexdigest.upcase
+        end
+
         def reserve(bucket_id:, path_to_file:, peepy: false, nsfw: false)
-          md5      = Digest::MD5.file(path_to_file).hexdigest.upcase
+          md5      = generate_md5(path_to_file)
           payload  = { bucket_id: bucket_id, peepy: peepy, nsfw: nsfw }
           response = post_request(action: :reserve, md5: md5, payload: payload)
           CloudFile.new Oj.load(response.body).symbolize_keys
@@ -78,7 +82,16 @@ module Eivu
 
       def write_to_s3; end
 
-      def transfer(content_type:, asset:, filesize:); end
+      def transfer(path_to_file)
+        asset    = File.basename(path_to_file)
+        mime     = MimeMagic.by_magic(File.open(path_to_file))
+        filesize = File.size(path_to_file)
+        payload  = { content_type: mime.type, asset: asset, filesize: filesize }
+        # will raise an error if there is a problem
+        post_request(action: :transfer, md5: md5, payload: payload)
+
+        binding.pry
+      end
 
       def complete(year: nil, rating: nil, release_pos: nil, metadata_list: {}, matched_recording: nil); end
 
@@ -93,6 +106,10 @@ module Eivu
       end
 
       private
+
+      def post_request(action:, payload:)
+        CloudFile.post_request(action: action, md5: md5, payload: payload)
+      end
 
       def sanitize(name)
         name = name.tr('\\', '/') # work-around for IE

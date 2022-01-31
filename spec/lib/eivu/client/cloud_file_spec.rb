@@ -4,6 +4,34 @@ describe Eivu::Client::CloudFile, vcr: true do
   let(:bucket_uuid) { '3b746ff6-82b3-4340-a745-ae6d5d375381' }
   let(:bucket_id) { 2 }
 
+  describe '.generate_md5' do
+    subject(:md5) { described_class.generate_md5(path_to_file) }
+
+    context 'test.mp3' do 
+      let(:path_to_file) { File.expand_path('../../../fixtures/samples/test.mp3', __dir__) }
+
+      it 'returns the correct md5' do
+        expect(md5).to eq('F45C04D717F3ED6720AE0A3A67981FE4')
+      end
+    end
+
+    context 'sample_640x360_beach.flv' do 
+      let(:path_to_file) { File.expand_path('../../../fixtures/samples/sample_640x360_beach.flv', __dir__) }
+
+      it 'returns the correct md5' do
+        expect(md5).to eq('288C872C9F2AE7231847A083A3C74366')
+      end
+    end
+
+    context 'mov_bbb.mp4' do 
+      let(:path_to_file) { File.expand_path('../../../fixtures/samples/mov_bbb.mp4', __dir__) }
+
+      it 'returns the correct md5' do
+        expect(md5).to eq('198918F40ECC7CAB0FC4231ADAF67C96')
+      end
+    end
+  end
+
   describe '.fetch' do
     subject(:instance) { described_class.fetch(md5) }
 
@@ -33,7 +61,7 @@ describe Eivu::Client::CloudFile, vcr: true do
   end
 
   describe '.reserve' do
-    subject(:instance) { described_class.reserve(bucket_id: bucket_id, path_to_file: path_to_file) }
+    subject(:reservation) { described_class.reserve(bucket_id: bucket_id, path_to_file: path_to_file) }
 
     context 'when md5 does not exist' do
       let(:md5) { 'F45C04D717F3ED6720AE0A3A67981FE4' }
@@ -41,24 +69,39 @@ describe Eivu::Client::CloudFile, vcr: true do
 
       it 'returns the proper object' do
         aggregate_failures do
-          expect(instance).to be_kind_of(described_class)
-          expect(instance.md5).to eq(md5)
-          expect(instance.bucket_id).to eq(bucket_id)
-          expect(instance.state).to eq('reserved')
+          expect(reservation).to be_kind_of(described_class)
+          expect(reservation.md5).to eq(md5)
+          expect(reservation.bucket_id).to eq(bucket_id)
+          expect(reservation.state).to eq('reserved')
         end
       end
     end
 
-    context 'when md5 DOES exist' do
+    context 'when md5 DOES exist, so it can not be reserved' do
       let(:path_to_file) { File.expand_path('../../../fixtures/samples/mov_bbb.mp4', __dir__) }
 
       it 'raises an error' do
         aggregate_failures do
-          expect{ instance }.to raise_error(RestClient::UnprocessableEntity)
+          expect{ reservation }.to raise_error(RestClient::UnprocessableEntity)
         end
       end
     end
   end
+
+  # describe '#transfer' do
+  #   subject(:transference) { instance.transfer(path_to_file: path_to_file) }
+
+  #   let(:instance) { described_class.fetch(md5) }
+  #   let(:md5) { generate_md5(path_to_file) }
+
+
+  #   context 'when working with a reserved file' do
+  #     let(:path_to_file) { File.expand_path('../../../fixtures/samples/test.mp3', __dir__) }
+
+  #     it 'returns the proper object' do
+  #     end
+  #   end
+  # end
 
 
 
