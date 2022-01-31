@@ -1,6 +1,9 @@
 # frozen_string_literal: true
 
 describe Eivu::Client::CloudFile, vcr: true do
+  let(:bucket_uuid) { '3b746ff6-82b3-4340-a745-ae6d5d375381' }
+  let(:bucket_id) { 2 }
+
   describe '.fetch' do
     subject(:instance) { described_class.fetch(md5) }
 
@@ -15,7 +18,7 @@ describe Eivu::Client::CloudFile, vcr: true do
         aggregate_failures do
           expect(instance.md5).to eq(md5)
           expect(instance.name).to eq('Piano_brokencrash-Brandondorf-1164520478.mp3')
-          expect(instance.bucket_uuid).to eq('3b746ff6-82b3-4340-a745-ae6d5d375381')
+          # expect(instance.bucket_uuid).to eq(bucket_uuid)
         end
       end
     end
@@ -30,12 +33,23 @@ describe Eivu::Client::CloudFile, vcr: true do
   end
 
   describe '.reserve' do
-    subject(:instance) { described_class.reserve(bucket_id: 1, fullpath: fullpath) }
+    subject(:instance) { described_class.reserve(bucket_id: bucket_id, path_to_file: path_to_file) }
 
-
-    
     context 'when md5 does not exist' do
-      let(:md5) { '00000000000000000000000000000000' }
+      let(:md5) { 'F45C04D717F3ED6720AE0A3A67981FE4' }
+      let(:path_to_file) { File.expand_path('../../../../fixtures/samples/test.mp3', __FILE__) }
+
+      it 'returns a CloudFile instance' do
+        expect(instance).to be_kind_of(described_class)
+      end
+
+      it 'has the correct attributes' do
+        aggregate_failures do
+          expect(instance.md5).to eq(md5)
+          expect(instance.bucket_uuid).to eq(bucket_uuid)
+          expect(instance.state).to eq('reserved')
+        end
+      end
     end
   end
 

@@ -10,6 +10,7 @@ module Eivu
     class CloudFile < Dry::Struct
       attribute  :md5, Types::String
       attribute  :state, Types::String
+      attribute? :bucket_id, Types::Coercible::Integer
       # attribute  :created_at, Types::Coercible::DateTime
       # attribute  :updated_at, Types::Coercible::DateTime
       attribute? :name, Types::String.optional
@@ -21,7 +22,6 @@ module Eivu
       attribute? :nsfw, Types::Bool.default(false)
       attribute? :peepy, Types::Bool.default(false)
       attribute? :folder_id, Types::Coercible::Integer.optional
-      attribute? :bucket_id, Types::Coercible::Integer.optional
       attribute? :ext_id, Types::Coercible::Integer.optional
       attribute? :data_source_id, Types::Coercible::Integer.optional
       attribute? :release_id, Types::Coercible::Integer.optional
@@ -45,16 +45,29 @@ module Eivu
           CloudFile.new Oj.load(response.body).symbolize_keys
         end
 
-        def reserve(bucket_id:, fullpath:, peepy: false, nsfw: false)
-          payload = { bucket_id: bucket_id, fullpath: fullpath, peepy: peepy, nsfw: nsfw }
-          response = post_request(action: :reserve, payload: payload)
+        def reserve(bucket_id:, path_to_file:, peepy: false, nsfw: false)
+          md5      = Digest::MD5.file(path_to_file).hexdigest.upcase
+          payload  = { bucket_id: bucket_id, peepy: peepy, nsfw: nsfw }
+          response = post_request(action: :reserve, md5: md5, payload: payload)
+          CloudFile.new Oj.load(response.body).symbolize_keys
+        end
+
+        private
+
+        def post_request(action:, md5:, payload:)
+          response = RestClient.post(
+            "#{Eivu::Client.configuration.host}/api/v1/cloud_files/#{md5}/#{action}",
+            payload,
+            { 'Authorization' => "Token #{Eivu::Client.configuration.user_token}" }
+          )
 
           if response.code != 200
             raise Errors::Connection, "Failed to connected received: #{response.code}"
           end
 
-          CloudFile.new Oj.load(response.body).symbolize_keys
+          response
         end
+
       end
 
       def online?(uri)
@@ -80,21 +93,6 @@ module Eivu
       end
 
       private
-
-      def post_request(action:, md5:, payload:)
-        response = RestClient.post(
-          "#{Eivu::Client.configuration.host}/api/v1/cloud_files/#{md5}/#{action}",
-          payload,
-          { 'Authorization' => "Token #{Eivu::Client.configuration.user_token}" }
-        )
-
-        if response.code != 200
-          raise Errors::Connection, "Failed to connected received: #{response.code}"
-        end
-
-        response
-      end
-
 
       def sanitize(name)
         name = name.tr('\\', '/') # work-around for IE
