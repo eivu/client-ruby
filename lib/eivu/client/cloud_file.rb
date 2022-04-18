@@ -11,8 +11,8 @@ module Eivu
       attribute  :md5, Types::String
       attribute  :state, Types::String
       attribute? :bucket_id, Types::Coercible::Integer
-      # attribute  :created_at, Types::Coercible::DateTime
-      # attribute  :updated_at, Types::Coercible::DateTime
+      attribute  :created_at, Types::JSON::DateTime
+      attribute  :updated_at, Types::JSON::DateTime
       attribute? :name, Types::String.optional
       attribute? :asset, Types::String.optional
       attribute? :content_type, Types::String.optional
@@ -30,7 +30,7 @@ module Eivu
       attribute? :year, Types::Coercible::Integer.optional
       attribute? :duration, Types::Coercible::Integer.optional
       attribute? :info_url, Types::String.optional
-      attribute? :metadata, Types::Strict::Array.of(Types::Hash)
+      attribute? :metadata, Types::JSON::Array.of(Types::JSON::Hash)
 
       class << self
         def fetch(md5)
