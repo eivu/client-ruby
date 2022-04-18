@@ -30,6 +30,7 @@ module Eivu
       attribute? :year, Types::Coercible::Integer.optional
       attribute? :duration, Types::Coercible::Integer.optional
       attribute? :info_url, Types::String.optional
+      attribute? :metadata, Types::Strict::Array.of(Types::Hash)
 
       class << self
         def fetch(md5)
@@ -67,10 +68,9 @@ module Eivu
             raise Errors::Connection, "Failed to connected received: #{response.code}"
           end
 
-          Oj.load(response.body).symbolize_keys
+          Oj.load(response.body).deep_symbolize_keys
         end
       end
-
 
       def transfer(path_to_file:)
         asset       = File.basename(path_to_file)
@@ -82,7 +82,12 @@ module Eivu
         CloudFile.new parsed_body
       end
 
-      def complete(year: nil, rating: nil, release_pos: nil, metadata_list: {}, matched_recording: nil); end
+      def complete(year: nil, rating: nil, release_pos: nil, metadata_list: {}, matched_recording: nil)
+        matched_recording.nil? # trying to avoid rubocop error
+        payload = { year: year, rating: rating, release_pos: release_pos, metadata_list: metadata_list }
+        parsed_body = post_request(action: :complete, payload: payload)
+        CloudFile.new parsed_body
+      end
 
       def visit
         system "open #{url}"

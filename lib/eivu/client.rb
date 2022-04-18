@@ -6,7 +6,6 @@ require 'oj'
 
 module Eivu
   class Client
-
     module Types
       include Dry.Types()
     end

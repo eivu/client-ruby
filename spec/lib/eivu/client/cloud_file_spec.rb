@@ -116,9 +116,42 @@ describe Eivu::Client::CloudFile, vcr: true do
       let(:path_to_file) { File.expand_path('../../../fixtures/samples/Piano_brokencrash-Brandondorf-1164520478.mp3', __dir__) }
 
       it 'will raise an exception' do
-        expect { transference } .to raise_error(RestClient::UnprocessableEntity)
+        expect { transference }.to raise_error(RestClient::UnprocessableEntity)
       end
     end
+  end
+
+  describe '#complete' do
+    subject(:completion) { instance.complete(year: year, rating: rating, release_pos: release_pos, metadata_list: metadata_list) }
+
+    let(:instance) { described_class.fetch(md5) }
+    let(:md5) { described_class.generate_md5(path_to_file) }
+    let(:year) { 2019 }
+    let(:rating) { 4.37 }
+    let(:release_pos) { 1 }
+    let(:metadata_list) { [{ name: 'title'}, { genre: 'sample' }, { performer: 'aws' }, { performer: 'Polly' } ] }
+
+    context 'when working with a transfered file' do
+      let(:path_to_file) { File.expand_path('../../../fixtures/samples/test.mp3', __dir__) }
+
+      it 'has the correct attributes' do
+        aggregate_failures do
+          expect(completion.year).to eq(year)
+          expect(completion.rating).to eq(rating)
+          expect(completion.release_pos).to eq(release_pos)
+          expect(completion.metadata).to eq(metadata_list)
+          expect(completion.state).to eq('completed')
+        end
+      end
+    end
+
+    # context 'when working with a file NOT transfered' do
+    #   let(:path_to_file) { File.expand_path('../../../fixtures/samples/Piano_brokencrash-Brandondorf-1164520478.mp3', __dir__) }
+
+    #   it 'will raise an exception' do
+    #     expect { completion }.to raise_error(RestClient::UnprocessableEntity)
+    #   end
+    # end
   end
 
 
