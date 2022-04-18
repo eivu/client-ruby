@@ -36,7 +36,6 @@ module Eivu
 
     def ingest!(path_to_dir:)
       Folder.traverse(path_to_dir) do |path_to_item|
-
         upload(path_to_item)
       end
     end
