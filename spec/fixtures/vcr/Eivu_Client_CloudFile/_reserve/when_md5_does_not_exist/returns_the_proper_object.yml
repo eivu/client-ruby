@@ -5,7 +5,7 @@ http_interactions:
     uri: "<EIVU_SERVER_HOST>/api/v1/cloud_files/F45C04D717F3ED6720AE0A3A67981FE4/reserve"
     body:
       encoding: UTF-8
-      string: bucket_id=2&peepy=false&nsfw=false
+      string: bucket_name=eivutest&peepy=false&nsfw=false
     headers:
       Accept:
       - "*/*"
@@ -14,7 +14,7 @@ http_interactions:
       Authorization:
       - Token <EIVU_USER_TOKEN>
       Content-Length:
-      - '34'
+      - '43'
       Content-Type:
       - application/x-www-form-urlencoded
       Accept-Encoding:
@@ -43,25 +43,25 @@ http_interactions:
       Cache-Control:
       - no-store, must-revalidate, private, max-age=0
       X-Request-Id:
-      - 615fe2d8-e866-458a-a643-1e0cafca9bbb
+      - 47234aca-3965-4d30-a1e3-9b4c0634dfee
       X-Runtime:
-      - '0.047259'
+      - '0.120424'
       Server-Timing:
-      - start_processing.action_controller;dur=0.224853515625, sql.active_record;dur=21.429931640625,
-        instantiation.active_record;dur=0.052978515625, unpermitted_parameters.action_controller;dur=1.44970703125,
-        process_action.action_controller;dur=31.698974609375
+      - start_processing.action_controller;dur=0.191162109375, sql.active_record;dur=47.409423828125,
+        instantiation.active_record;dur=0.364990234375, unpermitted_parameters.action_controller;dur=0.2177734375,
+        process_action.action_controller;dur=97.259033203125
       Vary:
       - Origin
       X-Miniprofiler-Original-Cache-Control:
       - max-age=0, private, must-revalidate
       X-Miniprofiler-Ids:
-      - i166y87cpam6tajs1l2f,y7r6s9pwiduf37ilssub,sdv9v9mqk6j3u17kup1v,4high2xnae54bgy8uo8l,2fszplq14htpcot834ub,34590054l8augnzpbpg3,hngl5xiis36lbp2xh4fa,ajrr6krdpalzfvg0e7l9,aup611xpiow7jkbsrhw7,ir0o5jvmq598ckx4acc4,m05rcy94t8tikfsi8ok9,h99a5p7ks8l312ws6ig0,vpgrxnd1padm0rhfug3y,j8odsxt57n4kynnilo8j,l1mvzai5jnd2cvlwfhgs,h351jv6j4xkj358gcjrc,mx7g98dwj96dlmx5x7or,jvfbn3wr9yff681ja3bz,irhbz98zq2xixmmkgppg,2olw46qus2en0bu83893
+      - ksqudrhwdu0g2un2srmu,29wu2fq4ln1g2bbt093o,l8oo5uktw462c13b7h4v,enes0yhs85fstxyrmnpl,5t0qov3asb3rzr453xd9,ruejgek82x3qp7b2vi0v,8wdtnnk8nfblppgpuejz,9wp4ja1mee6u798uvyk0,dl4wxklohsx3pbzj4j5s,j83k8tm99isllizv8dd,oqzz9drbv6u47vt52tt1,pp1cvfmijiia4u46novs,jt0qll768mtudwvt6y3x,nvvfmq16pun158llf341,9svvra2ucutiw74mole8,wjtkmy6koaule1vwxnaz,xuiy6uc67cxufrvzrf0t,pgw3iic1nz04lpgcr4j9,14mdjii4n6uqsqpdi7pp,78koamqekyvkyhma01cl
       Set-Cookie:
       - __profilin=p%3Dt; path=/; HttpOnly; SameSite=Lax
       Transfer-Encoding:
       - chunked
     body:
       encoding: UTF-8
-      string: '{"id":8,"name":null,"asset":null,"md5":"F45C04D717F3ED6720AE0A3A67981FE4","content_type":null,"filesize":0,"description":null,"rating":null,"nsfw":false,"peepy":false,"created_at":"2022-01-31T05:16:26.890Z","updated_at":"2022-01-31T05:16:26.890Z","folder_id":null,"info_url":null,"bucket_id":2,"duration":0,"settings":0,"ext_id":null,"data_source_id":null,"release_id":null,"year":null,"release_pos":null,"user_id":1,"num_plays":0,"state":"reserved"}'
-  recorded_at: Mon, 31 Jan 2022 05:16:26 GMT
+      string: '{"name":null,"asset":null,"md5":"F45C04D717F3ED6720AE0A3A67981FE4","content_type":null,"filesize":0,"description":null,"rating":null,"nsfw":false,"peepy":false,"created_at":"2022-04-24T06:00:40.543Z","updated_at":"2022-04-24T06:00:40.543Z","info_url":null,"duration":0,"ext_id":null,"data_source_id":null,"release_id":null,"year":null,"release_pos":null,"num_plays":0,"state":"reserved","bucket_uuid":"3b746ff6-82b3-4340-a745-ae6d5d375381","bucket_name":"eivutest","user_uuid":"1bf23eff-c27f-444e-96a9-6f25a6b98674","folder_uuid":null,"metadata":[]}'
+  recorded_at: Sun, 24 Apr 2022 06:00:40 GMT
 recorded_with: VCR 6.0.0

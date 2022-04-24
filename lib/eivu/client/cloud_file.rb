@@ -10,7 +10,8 @@ module Eivu
     class CloudFile < Dry::Struct
       attribute  :md5, Types::String
       attribute  :state, Types::String
-      attribute? :bucket_id, Types::Coercible::Integer
+      attribute? :bucket_uuid, Types::String
+      attribute? :bucket_name, Types::String
       attribute  :created_at, Types::JSON::DateTime
       attribute  :updated_at, Types::JSON::DateTime
       attribute? :name, Types::String.optional
