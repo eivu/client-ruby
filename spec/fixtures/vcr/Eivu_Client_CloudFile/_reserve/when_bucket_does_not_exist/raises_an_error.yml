@@ -5,7 +5,7 @@ http_interactions:
     uri: "<EIVU_SERVER_HOST>/api/v1/cloud_files/198918F40ECC7CAB0FC4231ADAF67C96/reserve"
     body:
       encoding: UTF-8
-      string: bucket_name=eivutest&peepy=false&nsfw=false
+      string: bucket_name=not-a-bucket&peepy=false&nsfw=false
     headers:
       Accept:
       - "*/*"
@@ -14,7 +14,7 @@ http_interactions:
       Authorization:
       - Token <EIVU_USER_TOKEN>
       Content-Length:
-      - '43'
+      - '47'
       Content-Type:
       - application/x-www-form-urlencoded
       Accept-Encoding:
@@ -23,8 +23,8 @@ http_interactions:
       - localhost:3000
   response:
     status:
-      code: 422
-      message: Unprocessable Entity
+      code: 400
+      message: Bad Request
     headers:
       X-Frame-Options:
       - SAMEORIGIN
@@ -43,13 +43,12 @@ http_interactions:
       Cache-Control:
       - no-cache
       X-Request-Id:
-      - 72c63b6a-ecf4-4e91-a709-860903f3008a
+      - 9d238684-73b6-4d83-a1b4-cbf51519188d
       X-Runtime:
-      - '0.038139'
+      - '0.040311'
       Server-Timing:
-      - start_processing.action_controller;dur=0.28271484375, sql.active_record;dur=17.41015625,
-        instantiation.active_record;dur=0.14990234375, unpermitted_parameters.action_controller;dur=0.091796875,
-        process_action.action_controller;dur=22.449951171875
+      - start_processing.action_controller;dur=0.197021484375, sql.active_record;dur=4.621826171875,
+        instantiation.active_record;dur=0.397216796875, process_action.action_controller;dur=10.52587890625
       Vary:
       - Origin
       Set-Cookie:
@@ -58,6 +57,6 @@ http_interactions:
       - chunked
     body:
       encoding: UTF-8
-      string: '{"message":"md5 already exists in this folder"}'
-  recorded_at: Sun, 24 Apr 2022 05:55:07 GMT
+      string: '{"message":"bucket does exist"}'
+  recorded_at: Sun, 24 Apr 2022 05:55:33 GMT
 recorded_with: VCR 6.0.0

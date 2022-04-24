@@ -50,9 +50,9 @@ module Eivu
           Digest::MD5.file(path_to_file).hexdigest.upcase
         end
 
-        def reserve(bucket_id:, path_to_file:, peepy: false, nsfw: false)
+        def reserve(bucket_name:, path_to_file:, peepy: false, nsfw: false)
           md5         = generate_md5(path_to_file)
-          payload     = { bucket_id: bucket_id, peepy: peepy, nsfw: nsfw }
+          payload     = { bucket_name: bucket_name, peepy: peepy, nsfw: nsfw }
           parsed_body = post_request(action: :reserve, md5: md5, payload: payload)
           CloudFile.new parsed_body
         end

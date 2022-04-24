@@ -2,7 +2,7 @@
 
 describe Eivu::Client::CloudFile, vcr: true do
   let(:bucket_uuid) { '3b746ff6-82b3-4340-a745-ae6d5d375381' }
-  let(:bucket_id) { 2 }
+  let(:bucket_name) { 'eivutest' }
 
   describe '.generate_md5' do
     subject(:md5) { described_class.generate_md5(path_to_file) }
@@ -61,7 +61,7 @@ describe Eivu::Client::CloudFile, vcr: true do
   end
 
   describe '.reserve' do
-    subject(:reservation) { described_class.reserve(bucket_id: bucket_id, path_to_file: path_to_file) }
+    subject(:reservation) { described_class.reserve(bucket_name: bucket_name, path_to_file: path_to_file) }
 
     context 'when md5 does not exist' do
       let(:md5) { 'F45C04D717F3ED6720AE0A3A67981FE4' }
@@ -71,7 +71,7 @@ describe Eivu::Client::CloudFile, vcr: true do
         aggregate_failures do
           expect(reservation).to be_kind_of(described_class)
           expect(reservation.md5).to eq(md5)
-          expect(reservation.bucket_id).to eq(bucket_id)
+          expect(reservation.bucket_name).to eq(bucket_name)
           expect(reservation.state).to eq('reserved')
         end
       end
@@ -83,6 +83,17 @@ describe Eivu::Client::CloudFile, vcr: true do
       it 'raises an error' do
         aggregate_failures do
           expect{ reservation }.to raise_error(RestClient::UnprocessableEntity)
+        end
+      end
+    end
+
+    context 'when bucket does not exist' do
+      let(:bucket_name) { 'not-a-bucket' }
+      let(:path_to_file) { File.expand_path('../../../fixtures/samples/mov_bbb.mp4', __dir__) }
+
+      it 'raises an error' do
+        aggregate_failures do
+          expect{ reservation }.to raise_error(RestClient::BadRequest)
         end
       end
     end
