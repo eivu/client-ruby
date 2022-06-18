@@ -1,3 +1,7 @@
+=begin
+  require './lib/eivu'; Eivu::Client.new.upload path_to_file: '/Users/jinx/Desktop/foo.json'
+=end
+endrequire './lib/eivu'; Eivu::Client.new.upload path_to_file: '/Users/jinx/Desktop/foo.json'
 # Client.new(itunes_path:"/Users/jinx/Music/iTunes/iTunes\ Music\ Library.xml")
 
 class Client
