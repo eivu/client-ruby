@@ -3,6 +3,8 @@
 describe Eivu::Client::CloudFile, vcr: true do
   let(:bucket_uuid) { '3b746ff6-82b3-4340-a745-ae6d5d375381' }
   let(:bucket_name) { 'eivutest' }
+  let(:peepy) { false }
+  let(:nsfw) { false }
 
   describe '.generate_md5' do
     subject(:md5) { described_class.generate_md5(path_to_file) }
@@ -164,6 +166,36 @@ describe Eivu::Client::CloudFile, vcr: true do
     #   end
     # end
   end
+
+  describe '#write_to_s3' do
+    subject(:write_to_s3) { cloud_file.write_to_s3(s3_resource, path_to_file) }
+
+    let(:s3_resource) { double('Aws::S3::Resource') }
+    let(:bucket) { double('Aws::S3::Bucket') }
+    let(:cloud_file) {
+      # build :cloud_file, :reserved, bucket_name: bucket_name, path_to_file: path_to_file, peepy: peepy, nsfw: nsfw
+      Eivu::Client::CloudFile.new md5: Faker::Crypto.md5, state: 'reserved', created_at: Time.now.to_s, updated_at: Time.now.to_s, bucket_name: bucket_name, path_to_file: path_to_file
+    }
+    let(:object) { double('Aws::S3::Object') }
+    let(:path_to_file) { File.expand_path('../../../fixtures/samples/test.mp3', __dir__) }
+
+    before do
+      expect(s3_resource).to receive(:bucket).with(bucket_name).and_return(bucket)
+      expect(bucket).to receive(:object).with(path_to_file)
+      expect(object).to receive(:upload_file).with(path_to_file, acl: 'public-read', content_type: kind_of(String), metadata: {})
+    end
+
+    it 'writes the file to S3' do
+      write_to_s3
+    end
+
+    # it 'does the thing' do
+    #   expect(resource).to receive_message_chain(:bucket, :object).with(bucket_name).with('PATH PRAM FOR CREATE OBJECT').and_return(object)
+    #   expect(object).to receive(:create_object).with('eivutest/F4/5C/04/D7/17/F3/ED/67/20/AE/0A/3A/67/98/1F/E4')
+    #   expect(object).to receive(:upload_file).with(path_to_file, acl: 'public-read', content_type: 'audio/mpeg', metadata: {})
+    # end
+  end
+
 
 
 

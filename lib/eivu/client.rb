@@ -12,27 +12,33 @@ module Eivu
 
     class << self
       attr_accessor :configuration
+
+      def configuration
+        @configuration ||= Configuration.new
+      end
+
+      def reset
+        configuration.access_key_id = nil
+        configuration.secret_key    = nil
+        configuration.bucket_name   = nil
+        configuration.region        = nil
+        configuration.user_token    = nil
+        configuration.host          = nil
+        configuration
+      end
+
+      def configure
+        yield(configuration)
+      end
     end
 
-    def self.configuration
-      @configuration ||= Configuration.new
+    def upload(path_to_file:, peepy: false, nsfw: false)
+      cloud_file = CloudFile.reserve(bucket_name: configuration.bucket_name, path_to_file: path_to_file, peepy: peepy, nsfw: nsfw)
+      s3_resource = instantiate_s3_resource
+      cloud_file.write_to_s3(s3_resource, path_to_file)
+      cloud_file.transfer(path_to_file: path_to_file)
+      cloud_file.complete(year: nil, rating: nil, release_pos: nil, metadata_list: {}, matched_recording: nil)
     end
-
-    def self.reset
-      configuration.access_key_id = nil
-      configuration.secret_key    = nil
-      configuration.bucket_name   = nil
-      configuration.region        = nil
-      configuration.user_token    = nil
-      configuration.host          = nil
-      configuration
-    end
-
-    def self.configure
-      yield(configuration)
-    end
-
-    def write_to_s3; end
 
     def ingest!(path_to_dir:)
       Folder.traverse(path_to_dir) do |path_to_item|
@@ -40,15 +46,18 @@ module Eivu
       end
     end
 
+    def configuration
+      @configuration ||= self.class.configuration
+    end
+
     private
 
-    def sanitize(name)
-      name = name.tr('\\', '/') # work-around for IE
-      name = File.basename(name)
-      name = name.gsub(/[^a-zA-Z0-9\.\-\+_]/, "_")
-      name = "_#{name}" if name =~ /\A\.+\z/
-      name = 'unnamed' if name.size == 0
-      return name.mb_chars.to_s
+    def s3_credentials
+      @s3_credentials ||= Aws::Credentials.new(configuration.access_key_id, configuration.secret_key)
+    end
+
+    def instantiate_s3_resource
+      Aws::S3::Resource.new(credentials: s3_credentials, region: 'us-east-1')
     end
   end
 end

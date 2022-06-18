@@ -47,17 +47,6 @@ module Eivu
           CloudFile.new Oj.load(response.body).symbolize_keys
         end
 
-        def generate_md5(path_to_file)
-          Digest::MD5.file(path_to_file).hexdigest.upcase
-        end
-
-        def reserve(bucket_name:, path_to_file:, peepy: false, nsfw: false)
-          md5         = generate_md5(path_to_file)
-          payload     = { bucket_name: bucket_name, peepy: peepy, nsfw: nsfw }
-          parsed_body = post_request(action: :reserve, md5: md5, payload: payload)
-          CloudFile.new parsed_body
-        end
-
         def post_request(action:, md5:, payload:)
           response = RestClient.post(
             "#{Eivu::Client.configuration.host}/api/v1/cloud_files/#{md5}/#{action}",
@@ -70,6 +59,17 @@ module Eivu
           end
 
           Oj.load(response.body).deep_symbolize_keys
+        end
+
+        def generate_md5(path_to_file)
+          Digest::MD5.file(path_to_file).hexdigest.upcase
+        end
+
+        def reserve(bucket_name:, path_to_file:, peepy: false, nsfw: false)
+          md5         = generate_md5(path_to_file)
+          payload     = { bucket_name: bucket_name, peepy: peepy, nsfw: nsfw }
+          parsed_body = post_request(action: :reserve, md5: md5, payload: payload)
+          CloudFile.new parsed_body
         end
       end
 
@@ -94,7 +94,32 @@ module Eivu
         system "open #{url}"
       end
 
+      def write_to_s3(s3_resource, path_to_file)
+        # create file information for file on s3
+        store_dir = "#{s3_folder}/#{md5.scan(/.{2}|.+/).join('/')}"
+        filename  = File.basename(path_to_file)
+        mime      = MimeMagic.by_magic(file)
+        sanitized_filename = Eivu::Client::Utils.sanitize(filename)
+
+        # upload the file to s3
+        s3_resource.bucket(bucket_name).object(path)
+        obj = create_object("#{store_dir}/#{sanitized_filename}")
+        obj.upload_file(path_to_file, acl: 'public-read', content_type: mime.type, metadata: {})
+      end
+
       private
+
+      def s3_folder
+        if peepy
+          'peepshow'
+        else
+          content_type.to_s.split('/')&.first
+        end
+      end
+
+      def create_object(path)
+        s3_resource.bucket(bucket_name).object(path)
+      end
 
       def post_request(action:, payload:)
         self.class.post_request(action: action, md5: md5, payload: payload)

@@ -1,29 +1,52 @@
 # frozen_string_literal: true
 
 describe Eivu::Client do
-  # describe '.traverse' do
-  #   subject(:traversal) do
-  #     described_class.traverse(path) { |x| x }
-  #   end
+  let(:bucket_name) { 'my-bucket' }
 
-  #   context 'when path is a simple directory' do
-  #     let(:path) { 'lib/eivu/client' }
+  describe '#upload' do
+    subject(:uploading) { client.upload(path_to_file: path_to_file, peepy: peepy, nsfw: nsfw) }
+    let(:path_to_file) { File.expand_path('../../../fixtures/samples/test.mp3', __dir__) }
+    let(:peepy) { false }
+    let(:nsfw) { false }
+    let(:resource) { double('Aws::S3::Resource') }
+    let(:cloud_file) { build :cloud_file, :reserved, bucket_name: bucket_name, path_to_file: path_to_file, peepy: peepy, nsfw: nsfw }
+    let(:object) { double('Aws::S3::Object') }
 
-  #     it 'returns a list of files' do
-  #       expect(traversal).to eq(
-  #         %w[lib/eivu/client/cloud_file.rb lib/eivu/client/folder.rb]
-  #       )
-  #     end
-  #   end
+#     before do
+#       expect(Aws::S3::Resource).to receive(:new).and_return(resource)
+#       expect(CloudFile).to receive(:reserve).with(bucket_name: bucket_name, path_to_file: path_to_file, peepy: peepy, nsfw: nsfw).and_return(cloud_file)
+#       expect(resource).to receive_message_chain(:bucket, :object).with(bucket_name).with('PATH PRAM FOR CREATE OBJECT').and_return(object)
+#       # allow(bucket).to receive(:object).and_return(object)
+#       # allow(object).to receive(:upload_file)
 
-  #   context 'when path has many subfolders and files' do
-  #     let(:path) { 'lib' }
 
-  #     it 'returns a list of files' do
-  #       expect(traversal).to eq(
-  #         %w[lib/eivu/client/cloud_file.rb lib/eivu/client/folder.rb lib/eivu/client.rb lib/eivu.rb]
-  #       )
-  #     end
-  #   end
-  # end
+
+# def create_object(path)
+# s3_resource.bucket(bucket_name).object(path)
+# end
+
+# def write_to_s3(s3_resource, path_to_file)
+# # create file information for file on s3
+# store_dir = "#{s3_folder}/#{md5.scan(/.{2}|.+/).join('/')}"
+# filename  = File.basename(path_to_file)
+# mime      = MimeMagic.by_magic(file)
+# sanitized_filename = Eivu::Client::Utils.sanitize(filename)
+
+# # upload the file to s3
+# s3_resource.bucket(bucket_name).object(path)
+# obj = create_object("#{store_dir}/#{sanitized_filename}")
+# obj.upload_file(path_to_file, acl: 'public-read', content_type: mime.type, metadata: {})
+
+#     end
+
+#     it 'does stuff' do
+
+#     end
+#   end
+#       cloud_file = CloudFile.reserve(bucket_name: bucket_name, path_to_file: path_to_file, peepy: peepy, nsfw: nsfw)
+#       s3_resource = instantiate_s3_resource
+#       cloud_file.write_to_s3(s3_resource, path_to_file)
+#       cloud_file.transfer(path_to_file: path_to_file)
+#       cloud_file.complete(year: nil, rating: nil, release_pos: nil, metadata_list: {}, matched_recording: nil)
+#     end
 end
