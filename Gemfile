@@ -12,7 +12,7 @@ gem 'nokogiri', '~> 1.13', '>= 1.13.4' # xml parser
 gem 'oj', '~> 3.3', '>= 3.3.5' # faster json parsing
 gem 'pry', '~> 0.14.1' # Debugger
 gem 'rest-client', '~> 2.1' # A simple HTTP and REST client for Ruby, inspired by the Sinatra microframework style of specifying actions
-gem 'rspec', '~> 3.10' # testing lib
+gem 'rspec', '~> 3.11' # testing lib
 gem 'vcr', '~> 6.0' # VCR for testing
 gem 'webmock', '~> 3.14' # WebMock allows stubbing HTTP requests and setting expectations on HTTP requests.
 gem 'zeitwerk', '~> 2.5', '>= 2.5.3' # ruby autoloder
