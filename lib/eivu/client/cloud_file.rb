@@ -73,11 +73,8 @@ module Eivu
         end
       end
 
-      def transfer(path_to_file:)
-        asset       = File.basename(path_to_file)
-        mime        = MimeMagic.by_magic(File.open(path_to_file))
-        filesize    = File.size(path_to_file)
-        payload     = { content_type: mime.type, asset: asset, filesize: filesize }
+      def transfer(content_type:, asset:, filesize:)
+        payload     = { content_type: content_type, asset: asset, filesize: filesize }
         # post_request will raise an error if there is a problem
         parsed_body = post_request(action: :transfer, payload: payload)
         CloudFile.new parsed_body
@@ -92,19 +89,6 @@ module Eivu
 
       def visit
         system "open #{url}"
-      end
-
-      def write_to_s3(s3_resource, path_to_file)
-        # create file information for file on s3
-        store_dir = "#{s3_folder}/#{md5.scan(/.{2}|.+/).join('/')}"
-        filename  = File.basename(path_to_file)
-        mime      = MimeMagic.by_magic(file)
-        sanitized_filename = Eivu::Client::Utils.sanitize(filename)
-
-        # upload the file to s3
-        s3_resource.bucket(bucket_name).object(path)
-        obj = create_object("#{store_dir}/#{sanitized_filename}")
-        obj.upload_file(path_to_file, acl: 'public-read', content_type: mime.type, metadata: {})
       end
 
       private

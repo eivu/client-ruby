@@ -102,12 +102,12 @@ describe Eivu::Client::CloudFile, vcr: true do
   end
 
   describe '#transfer' do
-    subject(:transference) { instance.transfer(path_to_file: path_to_file) }
+    subject(:transference) { instance.transfer(content_type: content_type, asset: asset, filesize: filesize) }
 
     let(:instance) { described_class.fetch(md5) }
     let(:md5) { described_class.generate_md5(path_to_file) }
     let(:asset) { File.basename(path_to_file) }
-    let(:mime) { MimeMagic.by_magic(File.open(path_to_file)) }
+    let(:content_type) { MimeMagic.by_magic(File.open(path_to_file)).type }
     let(:filesize) { File.size(path_to_file) }
 
     context 'when working with a reserved file' do
@@ -118,7 +118,7 @@ describe Eivu::Client::CloudFile, vcr: true do
           expect(transference).to be_kind_of(described_class)
           expect(transference.md5).to eq(md5)
           expect(transference.asset).to eq(File.basename(path_to_file))
-          expect(transference.content_type).to eq(mime.type)
+          expect(transference.content_type).to eq(content_type)
           expect(transference.filesize).to eq(filesize)
           expect(transference.state).to eq('transfered')
         end
@@ -166,92 +166,4 @@ describe Eivu::Client::CloudFile, vcr: true do
     #   end
     # end
   end
-
-  describe '#write_to_s3' do
-    subject(:write_to_s3) { cloud_file.write_to_s3(s3_resource, path_to_file) }
-
-    let(:s3_resource) { double('Aws::S3::Resource') }
-    let(:bucket) { double('Aws::S3::Bucket') }
-    let(:cloud_file) {
-      build :cloud_file, bucket_name: bucket_name, path_to_file: path_to_file, peepy: peepy, nsfw: nsfw
-    }
-    let(:object) { double('Aws::S3::Object') }
-    let(:path_to_file) { File.expand_path('../../../fixtures/samples/test.mp3', __dir__) }
-
-    before do
-      expect(s3_resource).to receive(:bucket).with(bucket_name).and_return(bucket)
-      expect(bucket).to receive(:object).with(path_to_file)
-      expect(object).to receive(:upload_file).with(path_to_file, acl: 'public-read', content_type: kind_of(String), metadata: {})
-    end
-
-    it 'writes the file to S3' do
-      write_to_s3
-    end
-
-    # it 'does the thing' do
-    #   expect(resource).to receive_message_chain(:bucket, :object).with(bucket_name).with('PATH PRAM FOR CREATE OBJECT').and_return(object)
-    #   expect(object).to receive(:create_object).with('eivutest/F4/5C/04/D7/17/F3/ED/67/20/AE/0A/3A/67/98/1F/E4')
-    #   expect(object).to receive(:upload_file).with(path_to_file, acl: 'public-read', content_type: 'audio/mpeg', metadata: {})
-    # end
-  end
-
-
-
-
-# reserve(md5:, bucket_id:, fullpath:, peepy: nil, nsfw: nil); end
-# {"id"=>285, "name"=>"Piano_brokencrash-Brandondorf-1164520478.mp3", "asset"=>"Piano_brokencrash-Brandondorf-1164520478.mp3", "md5"=>"A4FFA621BC8334B4C7F058161BDBABBF", "content_type"=>"audio/mpeg", "filesize"=>134899, "description"=>nil, "rating"=>nil, "nsfw"=>false, "peepy"=>false, "created_at"=>Thu, 14 May 2015 05:40:25.870345000 UTC +00:00, "updated_at"=>Thu, 14 May 2015 05:40:25.870345000 UTC +00:00, "folder_id"=>nil, "info_url"=>nil, "bucket_id"=>2, "duration"=>0, "settings"=>0, "ext_id"=>nil, "data_source_id"=>nil, "release_id"=>nil, "year"=>nil, "release_pos"=>nil, "user_id"=>nil, "num_plays"=>0, "state"=>"empty"}
-# md5= 'A4FFA621BC8334B4C7F058161BDBABBF'
-
-  # describe '.reserve' do
-  #   subject(:traversal) do
-  #     described_class.traverse(path) { |x| x }
-  #   end
-
-  #   context 'when path is a simple directory' do
-  #     let(:path) { 'lib/eivu/client' }
-
-  #     it 'returns a list of files' do
-  #       expect(traversal).to eq(
-  #         %w[lib/eivu/client/cloud_file.rb lib/eivu/client/folder.rb]
-  #       )
-  #     end
-  #   end
-
-  #   context 'when path has many subfolders and files' do
-  #     let(:path) { 'lib' }
-
-  #     it 'returns a list of files' do
-  #       expect(traversal).to eq(
-  #         %w[lib/eivu/client/cloud_file.rb lib/eivu/client/folder.rb lib/eivu/client.rb lib/eivu.rb]
-  #       )
-  #     end
-  #   end
-  # end
-  
-# {
-#   "name": "Piano_brokencrash-Brandondorf-1164520478.mp3",
-#   "asset": "Piano_brokencrash-Brandondorf-1164520478.mp3",
-#   "md5": "A4FFA621BC8334B4C7F058161BDBABBF",
-#   "content_type": "audio/mpeg",
-#   "filesize": 134899,
-#   "description": null,
-#   "rating": null,
-#   "nsfw": false,
-#   "peepy": false,
-#   "created_at": "2015-05-14T05:40:25.870Z",
-#   "updated_at": "2015-05-14T05:40:25.870Z",
-#   "folder_id": null,
-#   "info_url": null,
-#   "bucket_id": 2,
-#   "duration": 0,
-#   "ext_id": null,
-#   "data_source_id": null,
-#   "release_id": null,
-#   "year": null,
-#   "release_pos": null,
-#   "num_plays": 0,
-#   "state": "empty"
-# }
-
 end
-
