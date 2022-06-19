@@ -166,4 +166,34 @@ describe Eivu::Client::CloudFile, vcr: true do
     #   end
     # end
   end
+
+  describe '#s3_folder' do
+    subject(:s3_folder) { instance.s3_folder }
+
+    let(:md5) { 'F45C04D717F3ED6720AE0A3A67981FE4' }
+
+    context 'audio content' do
+      let(:instance) { build :cloud_file, :audio, md5: md5 }
+
+      it { is_expected.to eq('audio/f4/5c/04/d7/17/f3/ed/67/20/ae/0a/3a/67/98/1f/e4') }
+    end
+
+    context 'video content' do
+      let(:instance) { build :cloud_file, :video, md5: md5 }
+
+      it { is_expected.to eq('video/f4/5c/04/d7/17/f3/ed/67/20/ae/0a/3a/67/98/1f/e4') }
+    end
+
+    context 'other content' do
+      let(:instance) { build :cloud_file, :audio, md5: md5 }
+
+      it { is_expected.to eq('audio/f4/5c/04/d7/17/f3/ed/67/20/ae/0a/3a/67/98/1f/e4') }
+    end
+
+    context 'peepy content' do
+      let(:instance) { build :cloud_file, :audio, :peepy, md5: md5 }
+
+      it { is_expected.to eq('peepshow/f4/5c/04/d7/17/f3/ed/67/20/ae/0a/3a/67/98/1f/e4') }
+    end
+  end
 end

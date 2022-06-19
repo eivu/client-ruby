@@ -91,19 +91,18 @@ module Eivu
         system "open #{url}"
       end
 
-      private
-
       def s3_folder
-        if peepy
-          'peepshow'
-        else
-          content_type.to_s.split('/')&.first
-        end
+        folder =
+          if peepy
+            'peepshow'
+          else
+            content_type.to_s.split('/')&.first
+          end
+
+        "#{folder}/#{md5.scan(/.{2}|.+/).join('/')}".downcase
       end
 
-      def create_object(path)
-        s3_resource.bucket(bucket_name).object(path)
-      end
+      private
 
       def post_request(action:, payload:)
         self.class.post_request(action: action, md5: md5, payload: payload)
