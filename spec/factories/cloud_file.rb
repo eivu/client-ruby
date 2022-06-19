@@ -2,6 +2,8 @@
 
 FactoryBot.define do
   factory :cloud_file, class: Eivu::Client::CloudFile do
+    initialize_with  { new(attributes) }
+
     md5 { Faker::Crypto.md5 }
     bucket_uuid { SecureRandom.uuid }
     bucket_name { Faker::Name.name.downcase }

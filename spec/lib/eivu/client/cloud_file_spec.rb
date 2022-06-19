@@ -173,8 +173,7 @@ describe Eivu::Client::CloudFile, vcr: true do
     let(:s3_resource) { double('Aws::S3::Resource') }
     let(:bucket) { double('Aws::S3::Bucket') }
     let(:cloud_file) {
-      # build :cloud_file, :reserved, bucket_name: bucket_name, path_to_file: path_to_file, peepy: peepy, nsfw: nsfw
-      Eivu::Client::CloudFile.new md5: Faker::Crypto.md5, state: 'reserved', created_at: Time.now.to_s, updated_at: Time.now.to_s, bucket_name: bucket_name, path_to_file: path_to_file
+      build :cloud_file, bucket_name: bucket_name, path_to_file: path_to_file, peepy: peepy, nsfw: nsfw
     }
     let(:object) { double('Aws::S3::Object') }
     let(:path_to_file) { File.expand_path('../../../fixtures/samples/test.mp3', __dir__) }
