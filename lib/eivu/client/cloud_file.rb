@@ -99,7 +99,7 @@ module Eivu
             content_type.to_s.split('/')&.first
           end
 
-        "#{folder}/#{md5.scan(/.{2}|.+/).join('/')}".downcase
+        "#{folder}/#{md5.upcase.scan(/.{2}|.+/).join('/')}"
       end
 
       private

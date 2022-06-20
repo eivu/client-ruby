@@ -175,25 +175,25 @@ describe Eivu::Client::CloudFile, vcr: true do
     context 'audio content' do
       let(:instance) { build :cloud_file, :audio, md5: md5 }
 
-      it { is_expected.to eq('audio/f4/5c/04/d7/17/f3/ed/67/20/ae/0a/3a/67/98/1f/e4') }
+      it { is_expected.to eq('audio/F4/5C/04/D7/17/F3/ED/67/20/AE/0A/3A/67/98/1F/E4') }
     end
 
     context 'video content' do
       let(:instance) { build :cloud_file, :video, md5: md5 }
 
-      it { is_expected.to eq('video/f4/5c/04/d7/17/f3/ed/67/20/ae/0a/3a/67/98/1f/e4') }
+      it { is_expected.to eq('video/F4/5C/04/D7/17/F3/ED/67/20/AE/0A/3A/67/98/1F/E4') }
     end
 
     context 'other content' do
       let(:instance) { build :cloud_file, :audio, md5: md5 }
 
-      it { is_expected.to eq('audio/f4/5c/04/d7/17/f3/ed/67/20/ae/0a/3a/67/98/1f/e4') }
+      it { is_expected.to eq('audio/F4/5C/04/D7/17/F3/ED/67/20/AE/0A/3A/67/98/1F/E4') }
     end
 
     context 'peepy content' do
       let(:instance) { build :cloud_file, :audio, :peepy, md5: md5 }
 
-      it { is_expected.to eq('peepshow/f4/5c/04/d7/17/f3/ed/67/20/ae/0a/3a/67/98/1f/e4') }
+      it { is_expected.to eq('peepshow/F4/5C/04/D7/17/F3/ED/67/20/AE/0A/3A/67/98/1F/E4') }
     end
   end
 end
