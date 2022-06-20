@@ -78,6 +78,17 @@ describe Eivu::Client::Configuration do
   end
 
   context '#reset' do
+    after do
+      Eivu::Client.configure do |config|
+        config.access_key_id = ENV['EIVU_ACCESS_KEY_ID']
+        config.secret_key    = ENV['EIVU_SECRET_ACCESS_KEY']
+        config.bucket_name   = ENV['EIVU_BUCKET_NAME']
+        config.region        = ENV['EIVU_REGION']
+        config.user_token    = ENV['EIVU_USER_TOKEN']
+        config.host          = ENV['EIVU_SERVER_HOST']
+      end
+    end
+
     it 'resets configured values' do
       expect(Eivu::Client.configuration.access_key_id).to eq(access_key_id)
       expect(Eivu::Client.configuration.secret_key).to eq(secret_access_key)

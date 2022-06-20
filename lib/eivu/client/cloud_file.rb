@@ -76,8 +76,8 @@ module Eivu
         CloudFile.new parsed_body
       end
 
-      def complete(year: nil, rating: nil, release_pos: nil, metadata_list: {}, matched_recording: nil)
-        matched_recording.nil? # trying to avoid rubocop error
+      def complete(year: nil, rating: nil, release_pos: nil, metadata_list: [], matched_recording: nil)
+        matched_recording.nil? # trying to avoid rubocop error because it is not used yet
         payload = { year:, rating:, release_pos:, metadata_list: }
         parsed_body = post_request(action: :complete, payload:)
         CloudFile.new parsed_body

@@ -40,12 +40,13 @@ nsfw:)
       filesize    = File.size(path_to_file)
       s3_resource = instantiate_s3_resource
 
-      unless write_to_s3(s3_resource: s3_resource, s3_folder: cloud_file.s3_folder, path_to_file: path_to_file)
+      unless write_to_s3(s3_resource:, s3_folder: cloud_file.s3_folder, path_to_file:)
         raise Errors::CloudStorage::Connection, 'Failed to write to s3'
       end
 
+      metadata_list = [{original_local_path_to_file: path_to_file}]
       cloud_file.transfer(content_type: mime.type, asset:, filesize:)
-      cloud_file.complete(year: nil, rating: nil, release_pos: nil, metadata_list: {}, matched_recording: nil)
+      cloud_file.complete(year: nil, rating: nil, release_pos: nil, metadata_list:, matched_recording: nil)
     end
 
     def ingest!(path_to_dir:)

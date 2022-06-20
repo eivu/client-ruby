@@ -4,17 +4,6 @@ describe Eivu::Client do
   let(:bucket_name) { 'eivu-test' }
   let(:instance) { described_class.new }
 
-  before do
-    Eivu::Client.configure do |config|
-      config.access_key_id = ENV['EIVU_ACCESS_KEY_ID']
-      config.secret_key    = ENV['EIVU_SECRET_ACCESS_KEY']
-      config.bucket_name   = ENV['EIVU_BUCKET_NAME']
-      config.region        = ENV['EIVU_REGION']
-      config.user_token    = ENV['EIVU_USER_TOKEN']
-      config.host          = ENV['EIVU_SERVER_HOST']
-    end
-  end
-
   describe '#write_to_s3' do
     subject(:write_to_s3) {
       instance.write_to_s3(s3_resource:, s3_folder:, path_to_file:)
