@@ -26,12 +26,16 @@ describe Eivu::Client do
       end
     end
 
-    context 'with vcr', vcr: true do
+    context 'success', vcr: true do
       let(:s3_resource) { Eivu::Client.new.send(:instantiate_s3_resource) }
 
       it 'writes the file to S3' do
         write_to_s3
       end
+    end
+
+    context 'failure', vcr: true do
+      # force error. pass in wrong path
     end
   end
 

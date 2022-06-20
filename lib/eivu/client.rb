@@ -38,7 +38,10 @@ module Eivu
       mime        = MimeMagic.by_magic(File.open(path_to_file))
       filesize    = File.size(path_to_file)
       s3_resource = instantiate_s3_resource
-      write_to_s3(s3_resource: s3_resource, s3_folder: cloud_file.s3_folder, path_to_file: path_to_file)
+
+      unless write_to_s3(s3_resource: s3_resource, s3_folder: cloud_file.s3_folder, path_to_file: path_to_file)
+        raise Errors::CloudStorage::Connection, 'Failed to write to s3'
+      end
 
       cloud_file.transfer(content_type: mime.type, asset: asset, filesize: filesize)
       cloud_file.complete(year: nil, rating: nil, release_pos: nil, metadata_list: {}, matched_recording: nil)
