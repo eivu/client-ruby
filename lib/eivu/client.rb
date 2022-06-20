@@ -66,7 +66,6 @@ module Eivu
 
       # upload the file to s3
       #
-
       # create object on s3
       obj = s3_resource.bucket(configuration.bucket_name)
                        .object("#{s3_folder}/#{sanitized_filename}")

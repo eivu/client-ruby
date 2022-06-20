@@ -2,9 +2,21 @@
 
 describe Eivu::Client do
   let(:bucket_name) { 'eivu-test' }
+  let(:instance) { described_class.new }
+
+  before do
+    Eivu::Client.configure do |config|
+      config.access_key_id = ENV['EIVU_ACCESS_KEY_ID']
+      config.secret_key    = ENV['EIVU_SECRET_ACCESS_KEY']
+      config.bucket_name   = ENV['EIVU_BUCKET_NAME']
+      config.region        = ENV['EIVU_REGION']
+      config.user_token    = ENV['EIVU_USER_TOKEN']
+      config.host          = ENV['EIVU_SERVER_HOST']
+    end
+  end
 
   describe '#write_to_s3' do
-    subject(:write_to_s3) { described_class.new.write_to_s3(s3_resource: s3_resource, s3_folder: s3_folder, path_to_file: path_to_file) }
+    subject(:write_to_s3) { instance.write_to_s3(s3_resource: s3_resource, s3_folder: s3_folder, path_to_file: path_to_file) }
 
     let(:s3_folder) { 'audio/F4/5C/04/D7/17/F3/ED/67/20/AE/0A/3A/67/98/1F/E4' }
     let(:path_to_file) { File.expand_path('../../fixtures/samples/test.mp3', __dir__) }
@@ -27,7 +39,7 @@ describe Eivu::Client do
     end
 
     context 'success', vcr: true do
-      let(:s3_resource) { Eivu::Client.new.send(:instantiate_s3_resource) }
+      let(:s3_resource) { instance.send(:instantiate_s3_resource) }
 
       it 'writes the file to S3' do
         write_to_s3
