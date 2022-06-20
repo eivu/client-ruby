@@ -11,7 +11,11 @@ describe Eivu::Client::Folder do
 
       it 'returns a list of files' do
         expect(traversal).to eq(
-          %w[lib/eivu/client/errors/configuration.rb lib/eivu/client/errors/connection.rb]
+          %w[
+              lib/eivu/client/errors/cloud_storage/connection.rb
+              lib/eivu/client/errors/configuration.rb
+              lib/eivu/client/errors/server/connection.rb
+            ]
         )
       end
     end
@@ -21,12 +25,14 @@ describe Eivu::Client::Folder do
 
       it 'returns a list of files' do
         expect(traversal).to contain_exactly(
+          'lib/eivu/client.rb',
           'lib/eivu/client/cloud_file.rb',
           'lib/eivu/client/configuration.rb',
-          'lib/eivu/client.rb',
-          'lib/eivu/client/folder.rb',
           'lib/eivu/client/errors/configuration.rb',
-          'lib/eivu/client/errors/connection.rb'
+          'lib/eivu/client/errors/cloud_storage/connection.rb',
+          'lib/eivu/client/errors/server/connection.rb',
+          'lib/eivu/client/folder.rb',
+          'lib/eivu/client/utils.rb'
         )
       end
     end
