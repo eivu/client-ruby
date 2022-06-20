@@ -23,7 +23,7 @@ FactoryBot.define do
     trait :transfered do
       content_type { Faker::File.mime_type }
       asset { "#{Faker::Lorem.word.downcase}.#{Faker::File.extension}" }
-      filesize { rand(100.kilobytes..2.gigabytes) }
+      filesize { rand((100.kilobytes)..(2.gigabytes)) }
       state { 'transfered' }
     end
 
@@ -34,19 +34,19 @@ FactoryBot.define do
 
     trait :audio do
       content_type { 'audio/mpeg' }
-      filesize { rand(750.kilobytes..10.megabytes) }
+      filesize { rand((750.kilobytes)..(10.megabytes)) }
       asset { "#{Faker::Lorem.word.downcase}.mp3" }
     end
 
     trait :video do
       content_type { 'video/mpeg' }
-      filesize { rand(750.kilobytes..10.megabytes) }
+      filesize { rand((750.kilobytes)..(10.megabytes)) }
       asset { "#{Faker::Lorem.word.downcase}.mp4" }
     end
 
     trait :other do
       content_type { 'application/pdf' }
-      filesize { rand(750.kilobytes..10.megabytes) }
+      filesize { rand((750.kilobytes)..(10.megabytes)) }
       asset { "#{Faker::Lorem.word.downcase}.pdf" }
     end
   end

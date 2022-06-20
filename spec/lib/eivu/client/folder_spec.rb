@@ -1,5 +1,5 @@
 # frozen_string_literal: true
-
+=begin 
 describe Eivu::Client::Folder do
   describe '.traverse' do
     subject(:traversal) do
@@ -38,3 +38,4 @@ describe Eivu::Client::Folder do
     end
   end
 end
+=end

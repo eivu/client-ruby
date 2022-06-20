@@ -9,7 +9,7 @@ describe Eivu::Client::CloudFile, vcr: true do
   describe '.generate_md5' do
     subject(:md5) { described_class.generate_md5(path_to_file) }
 
-    context 'test.mp3' do 
+    context 'test.mp3' do
       let(:path_to_file) { File.expand_path('../../../fixtures/samples/test.mp3', __dir__) }
 
       it 'returns the correct md5' do
@@ -17,7 +17,7 @@ describe Eivu::Client::CloudFile, vcr: true do
       end
     end
 
-    context 'sample_640x360_beach.flv' do 
+    context 'sample_640x360_beach.flv' do
       let(:path_to_file) { File.expand_path('../../../fixtures/samples/sample_640x360_beach.flv', __dir__) }
 
       it 'returns the correct md5' do
@@ -25,7 +25,7 @@ describe Eivu::Client::CloudFile, vcr: true do
       end
     end
 
-    context 'mov_bbb.mp4' do 
+    context 'mov_bbb.mp4' do
       let(:path_to_file) { File.expand_path('../../../fixtures/samples/mov_bbb.mp4', __dir__) }
 
       it 'returns the correct md5' do
@@ -63,7 +63,7 @@ describe Eivu::Client::CloudFile, vcr: true do
   end
 
   describe '.reserve' do
-    subject(:reservation) { described_class.reserve(bucket_name: bucket_name, path_to_file: path_to_file) }
+    subject(:reservation) { described_class.reserve(bucket_name:, path_to_file:) }
 
     context 'when md5 does not exist' do
       let(:md5) { 'F45C04D717F3ED6720AE0A3A67981FE4' }
@@ -84,7 +84,7 @@ describe Eivu::Client::CloudFile, vcr: true do
 
       it 'raises an error' do
         aggregate_failures do
-          expect{ reservation }.to raise_error(RestClient::UnprocessableEntity)
+          expect { reservation }.to raise_error(RestClient::UnprocessableEntity)
         end
       end
     end
@@ -95,14 +95,14 @@ describe Eivu::Client::CloudFile, vcr: true do
 
       it 'raises an error' do
         aggregate_failures do
-          expect{ reservation }.to raise_error(RestClient::BadRequest)
+          expect { reservation }.to raise_error(RestClient::BadRequest)
         end
       end
     end
   end
 
   describe '#transfer' do
-    subject(:transference) { instance.transfer(content_type: content_type, asset: asset, filesize: filesize) }
+    subject(:transference) { instance.transfer(content_type:, asset:, filesize:) }
 
     let(:instance) { described_class.fetch(md5) }
     let(:md5) { described_class.generate_md5(path_to_file) }
@@ -126,7 +126,9 @@ describe Eivu::Client::CloudFile, vcr: true do
     end
 
     context 'when working with a file NOT reserved' do
-      let(:path_to_file) { File.expand_path('../../../fixtures/samples/Piano_brokencrash-Brandondorf-1164520478.mp3', __dir__) }
+      let(:path_to_file) {
+        File.expand_path('../../../fixtures/samples/Piano_brokencrash-Brandondorf-1164520478.mp3', __dir__)
+      }
 
       it 'will raise an exception' do
         expect { transference }.to raise_error(RestClient::UnprocessableEntity)
@@ -135,14 +137,16 @@ describe Eivu::Client::CloudFile, vcr: true do
   end
 
   describe '#complete' do
-    subject(:completion) { instance.complete(year: year, rating: rating, release_pos: release_pos, metadata_list: metadata_list) }
+    subject(:completion) {
+      instance.complete(year:, rating:, release_pos:, metadata_list:)
+    }
 
     let(:instance) { described_class.fetch(md5) }
     let(:md5) { described_class.generate_md5(path_to_file) }
     let(:year) { 2019 }
     let(:rating) { 4.37 }
     let(:release_pos) { 1 }
-    let(:metadata_list) { [{ name: 'title'}, { genre: 'sample' }, { performer: 'aws' }, { performer: 'Polly' } ] }
+    let(:metadata_list) { [{ name: 'title' }, { genre: 'sample' }, { performer: 'aws' }, { performer: 'Polly' } ] }
 
     context 'when working with a transfered file' do
       let(:path_to_file) { File.expand_path('../../../fixtures/samples/test.mp3', __dir__) }
@@ -173,25 +177,25 @@ describe Eivu::Client::CloudFile, vcr: true do
     let(:md5) { 'F45C04D717F3ED6720AE0A3A67981FE4' }
 
     context 'audio content' do
-      let(:instance) { build :cloud_file, :audio, md5: md5 }
+      let(:instance) { build :cloud_file, :audio, md5: }
 
       it { is_expected.to eq('audio/F4/5C/04/D7/17/F3/ED/67/20/AE/0A/3A/67/98/1F/E4') }
     end
 
     context 'video content' do
-      let(:instance) { build :cloud_file, :video, md5: md5 }
+      let(:instance) { build :cloud_file, :video, md5: }
 
       it { is_expected.to eq('video/F4/5C/04/D7/17/F3/ED/67/20/AE/0A/3A/67/98/1F/E4') }
     end
 
     context 'other content' do
-      let(:instance) { build :cloud_file, :audio, md5: md5 }
+      let(:instance) { build :cloud_file, :audio, md5: }
 
       it { is_expected.to eq('audio/F4/5C/04/D7/17/F3/ED/67/20/AE/0A/3A/67/98/1F/E4') }
     end
 
     context 'peepy content' do
-      let(:instance) { build :cloud_file, :audio, :peepy, md5: md5 }
+      let(:instance) { build :cloud_file, :audio, :peepy, md5: }
 
       it { is_expected.to eq('peepshow/F4/5C/04/D7/17/F3/ED/67/20/AE/0A/3A/67/98/1F/E4') }
     end

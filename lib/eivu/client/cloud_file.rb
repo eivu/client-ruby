@@ -40,9 +40,7 @@ module Eivu
             { 'Authorization' => "Token #{Eivu::Client.configuration.user_token}" }
           )
 
-          if response.code != 200
-            raise Errors::Connection, "Failed to connected received: #{response.code}"
-          end
+          raise Errors::Connection, "Failed to connected received: #{response.code}" if response.code != 200
 
           CloudFile.new Oj.load(response.body).symbolize_keys
         end
@@ -54,9 +52,7 @@ module Eivu
             { 'Authorization' => "Token #{Eivu::Client.configuration.user_token}" }
           )
 
-          if response.code != 200
-            raise Errors::Connection, "Failed to connected received: #{response.code}"
-          end
+          raise Errors::Connection, "Failed to connected received: #{response.code}" if response.code != 200
 
           Oj.load(response.body).deep_symbolize_keys
         end
@@ -67,23 +63,23 @@ module Eivu
 
         def reserve(bucket_name:, path_to_file:, peepy: false, nsfw: false)
           md5         = generate_md5(path_to_file)
-          payload     = { bucket_name: bucket_name, peepy: peepy, nsfw: nsfw }
-          parsed_body = post_request(action: :reserve, md5: md5, payload: payload)
+          payload     = { bucket_name:, peepy:, nsfw: }
+          parsed_body = post_request(action: :reserve, md5:, payload:)
           CloudFile.new parsed_body
         end
       end
 
       def transfer(content_type:, asset:, filesize:)
-        payload     = { content_type: content_type, asset: asset, filesize: filesize }
+        payload     = { content_type:, asset:, filesize: }
         # post_request will raise an error if there is a problem
-        parsed_body = post_request(action: :transfer, payload: payload)
+        parsed_body = post_request(action: :transfer, payload:)
         CloudFile.new parsed_body
       end
 
       def complete(year: nil, rating: nil, release_pos: nil, metadata_list: {}, matched_recording: nil)
         matched_recording.nil? # trying to avoid rubocop error
-        payload = { year: year, rating: rating, release_pos: release_pos, metadata_list: metadata_list }
-        parsed_body = post_request(action: :complete, payload: payload)
+        payload = { year:, rating:, release_pos:, metadata_list: }
+        parsed_body = post_request(action: :complete, payload:)
         CloudFile.new parsed_body
       end
 
@@ -105,7 +101,7 @@ module Eivu
       private
 
       def post_request(action:, payload:)
-        self.class.post_request(action: action, md5: md5, payload: payload)
+        self.class.post_request(action:, md5:, payload:)
       end
     end
   end

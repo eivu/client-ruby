@@ -33,7 +33,8 @@ module Eivu
     end
 
     def upload(path_to_file:, peepy: false, nsfw: false)
-      cloud_file  = CloudFile.reserve(bucket_name: configuration.bucket_name, path_to_file: path_to_file, peepy: peepy, nsfw: nsfw)
+      cloud_file  = CloudFile.reserve(bucket_name: configuration.bucket_name, path_to_file:, peepy:,
+nsfw:)
       asset       = File.basename(path_to_file)
       mime        = MimeMagic.by_magic(File.open(path_to_file))
       filesize    = File.size(path_to_file)
@@ -43,7 +44,7 @@ module Eivu
         raise Errors::CloudStorage::Connection, 'Failed to write to s3'
       end
 
-      cloud_file.transfer(content_type: mime.type, asset: asset, filesize: filesize)
+      cloud_file.transfer(content_type: mime.type, asset:, filesize:)
       cloud_file.complete(year: nil, rating: nil, release_pos: nil, metadata_list: {}, matched_recording: nil)
     end
 

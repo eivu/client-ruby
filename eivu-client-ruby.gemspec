@@ -29,7 +29,6 @@ Gem::Specification.new do |s|
   s.add_dependency 'vcr', '~> 6.0' # VCR for testing
   s.add_dependency 'zeitwerk', '~> 2.5', '>= 2.5.3' # ruby autoloder
 
-
   # s.files = `git ls-files`.split "\n"
   # s.test_files = `git ls-files -- {test,spec,features}/*`.split "\n"
   # s.executables = `git ls-files -- bin/*`.split("\n").map { |f| File.basename f }
@@ -58,4 +57,5 @@ Gem::Specification.new do |s|
   # s.add_development_dependency 'timecop', '~> 0.9'
   # s.add_development_dependency 'rspec', '~> 3.8'
   # s.add_development_dependency 'simplecov', '~> 0.16'
+  s.metadata['rubygems_mfa_required'] = 'true'
 end

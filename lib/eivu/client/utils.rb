@@ -7,9 +7,9 @@ module Eivu
         def sanitize(name)
           name = name.tr('\\', '/') # work-around for IE
           name = File.basename(name)
-          name = name.gsub(/[^a-zA-Z0-9\.\-\+_]/, "_")
+          name = name.gsub(/[^a-zA-Z0-9.\-+_]/, '_')
           name = "_#{name}" if name =~ /\A\.+\z/
-          name = 'unnamed' if name.size == 0
+          name = 'unnamed' if name.size.zero?
           name.mb_chars.to_s
         end
       end
