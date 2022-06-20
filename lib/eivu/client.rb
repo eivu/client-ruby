@@ -33,10 +33,14 @@ module Eivu
     end
 
     def upload(path_to_file:, peepy: false, nsfw: false)
-      cloud_file = CloudFile.reserve(bucket_name: configuration.bucket_name, path_to_file: path_to_file, peepy: peepy, nsfw: nsfw)
+      cloud_file  = CloudFile.reserve(bucket_name: configuration.bucket_name, path_to_file: path_to_file, peepy: peepy, nsfw: nsfw)
+      asset       = File.basename(path_to_file)
+      mime        = MimeMagic.by_magic(File.open(path_to_file))
+      filesize    = File.size(path_to_file)
       s3_resource = instantiate_s3_resource
-      cloud_file.write_to_s3(s3_resource, path_to_file)
-      cloud_file.transfer(path_to_file: path_to_file)
+      write_to_s3(s3_resource: s3_resource, s3_folder: cloud_file.s3_folder, path_to_file: path_to_file)
+
+      cloud_file.transfer(content_type: mime.type, asset: asset, filesize: filesize)
       cloud_file.complete(year: nil, rating: nil, release_pos: nil, metadata_list: {}, matched_recording: nil)
     end
 
@@ -50,7 +54,27 @@ module Eivu
       @configuration ||= self.class.configuration
     end
 
+    def write_to_s3(s3_resource:, s3_folder:, path_to_file:)
+      # generate file information for file on s3
+      #
+      filename  = File.basename(path_to_file)
+      mime      = MimeMagic.by_magic(File.open(path_to_file))
+      sanitized_filename = Eivu::Client::Utils.sanitize(filename)
+
+      # upload the file to s3
+      #
+
+      # create object on s3
+      obj = s3_resource.bucket(configuration.bucket_name)
+                       .object("#{s3_folder}/#{sanitized_filename}")
+      obj.upload_file(path_to_file, acl: 'public-read', content_type: mime.type, metadata: {})
+    end
+
     private
+
+    # def create_object(s3_resource, path)
+    #   s3_resource.bucket(bucket_name).object(path)
+    # end
 
     def s3_credentials
       @s3_credentials ||= Aws::Credentials.new(configuration.access_key_id, configuration.secret_key)
