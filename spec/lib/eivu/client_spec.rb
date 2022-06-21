@@ -12,25 +12,26 @@ describe Eivu::Client do
     let(:s3_resource) { instance.send(:instantiate_s3_resource) }
     let(:s3_folder) { 'audio/F4/5C/04/D7/17/F3/ED/67/20/AE/0A/3A/67/98/1F/E4' }
     let(:filename) { File.basename(path_to_file) }
+    let(:path_to_file) { File.expand_path('../../fixtures/samples/test.mp3', __dir__) }
 
     context 'success', vcr: true do
-      let(:path_to_file) { File.expand_path('../../fixtures/samples/test.mp3', __dir__) }
-
       it 'writes the file to S3' do
         expect(write_to_s3).to be true
       end
     end
 
-    # context 'failure', vcr: true do
-    #   let(:path_to_file) { File.expand_path('../../fixtures/samples/missing.mp3', __dir__) }
+    context 'failure', vcr: true do
+      before do
+        expect_any_instance_of(Aws::S3::Object).to receive(:upload_file).and_return(false)
+      end
 
-    #   it 'writes the file to S3' do
-    #     expect(write_to_s3).to be true
-    #   end
-    # end
+      it 'writes the file to S3' do
+        expect(write_to_s3).to be false
+      end
+    end
   end
 
-  describe '#upload_folder', vcr: true do
+  describe '#upload_file', vcr: true do
     subject(:result) { instance.upload_file(path_to_file:, peepy:, nsfw:) }
     let(:path_to_file) { File.expand_path('../../fixtures/samples/test.mp3', __dir__) }
     let(:peepy) { false }
@@ -64,35 +65,36 @@ describe Eivu::Client do
     end
   end
 
-  describe '#upload_file', vcr: true do
-    subject(:result) { instance.upload_file(path_to_file:, peepy:, nsfw:) }
+  describe '#upload_folder', vcr: true do
+    subject(:result) { instance.upload_folder(path_to_folder:, peepy:, nsfw:) }
     let(:path_to_folder) { File.expand_path('../../fixtures/samples/audio/brothers_grimm', __dir__) }
     let(:peepy) { false }
     let(:nsfw) { false }
-    let(:md5) { Digest::MD5.file(path_to_file).hexdigest.upcase }
 
-    context 'success' do
-      it 'writes the file to S3 and saves data to the server' do
-        aggregate_failures do
-          expect(result).to be_kind_of(Eivu::Client::CloudFile)
-          expect(result.md5).to eq(md5)
-          expect(result.state).to eq('completed')
-        end
-      end
-    end
+    # context 'success' do
+    #   it 'writes the file to S3 and saves data to the server' do
+    #     aggregate_failures do
+    #       expect(result).to be_kind_of(Eivu::Client::CloudFile)
+    #       expect(result.md5).to eq(md5)
+    #       expect(result.state).to eq('completed')
+    #     end
+    #   end
+    # end
 
     context 'failure' do
       before do
-        expect(Eivu::Client::CloudFile).to receive(:reserve).and_return(dummy_cloud_file)
-        expect(dummy_cloud_file).to receive(:s3_folder).and_return('/path/to/s3/folder')
-        expect_any_instance_of(Eivu::Client).to receive(:write_to_s3).and_return(false)
+        allow(Eivu::Client::CloudFile).to receive(:reserve).and_return(dummy_cloud_file)
+        allow(dummy_cloud_file).to receive(:s3_folder).and_return('/path/to/s3/folder')
+        allow_any_instance_of(Eivu::Client).to receive(:write_to_s3).and_return(false)
       end
 
       let(:dummy_cloud_file) { instance_double(Eivu::Client::CloudFile) }
 
-      it 'fails to write file to S3 and partially saves data to the server' do
+      it 'fails to write any files to S3 and returns a collection of errors' do
         aggregate_failures do
-          expect { result }.to raise_error(Eivu::Client::Errors::CloudStorage::Connection, /Failed to write to s3/)
+          expect(result[:success].count).to eq(0)
+          expect(result[:failure].count).to eq(5)
+          expect(result[:failure].values).to all(be_a(Eivu::Client::Errors::CloudStorage::Connection))
         end
       end
     end
@@ -156,5 +158,5 @@ describe Eivu::Client do
 #       cloud_file.transfer(path_to_file: path_to_file)
 #       cloud_file.complete(year: nil, rating: nil, release_pos: nil, metadata_list: {}, matched_recording: nil)
 #     end
-  end
+  # end
 end

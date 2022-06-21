@@ -11,8 +11,6 @@ module Eivu
     end
 
     class << self
-      attr_accessor :configuration, :errors
-
       def configuration
         @configuration ||= Configuration.new
       end
@@ -32,6 +30,10 @@ module Eivu
       end
     end
 
+    def initialize
+      @status = { success: {}, failure: {} }
+    end
+
     def upload_file(path_to_file:, peepy: false, nsfw: false)
       cloud_file  = CloudFile.reserve(bucket_name: configuration.bucket_name,
                                       path_to_file:, peepy:, nsfw:)
@@ -49,13 +51,16 @@ module Eivu
       cloud_file.complete(year: nil, rating: nil, release_pos: nil, metadata_list:, matched_recording: nil)
     end
 
-    def upload_folder(path_to_dir:, peepy: false, nsfw: false)
-      errors ||= Set.new
-      Folder.traverse(path_to_dir) do |path_to_item|
-        upload(path_to_item, peepy:, nsfw:)
+    def upload_folder(path_to_folder:, peepy: false, nsfw: false)
+      Folder.traverse(path_to_folder) do |path_to_file|
+        upload_file(path_to_file:, peepy:, nsfw:)
+        @status[:failure].delete(path_to_file)
+        @status[:success][path_to_file] = 'Upload successful'
       rescue StandardError => e
-        binding.pry
+        @status[:failure][path_to_file] = e
+        @status[:success].delete(path_to_file)
       end
+      @status
     end
 
     def configuration
@@ -75,6 +80,10 @@ module Eivu
       obj = s3_resource.bucket(configuration.bucket_name)
                        .object("#{s3_folder}/#{sanitized_filename}")
       obj.upload_file(path_to_file, acl: 'public-read', content_type: mime.type, metadata: {})
+    end
+
+    def status
+      @status
     end
 
     private
