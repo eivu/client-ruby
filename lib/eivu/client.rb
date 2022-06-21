@@ -33,8 +33,8 @@ module Eivu
     end
 
     def upload(path_to_file:, peepy: false, nsfw: false)
-      cloud_file  = CloudFile.reserve(bucket_name: configuration.bucket_name, path_to_file:, peepy:,
-nsfw:)
+      cloud_file  = CloudFile.reserve(bucket_name: configuration.bucket_name,
+                                      path_to_file:, peepy:, nsfw:)
       asset       = File.basename(path_to_file)
       mime        = MimeMagic.by_magic(File.open(path_to_file))
       filesize    = File.size(path_to_file)
@@ -75,10 +75,6 @@ nsfw:)
     end
 
     private
-
-    # def create_object(s3_resource, path)
-    #   s3_resource.bucket(bucket_name).object(path)
-    # end
 
     def s3_credentials
       @s3_credentials ||= Aws::Credentials.new(configuration.access_key_id, configuration.secret_key)

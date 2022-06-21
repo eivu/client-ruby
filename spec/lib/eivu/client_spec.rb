@@ -9,50 +9,81 @@ describe Eivu::Client do
       instance.write_to_s3(s3_resource:, s3_folder:, path_to_file:)
     }
 
+    let(:s3_resource) { instance.send(:instantiate_s3_resource) }
     let(:s3_folder) { 'audio/F4/5C/04/D7/17/F3/ED/67/20/AE/0A/3A/67/98/1F/E4' }
-    let(:path_to_file) { File.expand_path('../../fixtures/samples/test.mp3', __dir__) }
     let(:filename) { File.basename(path_to_file) }
 
-    context 'with mocks' do
-      before do
-        expect(s3_resource).to receive(:bucket).with(bucket_name).and_return(bucket)
-        expect(bucket).to receive(:object).with("#{s3_folder}/#{filename}").and_return(object)
-        expect(object).to receive(:upload_file).with(path_to_file, acl: 'public-read', content_type: kind_of(String),
-metadata: {})
-      end
-
-      let(:s3_resource) { double('Aws::S3::Resource') }
-      let(:bucket) { double('Aws::S3::Bucket') }
-      let(:object) { double('Aws::S3::Object') }
-
-      it 'writes the file to S3' do
-        write_to_s3
-      end
-    end
-
     context 'success', vcr: true do
-      let(:s3_resource) { instance.send(:instantiate_s3_resource) }
+      let(:path_to_file) { File.expand_path('../../fixtures/samples/test.mp3', __dir__) }
 
       it 'writes the file to S3' do
-        write_to_s3
+        expect(write_to_s3).to be true
       end
     end
 
-    context 'failure', vcr: true do
-      # force error. pass in wrong path
-    end
+    # context 'failure', vcr: true do
+    #   let(:path_to_file) { File.expand_path('../../fixtures/samples/missing.mp3', __dir__) }
+
+    #   it 'writes the file to S3' do
+    #     expect(write_to_s3).to be true
+    #   end
+    # end
   end
 
-  describe '#upload' do
-    subject(:uploading) { client.upload(path_to_file:, peepy:, nsfw:) }
-    let(:path_to_file) { File.expand_path('../../../fixtures/samples/test.mp3', __dir__) }
+  describe '#upload', vcr: true do
+    subject(:result) { instance.upload(path_to_file:, peepy:, nsfw:) }
+    let(:path_to_file) { File.expand_path('../../fixtures/samples/test.mp3', __dir__) }
     let(:peepy) { false }
     let(:nsfw) { false }
-    let(:resource) { double('Aws::S3::Resource') }
-    let(:cloud_file) {
-      build :cloud_file, :reserved, bucket_name:, path_to_file:, peepy:, nsfw:
-    }
-    let(:object) { double('Aws::S3::Object') }
+    let(:md5) { Digest::MD5.file(path_to_file).hexdigest.upcase }
+
+    context 'success' do
+      it 'writes the file to S3 and saves data to the server' do
+        aggregate_failures do
+          expect(result).to be_kind_of(Eivu::Client::CloudFile)
+          expect(result.md5).to eq(md5)
+          expect(result.state).to eq('completed')
+        end
+      end
+    end
+
+    context 'failure' do
+      before do
+        expect(Eivu::Client::CloudFile).to receive(:reserve).and_return(dummy_cloud_file)
+        expect(dummy_cloud_file).to receive(:s3_folder).and_return('/path/to/s3/folder')
+        expect_any_instance_of(Eivu::Client).to receive(:write_to_s3).and_return(false)
+      end
+
+      let(:dummy_cloud_file) { instance_double(Eivu::Client::CloudFile) }
+
+      it 'fails to write file to S3 and partially saves data to the server' do
+        aggregate_failures do
+          expect { result }.to raise_error(Eivu::Client::Errors::CloudStorage::Connection, /Failed to write to s3/)
+        end
+      end
+    end
+
+
+
+#     context 'with mocks' do
+#       before do
+#         expect(s3_resource).to receive(:bucket).with(bucket_name).and_return(bucket)
+#         expect(bucket).to receive(:object).with("#{s3_folder}/#{filename}").and_return(object)
+#         expect(object).to receive(:upload_file).with(path_to_file, acl: 'public-read', content_type: kind_of(String),
+# metadata: {})
+#       end
+
+#       let(:s3_resource) { double('Aws::S3::Resource') }
+#       let(:bucket) { double('Aws::S3::Bucket') }
+#       let(:object) { double('Aws::S3::Object') }
+
+#       it 'writes the file to S3' do
+#         expects(write_to_s3).to be true
+#       end
+#     end
+
+
+
 # #     before do
 #       expect(Aws::S3::Resource).to receive(:new).and_return(resource)
 #       expect(CloudFile).to receive(:reserve).with(bucket_name: bucket_name, path_to_file: path_to_file, peepy: peepy, nsfw: nsfw).and_return(cloud_file)
