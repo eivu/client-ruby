@@ -52,11 +52,9 @@ module Eivu
     def upload_folder(path_to_dir:, peepy: false, nsfw: false)
       errors ||= Set.new
       Folder.traverse(path_to_dir) do |path_to_item|
-
         upload(path_to_item, peepy:, nsfw:)
       rescue StandardError => e
         binding.pry
-
       end
     end
 

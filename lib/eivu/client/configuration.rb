@@ -66,7 +66,7 @@ module Eivu
       def access_key_id
         unless @access_key_id
           raise Errors::Configuration,
-'AWS access key id missing! See the documentation for configuration settings.'
+                'AWS access key id missing! See the documentation for configuration settings.'
         end
 
         @access_key_id
@@ -75,7 +75,7 @@ module Eivu
       def secret_key
         unless @secret_key
           raise Errors::Configuration,
-'AWS secret key missing! See the documentation for configuration settings.'
+                'AWS secret key missing! See the documentation for configuration settings.'
         end
 
         @secret_key
@@ -84,7 +84,7 @@ module Eivu
       def bucket_name
         unless @bucket_name
           raise Errors::Configuration,
-'AWS bucket name missing! See the documentation for configuration settings.'
+                'AWS bucket name missing! See the documentation for configuration settings.'
         end
 
         @bucket_name
@@ -93,7 +93,7 @@ module Eivu
       def user_token
         unless @user_token
           raise Errors::Configuration,
-'Eivu user token missing! See the documentation for configuration settings.'
+                'Eivu user token missing! See the documentation for configuration settings.'
         end
 
         @user_token
@@ -102,7 +102,7 @@ module Eivu
       def region
         unless @region
           raise Errors::Configuration,
-'Bucket region missing! See the documentation for configuration settings.'
+                'Bucket region missing! See the documentation for configuration settings.'
         end
 
         @region

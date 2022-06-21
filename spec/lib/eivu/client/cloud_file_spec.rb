@@ -126,9 +126,9 @@ describe Eivu::Client::CloudFile, vcr: true do
     end
 
     context 'when working with a file NOT reserved' do
-      let(:path_to_file) {
+      let(:path_to_file) do
         File.expand_path('../../../fixtures/samples/Piano_brokencrash-Brandondorf-1164520478.mp3', __dir__)
-      }
+      end
 
       it 'will raise an exception' do
         expect { transference }.to raise_error(RestClient::UnprocessableEntity)
@@ -137,16 +137,16 @@ describe Eivu::Client::CloudFile, vcr: true do
   end
 
   describe '#complete' do
-    subject(:completion) {
+    subject(:completion) do
       instance.complete(year:, rating:, release_pos:, metadata_list:)
-    }
+    end
 
     let(:instance) { described_class.fetch(md5) }
     let(:md5) { described_class.generate_md5(path_to_file) }
     let(:year) { 2019 }
     let(:rating) { 4.37 }
     let(:release_pos) { 1 }
-    let(:metadata_list) { [{ name: 'title' }, { genre: 'sample' }, { performer: 'aws' }, { performer: 'Polly' } ] }
+    let(:metadata_list) { [{ name: 'title' }, { genre: 'sample' }, { performer: 'aws' }, { performer: 'Polly' }] }
 
     context 'when working with a transfered file' do
       let(:path_to_file) { File.expand_path('../../../fixtures/samples/test.mp3', __dir__) }

@@ -12,9 +12,9 @@ Gem::Specification.new do |s|
 
   s.platform = Gem::Platform::RUBY
   s.summary = 'Ruby client for the eivu service'
-#   s.description = <<-EOD
-# Ruby client for the eivu service
-#   EOD
+  #   s.description = <<-EOD
+  # Ruby client for the eivu service
+  #   EOD
   s.files         = ['lib/eivu.rb']
   s.require_paths = ['lib']
 
