@@ -30,8 +30,8 @@ describe Eivu::Client do
     # end
   end
 
-  describe '#upload', vcr: true do
-    subject(:result) { instance.upload(path_to_file:, peepy:, nsfw:) }
+  describe '#upload_file', vcr: true do
+    subject(:result) { instance.upload_file(path_to_file:, peepy:, nsfw:) }
     let(:path_to_file) { File.expand_path('../../fixtures/samples/test.mp3', __dir__) }
     let(:peepy) { false }
     let(:nsfw) { false }

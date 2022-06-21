@@ -11,7 +11,7 @@ module Eivu
     end
 
     class << self
-      attr_accessor :configuration
+      attr_accessor :configuration, :errors
 
       def configuration
         @configuration ||= Configuration.new
@@ -32,7 +32,7 @@ module Eivu
       end
     end
 
-    def upload(path_to_file:, peepy: false, nsfw: false)
+    def upload_file(path_to_file:, peepy: false, nsfw: false)
       cloud_file  = CloudFile.reserve(bucket_name: configuration.bucket_name,
                                       path_to_file:, peepy:, nsfw:)
       asset       = File.basename(path_to_file)
@@ -49,9 +49,14 @@ module Eivu
       cloud_file.complete(year: nil, rating: nil, release_pos: nil, metadata_list:, matched_recording: nil)
     end
 
-    def ingest!(path_to_dir:)
+    def upload_folder(path_to_dir:)
+      errors ||= Set.new
       Folder.traverse(path_to_dir) do |path_to_item|
-        upload(path_to_item)
+        begin
+          upload(path_to_item)
+        rescue => e
+          binding.pry
+        end
       end
     end
 
