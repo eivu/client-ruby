@@ -44,19 +44,19 @@ module Eivu
         raise Errors::CloudStorage::Connection, 'Failed to write to s3'
       end
 
-      metadata_list = [{original_local_path_to_file: path_to_file}]
+      metadata_list = [{ original_local_path_to_file: path_to_file }]
       cloud_file.transfer(content_type: mime.type, asset:, filesize:)
       cloud_file.complete(year: nil, rating: nil, release_pos: nil, metadata_list:, matched_recording: nil)
     end
 
-    def upload_folder(path_to_dir:)
+    def upload_folder(path_to_dir:, peepy: false, nsfw: false)
       errors ||= Set.new
       Folder.traverse(path_to_dir) do |path_to_item|
-        begin
-          upload(path_to_item)
-        rescue => e
-          binding.pry
-        end
+
+        upload(path_to_item, peepy:, nsfw:)
+      rescue StandardError => e
+        binding.pry
+
       end
     end
 

@@ -30,7 +30,7 @@ describe Eivu::Client do
     # end
   end
 
-  describe '#upload_file', vcr: true do
+  describe '#upload_folder', vcr: true do
     subject(:result) { instance.upload_file(path_to_file:, peepy:, nsfw:) }
     let(:path_to_file) { File.expand_path('../../fixtures/samples/test.mp3', __dir__) }
     let(:peepy) { false }
@@ -62,6 +62,41 @@ describe Eivu::Client do
         end
       end
     end
+  end
+
+  describe '#upload_file', vcr: true do
+    subject(:result) { instance.upload_file(path_to_file:, peepy:, nsfw:) }
+    let(:path_to_folder) { File.expand_path('../../fixtures/samples/audio/brothers_grimm', __dir__) }
+    let(:peepy) { false }
+    let(:nsfw) { false }
+    let(:md5) { Digest::MD5.file(path_to_file).hexdigest.upcase }
+
+    context 'success' do
+      it 'writes the file to S3 and saves data to the server' do
+        aggregate_failures do
+          expect(result).to be_kind_of(Eivu::Client::CloudFile)
+          expect(result.md5).to eq(md5)
+          expect(result.state).to eq('completed')
+        end
+      end
+    end
+
+    context 'failure' do
+      before do
+        expect(Eivu::Client::CloudFile).to receive(:reserve).and_return(dummy_cloud_file)
+        expect(dummy_cloud_file).to receive(:s3_folder).and_return('/path/to/s3/folder')
+        expect_any_instance_of(Eivu::Client).to receive(:write_to_s3).and_return(false)
+      end
+
+      let(:dummy_cloud_file) { instance_double(Eivu::Client::CloudFile) }
+
+      it 'fails to write file to S3 and partially saves data to the server' do
+        aggregate_failures do
+          expect { result }.to raise_error(Eivu::Client::Errors::CloudStorage::Connection, /Failed to write to s3/)
+        end
+      end
+    end
+  end
 
 
 
