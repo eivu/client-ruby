@@ -8,7 +8,7 @@
 # this ((is)) a ((very)) ((useful)) thing
 
 
-re = /\(\((((?>[^\(\(\)\)]+)|(?R))*)\)\)/i
+re = /\(\((((?>[^\(\(\)\)]+)|(?R))*)\)\)/ig
 str = 'this ((is)) a ((very)) ((useful)) thing'
 
 # Print the match result
