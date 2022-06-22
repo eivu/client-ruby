@@ -1,0 +1,303 @@
+---
+http_interactions:
+- request:
+    method: post
+    uri: "<EIVU_SERVER_HOST>/api/v1/cloud_files/3170985D60D07923DB48CB43CD60F5AD/reserve"
+    body:
+      encoding: UTF-8
+      string: bucket_name=<EIVU_BUCKET_NAME>&peepy=false&nsfw=false
+    headers:
+      Accept:
+      - "*/*"
+      User-Agent:
+      - rest-client/2.1.0 (darwin20 x86_64) ruby/3.1.2p20
+      Authorization:
+      - Token <EIVU_USER_TOKEN>
+      Content-Length:
+      - '44'
+      Content-Type:
+      - application/x-www-form-urlencoded
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Host:
+      - localhost:3000
+  response:
+    status:
+      code: 422
+      message: Unprocessable Entity
+    headers:
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Xss-Protection:
+      - 1; mode=block
+      X-Content-Type-Options:
+      - nosniff
+      X-Download-Options:
+      - noopen
+      X-Permitted-Cross-Domain-Policies:
+      - none
+      Referrer-Policy:
+      - strict-origin-when-cross-origin
+      Content-Type:
+      - application/json; charset=utf-8
+      Cache-Control:
+      - no-cache
+      X-Request-Id:
+      - afa2a6a4-c4e9-467f-a808-44ea96c15e8d
+      X-Runtime:
+      - '0.181668'
+      Server-Timing:
+      - start_processing.action_controller;dur=0.203125, sql.active_record;dur=33.350830078125,
+        instantiation.active_record;dur=0.158203125, unpermitted_parameters.action_controller;dur=0.099609375,
+        process_action.action_controller;dur=109.632080078125
+      Vary:
+      - Origin
+      Set-Cookie:
+      - __profilin=p%3Dt; path=/; HttpOnly; SameSite=Lax
+      Transfer-Encoding:
+      - chunked
+    body:
+      encoding: UTF-8
+      string: '{"message":"md5 already exists in this folder","cloud_file":null}'
+  recorded_at: Wed, 22 Jun 2022 03:22:23 GMT
+- request:
+    method: post
+    uri: "<EIVU_SERVER_HOST>/api/v1/cloud_files/6796D80290B05CEF89076E4356BF2E2B/reserve"
+    body:
+      encoding: UTF-8
+      string: bucket_name=<EIVU_BUCKET_NAME>&peepy=false&nsfw=false
+    headers:
+      Accept:
+      - "*/*"
+      User-Agent:
+      - rest-client/2.1.0 (darwin20 x86_64) ruby/3.1.2p20
+      Authorization:
+      - Token <EIVU_USER_TOKEN>
+      Content-Length:
+      - '44'
+      Content-Type:
+      - application/x-www-form-urlencoded
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Host:
+      - localhost:3000
+  response:
+    status:
+      code: 422
+      message: Unprocessable Entity
+    headers:
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Xss-Protection:
+      - 1; mode=block
+      X-Content-Type-Options:
+      - nosniff
+      X-Download-Options:
+      - noopen
+      X-Permitted-Cross-Domain-Policies:
+      - none
+      Referrer-Policy:
+      - strict-origin-when-cross-origin
+      Content-Type:
+      - application/json; charset=utf-8
+      Cache-Control:
+      - no-cache
+      X-Request-Id:
+      - b0f50350-0ec2-4694-99f7-2e7e27b3243b
+      X-Runtime:
+      - '0.027589'
+      Server-Timing:
+      - start_processing.action_controller;dur=0.156982421875, sql.active_record;dur=7.18212890625,
+        instantiation.active_record;dur=0.158203125, unpermitted_parameters.action_controller;dur=0.086181640625,
+        process_action.action_controller;dur=12.699951171875
+      Vary:
+      - Origin
+      Set-Cookie:
+      - __profilin=p%3Dt; path=/; HttpOnly; SameSite=Lax
+      Transfer-Encoding:
+      - chunked
+    body:
+      encoding: UTF-8
+      string: '{"message":"md5 already exists in this folder","cloud_file":null}'
+  recorded_at: Wed, 22 Jun 2022 03:22:23 GMT
+- request:
+    method: post
+    uri: "<EIVU_SERVER_HOST>/api/v1/cloud_files/28D3BE13092B304AB60A5DC8F273F1C9/reserve"
+    body:
+      encoding: UTF-8
+      string: bucket_name=<EIVU_BUCKET_NAME>&peepy=false&nsfw=false
+    headers:
+      Accept:
+      - "*/*"
+      User-Agent:
+      - rest-client/2.1.0 (darwin20 x86_64) ruby/3.1.2p20
+      Authorization:
+      - Token <EIVU_USER_TOKEN>
+      Content-Length:
+      - '44'
+      Content-Type:
+      - application/x-www-form-urlencoded
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Host:
+      - localhost:3000
+  response:
+    status:
+      code: 422
+      message: Unprocessable Entity
+    headers:
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Xss-Protection:
+      - 1; mode=block
+      X-Content-Type-Options:
+      - nosniff
+      X-Download-Options:
+      - noopen
+      X-Permitted-Cross-Domain-Policies:
+      - none
+      Referrer-Policy:
+      - strict-origin-when-cross-origin
+      Content-Type:
+      - application/json; charset=utf-8
+      Cache-Control:
+      - no-cache
+      X-Request-Id:
+      - dde5f1a2-49dd-47e3-aff4-c8870aa40b80
+      X-Runtime:
+      - '0.027003'
+      Server-Timing:
+      - start_processing.action_controller;dur=0.23974609375, sql.active_record;dur=6.70361328125,
+        instantiation.active_record;dur=0.153076171875, unpermitted_parameters.action_controller;dur=0.083740234375,
+        process_action.action_controller;dur=11.930908203125
+      Vary:
+      - Origin
+      Set-Cookie:
+      - __profilin=p%3Dt; path=/; HttpOnly; SameSite=Lax
+      Transfer-Encoding:
+      - chunked
+    body:
+      encoding: UTF-8
+      string: '{"message":"md5 already exists in this folder","cloud_file":null}'
+  recorded_at: Wed, 22 Jun 2022 03:22:23 GMT
+- request:
+    method: post
+    uri: "<EIVU_SERVER_HOST>/api/v1/cloud_files/5078267831D4425B1E9209BF6433D723/reserve"
+    body:
+      encoding: UTF-8
+      string: bucket_name=<EIVU_BUCKET_NAME>&peepy=false&nsfw=false
+    headers:
+      Accept:
+      - "*/*"
+      User-Agent:
+      - rest-client/2.1.0 (darwin20 x86_64) ruby/3.1.2p20
+      Authorization:
+      - Token <EIVU_USER_TOKEN>
+      Content-Length:
+      - '44'
+      Content-Type:
+      - application/x-www-form-urlencoded
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Host:
+      - localhost:3000
+  response:
+    status:
+      code: 422
+      message: Unprocessable Entity
+    headers:
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Xss-Protection:
+      - 1; mode=block
+      X-Content-Type-Options:
+      - nosniff
+      X-Download-Options:
+      - noopen
+      X-Permitted-Cross-Domain-Policies:
+      - none
+      Referrer-Policy:
+      - strict-origin-when-cross-origin
+      Content-Type:
+      - application/json; charset=utf-8
+      Cache-Control:
+      - no-cache
+      X-Request-Id:
+      - a8dfbaf7-7fe6-4714-b1aa-6906bb14d1e2
+      X-Runtime:
+      - '0.027733'
+      Server-Timing:
+      - start_processing.action_controller;dur=0.19287109375, sql.active_record;dur=6.86474609375,
+        instantiation.active_record;dur=0.226806640625, unpermitted_parameters.action_controller;dur=0.12109375,
+        process_action.action_controller;dur=12.702880859375
+      Vary:
+      - Origin
+      Set-Cookie:
+      - __profilin=p%3Dt; path=/; HttpOnly; SameSite=Lax
+      Transfer-Encoding:
+      - chunked
+    body:
+      encoding: UTF-8
+      string: '{"message":"md5 already exists in this folder","cloud_file":null}'
+  recorded_at: Wed, 22 Jun 2022 03:22:23 GMT
+- request:
+    method: post
+    uri: "<EIVU_SERVER_HOST>/api/v1/cloud_files/0A9EC2C4605C23B9A039646344EF5AC8/reserve"
+    body:
+      encoding: UTF-8
+      string: bucket_name=<EIVU_BUCKET_NAME>&peepy=false&nsfw=false
+    headers:
+      Accept:
+      - "*/*"
+      User-Agent:
+      - rest-client/2.1.0 (darwin20 x86_64) ruby/3.1.2p20
+      Authorization:
+      - Token <EIVU_USER_TOKEN>
+      Content-Length:
+      - '44'
+      Content-Type:
+      - application/x-www-form-urlencoded
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Host:
+      - localhost:3000
+  response:
+    status:
+      code: 422
+      message: Unprocessable Entity
+    headers:
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Xss-Protection:
+      - 1; mode=block
+      X-Content-Type-Options:
+      - nosniff
+      X-Download-Options:
+      - noopen
+      X-Permitted-Cross-Domain-Policies:
+      - none
+      Referrer-Policy:
+      - strict-origin-when-cross-origin
+      Content-Type:
+      - application/json; charset=utf-8
+      Cache-Control:
+      - no-cache
+      X-Request-Id:
+      - 7dc07c11-6cf5-475c-94ed-bec54c2e089f
+      X-Runtime:
+      - '0.026700'
+      Server-Timing:
+      - start_processing.action_controller;dur=0.206787109375, sql.active_record;dur=6.427978515625,
+        instantiation.active_record;dur=0.154296875, unpermitted_parameters.action_controller;dur=0.093994140625,
+        process_action.action_controller;dur=11.900390625
+      Vary:
+      - Origin
+      Set-Cookie:
+      - __profilin=p%3Dt; path=/; HttpOnly; SameSite=Lax
+      Transfer-Encoding:
+      - chunked
+    body:
+      encoding: UTF-8
+      string: '{"message":"md5 already exists in this folder","cloud_file":null}'
+  recorded_at: Wed, 22 Jun 2022 03:22:23 GMT
+recorded_with: VCR 6.1.0
