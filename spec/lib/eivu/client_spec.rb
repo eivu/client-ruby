@@ -5,9 +5,9 @@ describe Eivu::Client do
   let(:instance) { described_class.new }
 
   describe '#write_to_s3' do
-    subject(:write_to_s3) {
+    subject(:write_to_s3) do
       instance.write_to_s3(s3_resource:, s3_folder:, path_to_file:)
-    }
+    end
 
     let(:s3_resource) { instance.send(:instantiate_s3_resource) }
     let(:s3_folder) { 'audio/F4/5C/04/D7/17/F3/ED/67/20/AE/0A/3A/67/98/1F/E4' }

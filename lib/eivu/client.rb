@@ -6,6 +6,8 @@ require 'oj'
 
 module Eivu
   class Client
+    attr_reader :status
+
     module Types
       include Dry.Types()
     end
@@ -80,10 +82,6 @@ module Eivu
       obj = s3_resource.bucket(configuration.bucket_name)
                        .object("#{s3_folder}/#{sanitized_filename}")
       obj.upload_file(path_to_file, acl: 'public-read', content_type: mime.type, metadata: {})
-    end
-
-    def status
-      @status
     end
 
     private
