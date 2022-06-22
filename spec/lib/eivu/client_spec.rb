@@ -68,18 +68,48 @@ describe Eivu::Client do
   describe '#upload_folder', vcr: true do
     subject(:result) { instance.upload_folder(path_to_folder:, peepy:, nsfw:) }
     let(:path_to_folder) { File.expand_path('../../fixtures/samples/audio/brothers_grimm', __dir__) }
+    let(:dummy_cloud_file) { instance_double(Eivu::Client::CloudFile) }
+    let(:cloud_file) { build :cloud_file }
     let(:peepy) { false }
     let(:nsfw) { false }
 
-    # context 'success' do
-    #   it 'writes the file to S3 and saves data to the server' do
+    # context 'success, with mocks' do
+    #   before do
+    #     expect(Eivu::Client::CloudFile).to receive(:reserve).and_return(dummy_cloud_file)
+    #     expect(cloud_file).to receive(:transfer)
+    #     expect(cloud_file).to receive(:complete)
+    #     expect(cloud_file).to receive(:s3_folder).and_return('/path/to/s3/folder')
+    #     expect(s3_resource).to receive(:bucket).with(bucket_name).and_return(bucket)
+    #     expect(bucket).to receive(:object).with("#{cloud_file.s3_folder}/#{cloud_file.asset}").and_return(object)
+    #     expect(object).to receive(:upload_file).and_return(true)
+    #   end
+
+    #   let(:s3_resource) { double('Aws::S3::Resource') }
+    #   let(:bucket) { double('Aws::S3::Bucket') }
+    #   let(:object) { double('Aws::S3::Object') }
+
+    #   it 'writes the file to S3 and returns a collection of success statements' do
     #     aggregate_failures do
-    #       expect(result).to be_kind_of(Eivu::Client::CloudFile)
-    #       expect(result.md5).to eq(md5)
-    #       expect(result.state).to eq('completed')
+    #       expect(result[:failure].count).to eq(0)
+    #       expect(result[:success].count).to eq(5)
+    #       expect(result[:success].values).to all(eq('Upload successful'))
     #     end
     #   end
     # end
+
+    context 'success, with mocks' do
+      # let(:s3_resource) { double('Aws::S3::Resource') }
+      # let(:bucket) { double('Aws::S3::Bucket') }
+      # let(:object) { double('Aws::S3::Object') }
+
+      it 'writes the file to S3 and returns a collection of success statements' do
+        aggregate_failures do
+          expect(result[:failure].count).to eq(0)
+          expect(result[:success].count).to eq(5)
+          expect(result[:success].values).to all(eq('Upload successful'))
+        end
+      end
+    end
 
     context 'failure' do
       before do
