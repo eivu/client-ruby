@@ -8,10 +8,6 @@ module Eivu
   class Client
     attr_reader :status
 
-    module Types
-      include Dry.Types()
-    end
-
     class << self
       def configuration
         @configuration ||= Configuration.new
