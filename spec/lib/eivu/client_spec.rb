@@ -33,17 +33,44 @@ describe Eivu::Client do
 
   describe '#upload_file', vcr: true do
     subject(:result) { instance.upload_file(path_to_file:, peepy:, nsfw:) }
-    let(:path_to_file) { File.expand_path('../../fixtures/samples/test.mp3', __dir__) }
     let(:peepy) { false }
     let(:nsfw) { false }
     let(:md5) { Digest::MD5.file(path_to_file).hexdigest.upcase }
 
     context 'success' do
-      it 'writes the file to S3 and saves data to the server' do
-        aggregate_failures do
-          expect(result).to be_kind_of(Eivu::Client::CloudFile)
-          expect(result.md5).to eq(md5)
-          expect(result.state).to eq('completed')
+      context 'live test' do
+        let(:path_to_file) { File.expand_path('../../fixtures/samples/test.mp3', __dir__) }
+
+        it 'writes the file to S3 and saves data to the server' do
+          aggregate_failures do
+            expect(result).to be_kind_of(Eivu::Client::CloudFile)
+            expect(result.md5).to eq(md5)
+            expect(result.state).to eq('completed')
+          end
+        end
+      end
+
+      context 'with mocks do' do
+        before do
+          expect(Eivu::Client::CloudFile).to receive(:reserve).and_return(dummy_cloud_file)
+          expect(dummy_cloud_file).to receive(:transfer)
+          expect(dummy_cloud_file).to receive(:complete) # test for metadata will go here
+          expect(dummy_cloud_file).to receive(:s3_folder).and_return('/path/to/s3/folder')
+          expect_any_instance_of(Eivu::Client).to receive(:write_to_s3).and_return(false)
+        end
+
+        let(:dummy_cloud_file) { instance_double(Eivu::Client::CloudFile) }
+
+        context 'with rating and metadata' do
+          let(:path_to_file) { File.expand_path('../../fixtures/samples/other/Cowboyboy Bebop - The Real Folk Blues, Part I ((anime)) ((script)) ((all time best)).txt', __dir__) }
+
+          it 'writes the file to S3 and saves data to the server' do
+            aggregate_failures do
+              expect(result).to be_kind_of(Eivu::Client::CloudFile)
+              expect(result.md5).to eq(md5)
+              expect(result.state).to eq('completed')
+            end
+          end
         end
       end
     end
@@ -55,6 +82,7 @@ describe Eivu::Client do
         expect_any_instance_of(Eivu::Client).to receive(:write_to_s3).and_return(false)
       end
 
+      let(:path_to_file) { File.expand_path('../../fixtures/samples/test.mp3', __dir__) }
       let(:dummy_cloud_file) { instance_double(Eivu::Client::CloudFile) }
 
       it 'fails to write file to S3 and partially saves data to the server' do

@@ -1,0 +1,249 @@
+---
+http_interactions:
+- request:
+    method: post
+    uri: "<EIVU_SERVER_HOST>/api/v1/cloud_files/F45C04D717F3ED6720AE0A3A67981FE4/reserve"
+    body:
+      encoding: UTF-8
+      string: bucket_name=<EIVU_BUCKET_NAME>&peepy=false&nsfw=false
+    headers:
+      Accept:
+      - "*/*"
+      User-Agent:
+      - rest-client/2.1.0 (darwin20 x86_64) ruby/3.1.2p20
+      Authorization:
+      - Token <EIVU_USER_TOKEN>
+      Content-Length:
+      - '44'
+      Content-Type:
+      - application/x-www-form-urlencoded
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Host:
+      - localhost:3000
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Xss-Protection:
+      - 1; mode=block
+      X-Content-Type-Options:
+      - nosniff
+      X-Download-Options:
+      - noopen
+      X-Permitted-Cross-Domain-Policies:
+      - none
+      Referrer-Policy:
+      - strict-origin-when-cross-origin
+      Content-Type:
+      - application/json; charset=utf-8
+      Cache-Control:
+      - no-store, must-revalidate, private, max-age=0
+      X-Request-Id:
+      - c2e71a6b-d2d3-4e34-83ff-beb499403c32
+      X-Runtime:
+      - '0.184099'
+      Server-Timing:
+      - start_processing.action_controller;dur=0.1640625, sql.active_record;dur=58.636474609375,
+        instantiation.active_record;dur=4.974853515625, unpermitted_parameters.action_controller;dur=0.25634765625,
+        process_action.action_controller;dur=168.56494140625
+      Vary:
+      - Origin
+      X-Miniprofiler-Original-Cache-Control:
+      - max-age=0, private, must-revalidate
+      X-Miniprofiler-Ids:
+      - 19x40fodx2qfsdiywvw9,cmxnsa3rlwehod5apgiw
+      Set-Cookie:
+      - __profilin=p%3Dt; path=/; HttpOnly; SameSite=Lax
+      Transfer-Encoding:
+      - chunked
+    body:
+      encoding: UTF-8
+      string: '{"name":null,"asset":null,"md5":"F45C04D717F3ED6720AE0A3A67981FE4","content_type":null,"filesize":0,"description":null,"rating":null,"nsfw":false,"peepy":false,"created_at":"2022-06-21T02:15:51.374Z","updated_at":"2022-06-21T02:15:51.374Z","info_url":null,"duration":0,"ext_id":null,"data_source_id":null,"release_id":null,"year":null,"release_pos":null,"num_plays":0,"state":"reserved","bucket_uuid":"3b746ff6-82b3-4340-a745-ae6d5d375381","bucket_name":"<EIVU_BUCKET_NAME>","user_uuid":"1bf23eff-c27f-444e-96a9-6f25a6b98674","folder_uuid":null,"metadata":[]}'
+  recorded_at: Tue, 21 Jun 2022 02:15:51 GMT
+- request:
+    method: put
+    uri: https://<EIVU_BUCKET_NAME>.s3.amazonaws.com//F4/5C/04/D7/17/F3/ED/67/20/AE/0A/3A/67/98/1F/E4/test.mp3
+    body:
+      encoding: ASCII-8BIT
+      string: !binary |-
+        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PqzxFJh6ZzRDNo5EhvC8JDFrVtUakUpJuVF0yyntJqF/cWClDXEI30i9FJxr//NkxFkY4dI4EtJGEFakssTWu2ZXf9SFDR5uSJtwfjCbMMcFTpG9hFdivlueqY/QpAq55FxCTIlUISvlmxcIlUfo6tZ1x3+ytlHfkFaKe76qPVenLWOT2BQLRlOIhSyfQTZRXAJEBgIOioBgIskXctAiOh2o0enUEtce5kSq6FuvVUPYwkdqeyz+LB1aCyhc//NkxHgQQBpQ/sCEACSzwusFXaizCYacsk4/sG3ESOhTDp5T1hssHSoabUBoGIyoCJKeGmlTIhVMQRYtEY1/jvAdVxrMuVwFiaVpejy5X6hRJQoNA09Q4DDg7qKuOtxKDQ4O89kkEVLiJ9Kn8Gvyx5Z1CIKkWkQVO/iU7y2sNRL/5Iq4qdGnYdkipZaREo8S//NkxLoYYCIkLNPMAGnjochUBCVMQU1FMy4xMDBVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//NkxNkXQJH8zMjEJFVVVVVVVVVMQU1FMy4xMDBVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//NkxHwAAANIAAAAAFVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV
+    headers:
+      Accept-Encoding:
+      - ''
+      User-Agent:
+      - aws-sdk-ruby3/3.125.2 ruby/3.1.2 x86_64-darwin20 aws-sdk-s3/1.111.1
+      X-Amz-Acl:
+      - public-read
+      Content-Type:
+      - audio/mpeg
+      Expect:
+      - 100-continue
+      Content-Md5:
+      - 9FwE1xfz7Wcgrgo6Z5gf5A==
+      Host:
+      - "<EIVU_BUCKET_NAME>.s3.amazonaws.com"
+      X-Amz-Date:
+      - 20220621T021551Z
+      X-Amz-Content-Sha256:
+      - c88fa323e5300a25e6b87c85a7b89036743a92ff16e67e11e8677762339785cd
+      Authorization:
+      - AWS4-HMAC-SHA256 Credential=<EIVU_ACCESS_KEY_ID>/20220621/<EIVU_REGION>/s3/aws4_request,
+        SignedHeaders=content-md5;content-type;host;user-agent;x-amz-acl;x-amz-content-sha256;x-amz-date,
+        Signature=b90532db5cecfaf0408a2b175c099e480088524996237ec200459f84b4ac7427
+      Content-Length:
+      - '4365'
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      X-Amz-Id-2:
+      - ja/vJTJvPkh6/zKBFPNu5QLpVCktNTMobH6P8Q+6BPKADP45km/3638CR274ql93Dafpgf9R1b0=
+      X-Amz-Request-Id:
+      - D65CMETS4WAY4WKZ
+      Date:
+      - Tue, 21 Jun 2022 02:15:52 GMT
+      Etag:
+      - '"f45c04d717f3ed6720ae0a3a67981fe4"'
+      Server:
+      - AmazonS3
+      Content-Length:
+      - '0'
+    body:
+      encoding: UTF-8
+      string: ''
+  recorded_at: Tue, 21 Jun 2022 02:15:51 GMT
+- request:
+    method: post
+    uri: "<EIVU_SERVER_HOST>/api/v1/cloud_files/F45C04D717F3ED6720AE0A3A67981FE4/transfer"
+    body:
+      encoding: UTF-8
+      string: content_type=audio%2Fmpeg&asset=test.mp3&filesize=4365
+    headers:
+      Accept:
+      - "*/*"
+      User-Agent:
+      - rest-client/2.1.0 (darwin20 x86_64) ruby/3.1.2p20
+      Authorization:
+      - Token <EIVU_USER_TOKEN>
+      Content-Length:
+      - '54'
+      Content-Type:
+      - application/x-www-form-urlencoded
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Host:
+      - localhost:3000
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Xss-Protection:
+      - 1; mode=block
+      X-Content-Type-Options:
+      - nosniff
+      X-Download-Options:
+      - noopen
+      X-Permitted-Cross-Domain-Policies:
+      - none
+      Referrer-Policy:
+      - strict-origin-when-cross-origin
+      Content-Type:
+      - application/json; charset=utf-8
+      Cache-Control:
+      - no-store, must-revalidate, private, max-age=0
+      X-Request-Id:
+      - 1d4bacf7-f1e5-40df-a41e-eaf320811578
+      X-Runtime:
+      - '0.056526'
+      Server-Timing:
+      - start_processing.action_controller;dur=0.21826171875, sql.active_record;dur=22.6767578125,
+        instantiation.active_record;dur=0.568359375, unpermitted_parameters.action_controller;dur=0.10302734375,
+        process_action.action_controller;dur=34.623779296875
+      Vary:
+      - Origin
+      X-Miniprofiler-Original-Cache-Control:
+      - max-age=0, private, must-revalidate
+      X-Miniprofiler-Ids:
+      - x0absxc26z4hrgei9xy6,cmxnsa3rlwehod5apgiw,19x40fodx2qfsdiywvw9
+      Set-Cookie:
+      - __profilin=p%3Dt; path=/; HttpOnly; SameSite=Lax
+      Transfer-Encoding:
+      - chunked
+    body:
+      encoding: UTF-8
+      string: '{"name":null,"asset":"test.mp3","md5":"F45C04D717F3ED6720AE0A3A67981FE4","content_type":"audio/mpeg","filesize":4365,"description":null,"rating":null,"nsfw":false,"peepy":false,"created_at":"2022-06-21T02:15:51.374Z","updated_at":"2022-06-21T02:15:51.848Z","info_url":null,"duration":0,"ext_id":null,"data_source_id":null,"release_id":null,"year":null,"release_pos":null,"num_plays":0,"state":"transfered","bucket_uuid":"3b746ff6-82b3-4340-a745-ae6d5d375381","bucket_name":"<EIVU_BUCKET_NAME>","user_uuid":"1bf23eff-c27f-444e-96a9-6f25a6b98674","folder_uuid":null,"metadata":[]}'
+  recorded_at: Tue, 21 Jun 2022 02:15:51 GMT
+- request:
+    method: post
+    uri: "<EIVU_SERVER_HOST>/api/v1/cloud_files/F45C04D717F3ED6720AE0A3A67981FE4/complete"
+    body:
+      encoding: US-ASCII
+      string: year&rating&release_pos&metadata_list[][original_local_path_to_file]=%2FUsers%2Fjinx%2Fprojects%2Feivu%2Fruby_client%2Fspec%2Ffixtures%2Fsamples%2Ftest.mp3
+    headers:
+      Accept:
+      - "*/*"
+      User-Agent:
+      - rest-client/2.1.0 (darwin20 x86_64) ruby/3.1.2p20
+      Authorization:
+      - Token <EIVU_USER_TOKEN>
+      Content-Length:
+      - '155'
+      Content-Type:
+      - application/x-www-form-urlencoded
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Host:
+      - localhost:3000
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Xss-Protection:
+      - 1; mode=block
+      X-Content-Type-Options:
+      - nosniff
+      X-Download-Options:
+      - noopen
+      X-Permitted-Cross-Domain-Policies:
+      - none
+      Referrer-Policy:
+      - strict-origin-when-cross-origin
+      Content-Type:
+      - application/json; charset=utf-8
+      Cache-Control:
+      - no-store, must-revalidate, private, max-age=0
+      X-Request-Id:
+      - bff04663-267e-4640-8681-878090b5ab84
+      X-Runtime:
+      - '0.148421'
+      Server-Timing:
+      - start_processing.action_controller;dur=0.2978515625, sql.active_record;dur=58.188232421875,
+        instantiation.active_record;dur=0.735107421875, process_action.action_controller;dur=134.10888671875
+      Vary:
+      - Origin
+      X-Miniprofiler-Original-Cache-Control:
+      - max-age=0, private, must-revalidate
+      X-Miniprofiler-Ids:
+      - sp4qcmdjoik3me1btk5d,cmxnsa3rlwehod5apgiw,19x40fodx2qfsdiywvw9,x0absxc26z4hrgei9xy6
+      Set-Cookie:
+      - __profilin=p%3Dt; path=/; HttpOnly; SameSite=Lax
+      Transfer-Encoding:
+      - chunked
+    body:
+      encoding: UTF-8
+      string: '{"name":null,"asset":"test.mp3","md5":"F45C04D717F3ED6720AE0A3A67981FE4","content_type":"audio/mpeg","filesize":4365,"description":null,"rating":null,"nsfw":false,"peepy":false,"created_at":"2022-06-21T02:15:51.374Z","updated_at":"2022-06-21T02:15:51.945Z","info_url":null,"duration":0,"ext_id":null,"data_source_id":null,"release_id":null,"year":null,"release_pos":null,"num_plays":0,"state":"completed","bucket_uuid":"3b746ff6-82b3-4340-a745-ae6d5d375381","bucket_name":"<EIVU_BUCKET_NAME>","user_uuid":"1bf23eff-c27f-444e-96a9-6f25a6b98674","folder_uuid":null,"metadata":[{"original_local_path_to_file":"/Users/jinx/projects/eivu/ruby_client/spec/fixtures/samples/test.mp3"}]}'
+  recorded_at: Tue, 21 Jun 2022 02:15:52 GMT
+recorded_with: VCR 6.0.0
