@@ -54,9 +54,8 @@ describe Eivu::Client do
         before do
           expect(Eivu::Client::CloudFile).to receive(:reserve).and_return(dummy_cloud_file)
           expect(dummy_cloud_file).to receive(:transfer)
-          expect(dummy_cloud_file).to receive(:complete) # test for metadata will go here
           expect(dummy_cloud_file).to receive(:s3_folder).and_return('/path/to/s3/folder')
-          expect_any_instance_of(Eivu::Client).to receive(:write_to_s3).and_return(false)
+          expect_any_instance_of(Eivu::Client).to receive(:write_to_s3).and_return(true)
         end
 
         let(:dummy_cloud_file) { instance_double(Eivu::Client::CloudFile) }
@@ -66,10 +65,9 @@ describe Eivu::Client do
 
           it 'writes the file to S3 and saves data to the server' do
             aggregate_failures do
-              expect(result).to be_kind_of(Eivu::Client::CloudFile)
-              expect(result.md5).to eq(md5)
-              expect(result.state).to eq('completed')
+              expect(dummy_cloud_file).to receive(:complete) # te'st for metadata will go here
             end
+            result
           end
         end
       end

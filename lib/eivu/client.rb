@@ -36,7 +36,7 @@ module Eivu
       cloud_file  = CloudFile.reserve(bucket_name: configuration.bucket_name,
                                       path_to_file:, peepy:, nsfw:)
       asset       = File.basename(path_to_file)
-      mime        = MimeMagic.by_magic(File.open(path_to_file))
+      mime        = MimeMagic.by_magic(File.open(path_to_file)) || MimeMagic.by_path(path_to_file)
       filesize    = File.size(path_to_file)
       s3_resource = instantiate_s3_resource
       tags        = MetadataExtractor.extract_tags(path_to_file)&.map { |tag| { tag: tag } }
