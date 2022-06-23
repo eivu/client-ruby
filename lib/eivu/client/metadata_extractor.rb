@@ -3,7 +3,7 @@
 module Eivu
   class Client
     module MetadataExtractor
-      DOUBLE_PAREN_REGEX = /\(\(([^\)]+)\)\)/
+      DOUBLE_PAREN_REGEX = /\(\(([^)]+)\)\)/
 
       class << self
         def extract_tags(string)
@@ -17,8 +17,6 @@ module Eivu
             4.75
           elsif string.starts_with?('`')
             4.25
-          else
-            nil
           end
         end
       end

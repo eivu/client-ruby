@@ -57,25 +57,30 @@ describe Eivu::Client do
           expect_any_instance_of(Eivu::Client).to receive(:write_to_s3).and_return(true)
           # true tests below
           expect(dummy_cloud_file).to receive(:transfer).with(content_type:, asset:, filesize:)
-          expect(dummy_cloud_file).to receive(:complete).with(rating:, metadata_list:, year: nil, release_pos: nil, matched_recording: nil)
+          expect(dummy_cloud_file).to receive(:complete).with(rating:, metadata_list:, year: nil, release_pos: nil,
+                                                              matched_recording: nil)
         end
 
         let(:dummy_cloud_file) { instance_double(Eivu::Client::CloudFile) }
         let(:filesize) { File.size(path_to_file) }
 
         context 'with rating and metadata' do
-          let(:path_to_file) { File.expand_path('../../fixtures/samples/other/`Cowboyboy Bebop - The Real Folk Blues, Part I ((anime)) ((script)) ((all time best)).txt', __dir__) }
+          let(:path_to_file) do
+            File.expand_path(
+              '../../fixtures/samples/other/`Cowboyboy Bebop - The Real Folk Blues, Part I ((anime)) ((script)) ((all time best)).txt', __dir__
+            )
+          end
           let(:asset) { File.basename(path_to_file) }
           let(:rating) { 4.25 }
           let(:content_type) { 'text/plain' }
-          let(:metadata_list) {
+          let(:metadata_list) do
             [
-              {original_local_path_to_file: path_to_file},
-              {tag: 'anime'},
-              {tag: 'script'},
-              {tag: 'all time best'}
+              { original_local_path_to_file: path_to_file },
+              { tag: 'anime' },
+              { tag: 'script' },
+              { tag: 'all time best' }
             ]
-          }
+          end
 
           it 'writes the file to S3 and saves data to the server' do
             result
