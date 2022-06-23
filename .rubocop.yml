@@ -30,6 +30,8 @@ Metrics/BlockLength:
 Layout/LineLength:
   Max: 120
   Exclude:
+    - eivu-client-ruby.gemspec
+    - Gemfile
     - spec/spec_helper.rb
     - spec/support/vcr_helper.rb
 
