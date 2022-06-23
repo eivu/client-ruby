@@ -25,8 +25,8 @@ describe Eivu::Client::MetadataExtractor do
       it { is_expected.to include('Comic Book Movie') }
     end
 
-    context '`Cowboyboy Bebop - The Real Folk Blues, Part I ((anime)) ((blues)) ((all time best)).wmv' do
-      let(:string) { '`Cowboyboy Bebop - The Real Folk Blues, Part I ((anime)) ((blues)) ((all time best)).wmv' }
+    context '`Cowboyboy Bebop - Wild Horses ((anime)) ((blues)) ((all time best)).wmv' do
+      let(:string) { '`Cowboyboy Bebop - Wild Horses ((anime)) ((blues)) ((all time best)).wmv' }
 
       it { is_expected.to include('anime', 'blues', 'all time best') }
     end
@@ -53,8 +53,8 @@ describe Eivu::Client::MetadataExtractor do
       it { is_expected.to eq(4.75) }
     end
 
-    context '`Cowboyboy Bebop - The Real Folk Blues, Part I ((anime)) ((blues)) ((all time best)).wmv' do
-      let(:string) { '`Cowboyboy Bebop - The Real Folk Blues, Part I ((anime)) ((blues)) ((all time best)).wmv' }
+    context '`Cowboyboy Bebop - Wild Horses ((anime)) ((blues)) ((all time best)).wmv' do
+      let(:string) { '`Cowboyboy Bebop - Wild Horses ((anime)) ((blues)) ((all time best)).wmv' }
 
       it { is_expected.to eq(4.25) }
     end
