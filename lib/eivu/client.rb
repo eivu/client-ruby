@@ -35,12 +35,13 @@ module Eivu
     def upload_file(path_to_file:, peepy: false, nsfw: false)
       cloud_file  = CloudFile.reserve(bucket_name: configuration.bucket_name,
                                       path_to_file:, peepy:, nsfw:)
-      asset       = File.basename(path_to_file)
+      filename    = File.basename(path_to_file)
+      asset       = Utils.prune_metadata(filename)
       mime        = MimeMagic.by_magic(File.open(path_to_file)) || MimeMagic.by_path(path_to_file)
       filesize    = File.size(path_to_file)
       s3_resource = instantiate_s3_resource
-      tags        = MetadataExtractor.extract_tags(asset)&.map { |tag| { tag: } }
-      rating      = MetadataExtractor.extract_rating(asset)
+      tags        = MetadataExtractor.extract_tags(filename)&.map { |tag| { tag: } }
+      rating      = MetadataExtractor.extract_rating(filename)
 
       unless write_to_s3(s3_resource:, s3_folder: cloud_file.s3_folder, path_to_file:)
         raise Errors::CloudStorage::Connection, 'Failed to write to s3'

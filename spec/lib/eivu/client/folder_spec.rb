@@ -34,7 +34,7 @@ describe Eivu::Client::Folder do
           'spec/fixtures/samples/mov_bbb.mp4',
           'spec/fixtures/samples/sample_640x360_beach.flv',
           'spec/fixtures/samples/test.mp3',
-          'spec/fixtures/samples/other/`Cowboyboy Bebop - Wild Horses ((anime)) ((script)) ((all time best)).txt'
+          'spec/fixtures/samples/other/`Cowboy Bebop - Asteroid Blues ((anime)) ((script)) ((all time best)).txt'
         )
       end
     end

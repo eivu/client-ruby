@@ -67,11 +67,11 @@ describe Eivu::Client do
         context 'with rating and metadata' do
           let(:path_to_file) do
             File.expand_path(
-              '../../fixtures/samples/other/`Cowboyboy Bebop - Wild Horses ((anime)) ((script)) ((all time best)).txt',
+              '../../fixtures/samples/other/`Cowboy Bebop - Asteroid Blues ((anime)) ((script)) ((all time best)).txt',
               __dir__
             )
           end
-          let(:asset) { File.basename(path_to_file) }
+          let(:asset) { 'Cowboy Bebop - Asteroid Blues.txt' }
           let(:rating) { 4.25 }
           let(:content_type) { 'text/plain' }
           let(:metadata_list) do
