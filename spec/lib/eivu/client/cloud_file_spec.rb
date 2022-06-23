@@ -2,7 +2,7 @@
 
 describe Eivu::Client::CloudFile, vcr: true do
   let(:bucket_uuid) { '3b746ff6-82b3-4340-a745-ae6d5d375381' }
-  let(:bucket_name) { 'eivutest' }
+  let(:bucket_name) { 'eivu-test' }
   let(:peepy) { false }
   let(:nsfw) { false }
 
@@ -161,14 +161,6 @@ describe Eivu::Client::CloudFile, vcr: true do
         end
       end
     end
-
-    # context 'when working with a file NOT transfered' do
-    #   let(:path_to_file) { File.expand_path('../../../fixtures/samples/Piano_brokencrash-Brandondorf-1164520478.mp3', __dir__) }
-
-    #   it 'will raise an exception' do
-    #     expect { completion }.to raise_error(RestClient::UnprocessableEntity)
-    #   end
-    # end
   end
 
   describe '#s3_folder' do

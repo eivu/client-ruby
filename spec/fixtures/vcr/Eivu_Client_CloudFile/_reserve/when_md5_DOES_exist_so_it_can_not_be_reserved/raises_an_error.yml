@@ -5,7 +5,7 @@ http_interactions:
     uri: "<EIVU_SERVER_HOST>/api/v1/cloud_files/198918F40ECC7CAB0FC4231ADAF67C96/reserve"
     body:
       encoding: UTF-8
-      string: bucket_name=eivutest&peepy=false&nsfw=false
+      string: bucket_name=eivu-test&peepy=false&nsfw=false
     headers:
       Accept:
       - "*/*"

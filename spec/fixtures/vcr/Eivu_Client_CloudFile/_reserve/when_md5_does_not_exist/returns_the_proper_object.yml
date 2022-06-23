@@ -5,7 +5,7 @@ http_interactions:
     uri: "<EIVU_SERVER_HOST>/api/v1/cloud_files/F45C04D717F3ED6720AE0A3A67981FE4/reserve"
     body:
       encoding: UTF-8
-      string: bucket_name=eivutest&peepy=false&nsfw=false
+      string: bucket_name=eivu-test&peepy=false&nsfw=false
     headers:
       Accept:
       - "*/*"
@@ -62,6 +62,6 @@ http_interactions:
       - chunked
     body:
       encoding: UTF-8
-      string: '{"name":null,"asset":null,"md5":"F45C04D717F3ED6720AE0A3A67981FE4","content_type":null,"filesize":0,"description":null,"rating":null,"nsfw":false,"peepy":false,"created_at":"2022-04-24T06:00:40.543Z","updated_at":"2022-04-24T06:00:40.543Z","info_url":null,"duration":0,"ext_id":null,"data_source_id":null,"release_id":null,"year":null,"release_pos":null,"num_plays":0,"state":"reserved","bucket_uuid":"3b746ff6-82b3-4340-a745-ae6d5d375381","bucket_name":"eivutest","user_uuid":"1bf23eff-c27f-444e-96a9-6f25a6b98674","folder_uuid":null,"metadata":[]}'
+      string: '{"name":null,"asset":null,"md5":"F45C04D717F3ED6720AE0A3A67981FE4","content_type":null,"filesize":0,"description":null,"rating":null,"nsfw":false,"peepy":false,"created_at":"2022-04-24T06:00:40.543Z","updated_at":"2022-04-24T06:00:40.543Z","info_url":null,"duration":0,"ext_id":null,"data_source_id":null,"release_id":null,"year":null,"release_pos":null,"num_plays":0,"state":"reserved","bucket_uuid":"3b746ff6-82b3-4340-a745-ae6d5d375381","bucket_name":"eivu-test","user_uuid":"1bf23eff-c27f-444e-96a9-6f25a6b98674","folder_uuid":null,"metadata":[]}'
   recorded_at: Sun, 24 Apr 2022 06:00:40 GMT
 recorded_with: VCR 6.0.0
