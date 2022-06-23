@@ -39,7 +39,8 @@ module Eivu
       mime        = MimeMagic.by_magic(File.open(path_to_file)) || MimeMagic.by_path(path_to_file)
       filesize    = File.size(path_to_file)
       s3_resource = instantiate_s3_resource
-      tags        = MetadataExtractor.extract_tags(path_to_file)&.map { |tag| { tag: tag } }
+      tags        = MetadataExtractor.extract_tags(asset)&.map { |tag| { tag: } }
+      rating      = MetadataExtractor.extract_rating(asset)
 
       unless write_to_s3(s3_resource:, s3_folder: cloud_file.s3_folder, path_to_file:)
         raise Errors::CloudStorage::Connection, 'Failed to write to s3'
@@ -48,7 +49,7 @@ module Eivu
       metadata_list = [{ original_local_path_to_file: path_to_file }]
       metadata_list += tags.to_a
       cloud_file.transfer(content_type: mime.type, asset:, filesize:)
-      cloud_file.complete(year: nil, rating: nil, release_pos: nil, metadata_list:, matched_recording: nil)
+      cloud_file.complete(year: nil, rating:, release_pos: nil, metadata_list:, matched_recording: nil)
     end
 
     def upload_folder(path_to_folder:, peepy: false, nsfw: false)
