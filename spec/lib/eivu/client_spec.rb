@@ -91,6 +91,7 @@ describe Eivu::Client do
     end
 
     context 'failure' do
+
       before do
         expect(Eivu::Client::CloudFile).to receive(:reserve).and_return(dummy_cloud_file)
         expect(dummy_cloud_file).to receive(:s3_folder).and_return('/path/to/s3/folder')
@@ -125,19 +126,31 @@ describe Eivu::Client do
     end
 
     context 'failure' do
-      before do
-        allow(Eivu::Client::CloudFile).to receive(:reserve).and_return(dummy_cloud_file)
-        allow(dummy_cloud_file).to receive(:s3_folder).and_return('/path/to/s3/folder')
-        allow_any_instance_of(Eivu::Client).to receive(:write_to_s3).and_return(false)
+      context 'fails to write to s3' do
+        before do
+          allow(Eivu::Client::CloudFile).to receive(:reserve).and_return(dummy_cloud_file)
+          allow(dummy_cloud_file).to receive(:s3_folder).and_return('/path/to/s3/folder')
+          allow_any_instance_of(Eivu::Client).to receive(:write_to_s3).and_return(false)
+        end
+
+        let(:dummy_cloud_file) { instance_double(Eivu::Client::CloudFile) }
+
+        it 'fails to write any files to S3 and returns a collection of errors' do
+          aggregate_failures do
+            expect(result[:success].count).to eq(0)
+            expect(result[:failure].count).to eq(5)
+            expect(result[:failure].values).to all(be_a(Eivu::Client::Errors::CloudStorage::Connection))
+          end
+        end
       end
 
-      let(:dummy_cloud_file) { instance_double(Eivu::Client::CloudFile) }
-
-      it 'fails to write any files to S3 and returns a collection of errors' do
-        aggregate_failures do
-          expect(result[:success].count).to eq(0)
-          expect(result[:failure].count).to eq(5)
-          expect(result[:failure].values).to all(be_a(Eivu::Client::Errors::CloudStorage::Connection))
+      context 'fails to connect to eivu server', vcr: true do
+        it 'writes the file to S3 and returns a collection of success statements' do
+          aggregate_failures do
+            expect(result[:success].count).to eq(0)
+            expect(result[:failure].count).to eq(5)
+            expect(result[:failure].values).to all(be_a(Eivu::Client::Errors::Server::Connection))
+          end
         end
       end
     end

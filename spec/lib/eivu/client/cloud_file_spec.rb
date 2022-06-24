@@ -65,37 +65,51 @@ describe Eivu::Client::CloudFile, vcr: true do
   describe '.reserve' do
     subject(:reservation) { described_class.reserve(bucket_name:, path_to_file:) }
 
-    context 'when md5 does not exist' do
-      let(:md5) { 'F45C04D717F3ED6720AE0A3A67981FE4' }
-      let(:path_to_file) { File.expand_path('../../../fixtures/samples/test.mp3', __dir__) }
+    context 'success' do
+      context 'when md5 does not exist' do
+        let(:md5) { 'F45C04D717F3ED6720AE0A3A67981FE4' }
+        let(:path_to_file) { File.expand_path('../../../fixtures/samples/test.mp3', __dir__) }
 
-      it 'returns the proper object' do
-        aggregate_failures do
-          expect(reservation).to be_kind_of(described_class)
-          expect(reservation.md5).to eq(md5)
-          expect(reservation.bucket_name).to eq(bucket_name)
-          expect(reservation.state).to eq('reserved')
+        it 'returns the proper object' do
+          aggregate_failures do
+            expect(reservation).to be_kind_of(described_class)
+            expect(reservation.md5).to eq(md5)
+            expect(reservation.bucket_name).to eq(bucket_name)
+            expect(reservation.state).to eq('reserved')
+          end
         end
       end
     end
 
-    context 'when md5 DOES exist, so it can not be reserved' do
-      let(:path_to_file) { File.expand_path('../../../fixtures/samples/mov_bbb.mp4', __dir__) }
+    context 'failure' do
+      context 'when server is offline' do
+        let(:path_to_file) { File.expand_path('../../../fixtures/samples/mov_bbb.mp4', __dir__) }
 
-      it 'raises an error' do
-        aggregate_failures do
-          expect { reservation }.to raise_error(RestClient::UnprocessableEntity)
+        it 'raises an error' do
+          aggregate_failures do
+            expect { reservation }.to raise_error(Eivu::Client::Errors::Server::Connection)
+          end
         end
       end
-    end
 
-    context 'when bucket does not exist' do
-      let(:bucket_name) { 'not-a-bucket' }
-      let(:path_to_file) { File.expand_path('../../../fixtures/samples/mov_bbb.mp4', __dir__) }
+      context 'when md5 DOES exist, so it can not be reserved' do
+        let(:path_to_file) { File.expand_path('../../../fixtures/samples/mov_bbb.mp4', __dir__) }
 
-      it 'raises an error' do
-        aggregate_failures do
-          expect { reservation }.to raise_error(RestClient::BadRequest)
+        it 'raises an error' do
+          aggregate_failures do
+            expect { reservation }.to raise_error(RestClient::UnprocessableEntity)
+          end
+        end
+      end
+
+      context 'when bucket does not exist' do
+        let(:bucket_name) { 'not-a-bucket' }
+        let(:path_to_file) { File.expand_path('../../../fixtures/samples/mov_bbb.mp4', __dir__) }
+
+        it 'raises an error' do
+          aggregate_failures do
+            expect { reservation }.to raise_error(RestClient::BadRequest)
+          end
         end
       end
     end

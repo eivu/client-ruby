@@ -40,7 +40,7 @@ module Eivu
             { 'Authorization' => "Token #{Eivu::Client.configuration.user_token}" }
           )
 
-          raise Errors::Connection, "Failed to connected received: #{response.code}" if response.code != 200
+          raise Errors::Connection, "Failed connection: #{response.code}" if response.code != 200
 
           CloudFile.new Oj.load(response.body).symbolize_keys
         end
@@ -52,9 +52,11 @@ module Eivu
             { 'Authorization' => "Token #{Eivu::Client.configuration.user_token}" }
           )
 
-          raise Errors::Connection, "Failed to connected received: #{response.code}" if response.code != 200
+          raise Errors::Connection, "Failed connection: #{response.code}" if response.code != 200
 
           Oj.load(response.body).deep_symbolize_keys
+        rescue Errno::ECONNREFUSED
+          raise Errors::Server::Connection, "Failed to connect to eivu server: #{Eivu::Client.configuration.host}"
         end
 
         def generate_md5(path_to_file)
