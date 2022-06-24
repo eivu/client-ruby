@@ -124,28 +124,32 @@ describe Eivu::Client::CloudFile, vcr: true do
     let(:content_type) { MimeMagic.by_magic(File.open(path_to_file)).type }
     let(:filesize) { File.size(path_to_file) }
 
-    context 'when working with a reserved file' do
-      let(:path_to_file) { File.expand_path('../../../fixtures/samples/test.mp3', __dir__) }
+    context 'success' do
+      context 'when working with a reserved file' do
+        let(:path_to_file) { File.expand_path('../../../fixtures/samples/test.mp3', __dir__) }
 
-      it 'has the correct attributes' do
-        aggregate_failures do
-          expect(transference).to be_kind_of(described_class)
-          expect(transference.md5).to eq(md5)
-          expect(transference.asset).to eq(File.basename(path_to_file))
-          expect(transference.content_type).to eq(content_type)
-          expect(transference.filesize).to eq(filesize)
-          expect(transference.state).to eq('transfered')
+        it 'has the correct attributes' do
+          aggregate_failures do
+            expect(transference).to be_kind_of(described_class)
+            expect(transference.md5).to eq(md5)
+            expect(transference.asset).to eq(File.basename(path_to_file))
+            expect(transference.content_type).to eq(content_type)
+            expect(transference.filesize).to eq(filesize)
+            expect(transference.state).to eq('transfered')
+          end
         end
       end
     end
 
-    context 'when working with a file NOT reserved' do
-      let(:path_to_file) do
-        File.expand_path('../../../fixtures/samples/Piano_brokencrash-Brandondorf-1164520478.mp3', __dir__)
-      end
+    context 'failure' do
+      context 'when working with a file NOT reserved' do
+        let(:path_to_file) do
+          File.expand_path('../../../fixtures/samples/Piano_brokencrash-Brandondorf-1164520478.mp3', __dir__)
+        end
 
-      it 'will raise an exception' do
-        expect { transference }.to raise_error(RestClient::UnprocessableEntity)
+        it 'will raise an exception' do
+          expect { transference }.to raise_error(RestClient::UnprocessableEntity)
+        end
       end
     end
   end
