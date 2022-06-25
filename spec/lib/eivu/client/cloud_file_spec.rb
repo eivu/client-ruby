@@ -109,17 +109,6 @@ describe Eivu::Client::CloudFile, vcr: true do
           end
         end
       end
-
-      context 'when bucket does not exist' do
-        let(:bucket_name) { 'not-a-bucket' }
-        let(:path_to_file) { File.expand_path('../../../fixtures/samples/mov_bbb.mp4', __dir__) }
-
-        it 'raises an error' do
-          aggregate_failures do
-            expect { reservation }.to raise_error(RestClient::BadRequest)
-          end
-        end
-      end
     end
   end
 
@@ -156,7 +145,7 @@ describe Eivu::Client::CloudFile, vcr: true do
         end
 
         it 'will raise an exception' do
-          expect { transference }.to raise_error(RestClient::UnprocessableEntity)
+          expect { transference }.to raise_error(Eivu::Client::Errors::Server::InvalidCloudFileState)
         end
       end
     end

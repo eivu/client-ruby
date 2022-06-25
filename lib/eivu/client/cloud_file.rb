@@ -51,14 +51,14 @@ module Eivu
             payload,
             { 'Authorization' => "Token #{Eivu::Client.configuration.user_token}" }
           )
-binding.pry
+
           case response.code
           when 200
             :ok
-          when 400
-            raise Errors::Server::Connection, 'Bucket does not exist'
-          when 401
-            raise Errors::Server::InvalidCloudFileState, "Invalid cloud file state: #{response.body}"
+          # when 400
+          #   raise Errors::Server::Connection, 'Bucket does not exist'
+          # when 401
+          #   raise Errors::Server::InvalidCloudFileState, "Invalid cloud file state: #{response.body}"
           when 422
             raise Errors::Server::Security, 'Bucket does is not owned by user'
           else
@@ -66,6 +66,10 @@ binding.pry
           end
 
           Oj.load(response.body).deep_symbolize_keys
+        rescue RestClient::UnprocessableEntity
+          raise Errors::Server::InvalidCloudFileState, "Failed to reserve file: #{md5}"
+        rescue RestClient::BadRequest
+          raise Errors::Server::Connection, 'Bucket does not exist'
         rescue Errno::ECONNREFUSED
           raise Errors::Server::Connection, "Failed to connect to eivu server: #{Eivu::Client.configuration.host}"
         end
@@ -79,10 +83,6 @@ binding.pry
           payload     = { bucket_name:, peepy:, nsfw: }
           parsed_body = post_request(action: :reserve, md5:, payload:)
           CloudFile.new parsed_body
-        rescue RestClient::UnprocessableEntity
-          raise Errors::Server::InvalidCloudFileState, "Failed to reserve file: #{md5}"
-        rescue RestClient::BadRequest
-          raise Errors::Server::Connection, 'Bucket does not exist'
         end
       end
 
