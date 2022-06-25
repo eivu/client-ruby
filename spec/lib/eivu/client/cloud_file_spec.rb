@@ -49,7 +49,7 @@ describe Eivu::Client::CloudFile, vcr: true do
           aggregate_failures do
             expect(instance.md5).to eq(md5)
             expect(instance.name).to eq('Piano_brokencrash-Brandondorf-1164520478.mp3')
-            # expect(instance.bucket_uuid).to eq(bucket_uuid)
+            expect(instance.bucket_uuid).to eq(bucket_uuid)
           end
         end
       end
@@ -66,8 +66,8 @@ describe Eivu::Client::CloudFile, vcr: true do
     end
   end
 
-  describe '.reserve_or_fetch' do
-    subject(:instance) { described_class.reserve_or_fetch(bucket_name:, path_to_file:) }
+  describe '.reserve_or_fetch_by' do
+    subject(:instance) { described_class.reserve_or_fetch_by(bucket_name:, path_to_file:) }
 
     let(:md5) { described_class.generate_md5(path_to_file) }
     let(:path_to_file) { File.expand_path('../../../fixtures/samples/test.mp3', __dir__) }
@@ -102,41 +102,41 @@ describe Eivu::Client::CloudFile, vcr: true do
       end
     end
 
-    # context 'failure' do
-    #   let(:path_to_file) { File.expand_path('../../../fixtures/samples/mov_bbb.mp4', __dir__) }
+    context 'failure' do
+      let(:path_to_file) { File.expand_path('../../../fixtures/samples/mov_bbb.mp4', __dir__) }
 
-    #   context 'when server is offline' do
-    #     before do
-    #       expect(RestClient).to receive(:post).and_raise(Errno::ECONNREFUSED)
-    #     end
+      context 'when server is offline' do
+        before do
+          expect(RestClient).to receive(:post).and_raise(Errno::ECONNREFUSED)
+        end
 
-    #     it 'raises an error' do
-    #       aggregate_failures do
-    #         expect { instance }.to raise_error(Eivu::Client::Errors::Server::Connection)
-    #       end
-    #     end
-    #   end
+        it 'raises an error' do
+          aggregate_failures do
+            expect { instance }.to raise_error(Eivu::Client::Errors::Server::Connection)
+          end
+        end
+      end
 
-    #   context 'when bucket does not exist' do
-    #     let(:bucket_name) { 'missing-bucket' }
+      context 'when bucket does not exist' do
+        let(:bucket_name) { 'missing-bucket' }
 
-    #     it 'raises an error' do
-    #       aggregate_failures do
-    #         expect { instance }.to raise_error(Eivu::Client::Errors::Server::Connection)
-    #       end
-    #     end
-    #   end
+        it 'raises an error' do
+          aggregate_failures do
+            expect { instance }.to raise_error(Eivu::Client::Errors::Server::Connection)
+          end
+        end
+      end
 
-    #   context 'when reserving file in wrong bucket' do
-    #     let(:bucket_name) { 'error' }
+      context 'when reserving file in wrong bucket' do
+        let(:bucket_name) { 'error' }
 
-    #     it 'raises an error' do
-    #       aggregate_failures do
-    #         expect { instance }.to raise_error(Eivu::Client::Errors::Server::Security)
-    #       end
-    #     end
-    #   end
-    # end
+        it 'raises an error' do
+          aggregate_failures do
+            expect { instance }.to raise_error(Eivu::Client::Errors::Server::Security)
+          end
+        end
+      end
+    end
   end
 
   describe '.reserve' do

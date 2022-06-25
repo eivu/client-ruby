@@ -34,7 +34,7 @@ module Eivu
       attribute? :metadata, Types::JSON::Array.of(Types::JSON::Hash)
 
       class << self
-        def reserve_or_fetch(bucket_name:, path_to_file:, peepy: false, nsfw: false)
+        def reserve_or_fetch_by(bucket_name:, path_to_file:, peepy: false, nsfw: false)
           reserve(bucket_name:, path_to_file:, peepy:, nsfw:)
         rescue Errors::Server::InvalidCloudFileState
           md5 = generate_md5(path_to_file)
