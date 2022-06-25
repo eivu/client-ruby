@@ -1,8 +1,68 @@
 ---
 http_interactions:
 - request:
+    method: post
+    uri: "<EIVU_SERVER_HOST>/api/v1/cloud_files/F45C04D717F3ED6720AE0A3A67981FE4/reserve"
+    body:
+      encoding: UTF-8
+      string: bucket_name=<EIVU_BUCKET_NAME>&peepy=false&nsfw=false
+    headers:
+      Accept:
+      - "*/*"
+      User-Agent:
+      - rest-client/2.1.0 (darwin20 x86_64) ruby/3.1.2p20
+      Authorization:
+      - Token <EIVU_USER_TOKEN>
+      Content-Length:
+      - '44'
+      Content-Type:
+      - application/x-www-form-urlencoded
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Host:
+      - localhost:3000
+  response:
+    status:
+      code: 422
+      message: Unprocessable Entity
+    headers:
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Xss-Protection:
+      - 1; mode=block
+      X-Content-Type-Options:
+      - nosniff
+      X-Download-Options:
+      - noopen
+      X-Permitted-Cross-Domain-Policies:
+      - none
+      Referrer-Policy:
+      - strict-origin-when-cross-origin
+      Content-Type:
+      - application/json; charset=utf-8
+      Cache-Control:
+      - no-cache
+      X-Request-Id:
+      - 27618c79-e7dc-4adf-ba2e-fff9f87983c2
+      X-Runtime:
+      - '0.030306'
+      Server-Timing:
+      - start_processing.action_controller;dur=0.290283203125, sql.active_record;dur=7.090087890625,
+        instantiation.active_record;dur=0.189208984375, unpermitted_parameters.action_controller;dur=0.10693359375,
+        process_action.action_controller;dur=12.28076171875
+      Vary:
+      - Origin
+      Set-Cookie:
+      - __profilin=p%3Dt; path=/; HttpOnly; SameSite=Lax
+      Transfer-Encoding:
+      - chunked
+    body:
+      encoding: UTF-8
+      string: '{"message":"md5 already exists in this folder"}'
+  recorded_at: Sat, 25 Jun 2022 22:47:43 GMT
+- request:
     method: get
-    uri: "<EIVU_SERVER_HOST>/api/v1/cloud_files/A4FFA621BC8334B4C7F058161BDBABBF"
+    uri: "<EIVU_SERVER_HOST>/api/v1/cloud_files/F45C04D717F3ED6720AE0A3A67981FE4"
     body:
       encoding: US-ASCII
       string: ''
@@ -10,7 +70,7 @@ http_interactions:
       Accept:
       - "*/*"
       User-Agent:
-      - rest-client/2.1.0 (darwin20 x86_64) ruby/3.0.2p107
+      - rest-client/2.1.0 (darwin20 x86_64) ruby/3.1.2p20
       Authorization:
       - Token <EIVU_USER_TOKEN>
       Accept-Encoding:
@@ -39,24 +99,24 @@ http_interactions:
       Cache-Control:
       - no-store, must-revalidate, private, max-age=0
       X-Request-Id:
-      - 9ba64306-2cd3-43c8-9cce-d4d8e2a31c84
+      - e04f18ed-ad0c-416a-8841-3aaa9215c29b
       X-Runtime:
-      - '0.351872'
+      - '0.046373'
       Server-Timing:
-      - sql.active_record;dur=38.9423828125, start_processing.action_controller;dur=0.175048828125,
-        instantiation.active_record;dur=19.121337890625, process_action.action_controller;dur=67.965087890625
+      - start_processing.action_controller;dur=0.23388671875, sql.active_record;dur=13.106201171875,
+        instantiation.active_record;dur=0.715087890625, process_action.action_controller;dur=21.661865234375
       Vary:
       - Origin
       X-Miniprofiler-Original-Cache-Control:
       - max-age=0, private, must-revalidate
       X-Miniprofiler-Ids:
-      - j8odsxt57n4kynnilo8j,l1mvzai5jnd2cvlwfhgs,h351jv6j4xkj358gcjrc,mx7g98dwj96dlmx5x7or,jvfbn3wr9yff681ja3bz,irhbz98zq2xixmmkgppg,2olw46qus2en0bu83893,ruzvt1gp1hy1yqtsrp75,qfbskbfsdyab27djfgrx,xv85ivtrpcdci6sy43iu,6b8m696kwzwypay98hlg,6b5pjjp4kf4n3h5dllnr,emsm2uwa42gjf8fllzqd,8yh1sf8dnlx8sj8q2v6m,ffy6c0z8yi0d3radj680,rthjel81wlgi5bppjp1v,is57w1byhkezluonla7k,jh89weip8485ncjqov0h,wdqycioov00w0mrthtwx,35ndk0cm0marp9z01zm1
+      - dgcqgz437dwb3xtr4sj5,nat8r626flusu8f4vbr5,6j7zijmdl9h0gnb54m31,p2wij0q1c8fpzzyp1wrc,mqx4pn8ai98x9eycth57,h5kqo0307bqt0gqciei2,fgsy3f6r03a14fbueqdw,qinsmu85833ucp0u2xsx,3uz2hgkwkg1ovequxwh,cmxnsa3rlwehod5apgiw,19x40fodx2qfsdiywvw9,x0absxc26z4hrgei9xy6,sp4qcmdjoik3me1btk5d,6r5zldxin4v865xx1xz5,29ikbiju5spec90hzx73,qh337q4yix23zn0ad7v3,cnfl1vxqcle5kmzinv5l,hsg3c7iunekq5kwtj9lz,4nboh3bfyx3k56yr0an4,nblokmgdlxihz3obej2j
       Set-Cookie:
       - __profilin=p%3Dt; path=/; HttpOnly; SameSite=Lax
       Transfer-Encoding:
       - chunked
     body:
       encoding: UTF-8
-      string: '{"name":"Piano_brokencrash-Brandondorf-1164520478.mp3","asset":"Piano_brokencrash-Brandondorf-1164520478.mp3","md5":"A4FFA621BC8334B4C7F058161BDBABBF","content_type":"audio/mpeg","filesize":134899,"description":null,"rating":null,"nsfw":false,"peepy":false,"created_at":"2015-05-14T05:40:25.870Z","updated_at":"2015-05-14T05:40:25.870Z","folder_id":null,"info_url":null,"duration":0,"ext_id":null,"data_source_id":null,"release_id":null,"year":null,"release_pos":null,"num_plays":0,"state":"empty","bucket_uuid":"3b746ff6-82b3-4340-a745-ae6d5d375381"}'
-  recorded_at: Sun, 30 Jan 2022 04:16:33 GMT
-recorded_with: VCR 6.0.0
+      string: '{"name":null,"asset":null,"md5":"F45C04D717F3ED6720AE0A3A67981FE4","content_type":null,"filesize":0,"description":null,"rating":null,"nsfw":false,"peepy":false,"created_at":"2022-06-25T22:42:56.058Z","updated_at":"2022-06-25T22:42:56.058Z","info_url":null,"duration":0,"ext_id":null,"data_source_id":null,"release_id":null,"year":null,"release_pos":null,"num_plays":0,"state":"reserved","bucket_uuid":"3b746ff6-82b3-4340-a745-ae6d5d375381","bucket_name":"<EIVU_BUCKET_NAME>","user_uuid":"1bf23eff-c27f-444e-96a9-6f25a6b98674","folder_uuid":null,"metadata":[]}'
+  recorded_at: Sat, 25 Jun 2022 22:47:43 GMT
+recorded_with: VCR 6.1.0
