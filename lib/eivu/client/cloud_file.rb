@@ -52,7 +52,18 @@ module Eivu
             { 'Authorization' => "Token #{Eivu::Client.configuration.user_token}" }
           )
 
-          raise Errors::Connection, "Failed connection: #{response.code}" if response.code != 200
+          case response.code
+          when 200
+            :ok
+          when 400
+            raise Errors::Server::Connection, 'Bucket does not exist'
+          when 401
+            raise Errors::Server::InvalidCloudFileState, "Invalid cloud file state: #{response.body}"
+          when 422
+            raise Errors::Server::Security, 'Bucket does is not owned by user'
+          else
+            raise Errors::Server::Connection, "Failed connection: #{response.code}"
+          end
 
           Oj.load(response.body).deep_symbolize_keys
         rescue Errno::ECONNREFUSED

@@ -1,0 +1,63 @@
+---
+http_interactions:
+- request:
+    method: post
+    uri: "<EIVU_SERVER_HOST>/api/v1/cloud_files/198918F40ECC7CAB0FC4231ADAF67C96/reserve"
+    body:
+      encoding: UTF-8
+      string: bucket_name=<EIVU_BUCKET_NAME>&peepy=false&nsfw=false
+    headers:
+      Accept:
+      - "*/*"
+      User-Agent:
+      - rest-client/2.1.0 (darwin20 x86_64) ruby/3.1.2p20
+      Authorization:
+      - Token <EIVU_USER_TOKEN>
+      Content-Length:
+      - '44'
+      Content-Type:
+      - application/x-www-form-urlencoded
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Host:
+      - localhost:3000
+  response:
+    status:
+      code: 422
+      message: Unprocessable Entity
+    headers:
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Xss-Protection:
+      - 1; mode=block
+      X-Content-Type-Options:
+      - nosniff
+      X-Download-Options:
+      - noopen
+      X-Permitted-Cross-Domain-Policies:
+      - none
+      Referrer-Policy:
+      - strict-origin-when-cross-origin
+      Content-Type:
+      - application/json; charset=utf-8
+      Cache-Control:
+      - no-cache
+      X-Request-Id:
+      - 6fa73a70-1b27-4c03-b9ff-fb2baa6f5dc6
+      X-Runtime:
+      - '0.218668'
+      Server-Timing:
+      - sql.active_record;dur=70.7978515625, start_processing.action_controller;dur=0.276123046875,
+        instantiation.active_record;dur=21.22802734375, unpermitted_parameters.action_controller;dur=0.149169921875,
+        process_action.action_controller;dur=75.908935546875
+      Vary:
+      - Origin
+      Set-Cookie:
+      - __profilin=p%3Dt; path=/; HttpOnly; SameSite=Lax
+      Transfer-Encoding:
+      - chunked
+    body:
+      encoding: UTF-8
+      string: '{"message":"md5 already exists in this folder","cloud_file":null}'
+  recorded_at: Sat, 25 Jun 2022 04:24:15 GMT
+recorded_with: VCR 6.1.0
