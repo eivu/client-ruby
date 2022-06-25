@@ -37,27 +37,31 @@ describe Eivu::Client::CloudFile, vcr: true do
   describe '.fetch' do
     subject(:instance) { described_class.fetch(md5) }
 
-    context 'when md5 exists' do
-      let(:md5) { 'A4FFA621BC8334B4C7F058161BDBABBF' }
+    context 'success' do
+      context 'when md5 exists' do
+        let(:md5) { 'A4FFA621BC8334B4C7F058161BDBABBF' }
 
-      it 'returns a CloudFile instance' do
-        expect(instance).to be_kind_of(described_class)
-      end
+        it 'returns a CloudFile instance' do
+          expect(instance).to be_kind_of(described_class)
+        end
 
-      it 'has the correct attributes' do
-        aggregate_failures do
-          expect(instance.md5).to eq(md5)
-          expect(instance.name).to eq('Piano_brokencrash-Brandondorf-1164520478.mp3')
-          # expect(instance.bucket_uuid).to eq(bucket_uuid)
+        it 'has the correct attributes' do
+          aggregate_failures do
+            expect(instance.md5).to eq(md5)
+            expect(instance.name).to eq('Piano_brokencrash-Brandondorf-1164520478.mp3')
+            # expect(instance.bucket_uuid).to eq(bucket_uuid)
+          end
         end
       end
     end
 
-    context 'when md5 does not exist' do
-      let(:md5) { '==============ERROR=============' }
+    context 'failure' do
+      context 'when md5 does not exist' do
+        let(:md5) { '==============ERROR=============' }
 
-      it 'raises an error' do
-        expect { instance }.to raise_error(Eivu::Client::Errors::CloudStorage::MissingResource)
+        it 'raises an error' do
+          expect { instance }.to raise_error(Eivu::Client::Errors::CloudStorage::MissingResource)
+        end
       end
     end
   end
