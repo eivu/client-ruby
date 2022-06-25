@@ -191,7 +191,7 @@ describe Eivu::Client::CloudFile, vcr: true do
         end
       end
 
-      context 'when writing to wrong bucket' do
+      context 'when reserving file in wrong bucket' do
         let(:bucket_name) { 'error' }
 
         it 'raises an error' do
