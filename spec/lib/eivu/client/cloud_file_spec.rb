@@ -118,7 +118,7 @@ describe Eivu::Client::CloudFile, vcr: true do
   describe '#transfer' do
     subject(:transference) { instance.transfer(content_type:, asset:, filesize:) }
 
-    let(:instance) { described_class.fetch(md5) }
+    let(:instance) { build :cloud_file, :test_mp3 }
     let(:md5) { described_class.generate_md5(path_to_file) }
     let(:asset) { File.basename(path_to_file) }
     let(:content_type) { MimeMagic.by_magic(File.open(path_to_file)).type }
