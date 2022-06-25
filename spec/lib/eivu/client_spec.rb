@@ -149,7 +149,7 @@ describe Eivu::Client do
           aggregate_failures do
             expect(result[:success].count).to eq(0)
             expect(result[:failure].count).to eq(5)
-            expect(result[:failure].values).to all(be_a(Eivu::Client::Errors::Server::Connection))
+            expect(result[:failure].values).to all(be_a(Eivu::Client::Errors::Server::InvalidCloudFileState))
           end
         end
       end
