@@ -109,6 +109,16 @@ describe Eivu::Client::CloudFile, vcr: true do
           end
         end
       end
+
+      context 'when writing to wrong bucket' do
+        let(:bucket_name) { 'error' }
+
+        it 'raises an error' do
+          aggregate_failures do
+            expect { reservation }.to raise_error(Eivu::Client::Errors::Server::Security)
+          end
+        end
+      end
     end
   end
 

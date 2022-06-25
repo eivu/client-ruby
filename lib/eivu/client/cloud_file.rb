@@ -59,13 +59,13 @@ module Eivu
           #   raise Errors::Server::Connection, 'Bucket does not exist'
           # when 401
           #   raise Errors::Server::InvalidCloudFileState, "Invalid cloud file state: #{response.body}"
-          when 422
-            raise Errors::Server::Security, 'Bucket does is not owned by user'
           else
             raise Errors::Server::Connection, "Failed connection: #{response.code}"
           end
 
           Oj.load(response.body).deep_symbolize_keys
+        rescue RestClient::Unauthorized
+          raise Errors::Server::Security, 'Bucket does is not owned by user'
         rescue RestClient::UnprocessableEntity
           raise Errors::Server::InvalidCloudFileState, "Failed to reserve file: #{md5}"
         rescue RestClient::BadRequest
