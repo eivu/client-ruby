@@ -84,13 +84,17 @@ describe Eivu::Client::CloudFile, vcr: true do
     context 'failure' do
       let(:path_to_file) { File.expand_path('../../../fixtures/samples/mov_bbb.mp4', __dir__) }
 
-      # context 'when server is offline' do
-      #   it 'raises an error' do
-      #     aggregate_failures do
-      #       expect { reservation }.to raise_error(Eivu::Client::Errors::Server::Connection)
-      #     end
-      #   end
-      # end
+      context 'when server is offline' do
+        before do
+          expect(RestClient).to receive(:post).and_raise(Errno::ECONNREFUSED)
+        end
+
+        it 'raises an error' do
+          aggregate_failures do
+            expect { reservation }.to raise_error(Eivu::Client::Errors::Server::Connection)
+          end
+        end
+      end
 
       context 'when bucket does not exist' do
         let(:bucket_name) { 'missing-bucket' }

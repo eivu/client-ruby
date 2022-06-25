@@ -52,16 +52,7 @@ module Eivu
             { 'Authorization' => "Token #{Eivu::Client.configuration.user_token}" }
           )
 
-          case response.code
-          when 200
-            :ok
-          # when 400
-          #   raise Errors::Server::Connection, 'Bucket does not exist'
-          # when 401
-          #   raise Errors::Server::InvalidCloudFileState, "Invalid cloud file state: #{response.body}"
-          else
-            raise Errors::Server::Connection, "Failed connection: #{response.code}"
-          end
+          raise Errors::Server::Connection, "Failed connection: #{response.code}" unless response.code == 200
 
           Oj.load(response.body).deep_symbolize_keys
         rescue RestClient::Unauthorized
