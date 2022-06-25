@@ -10,7 +10,9 @@ FactoryBot.define do
     state { 'reserved' }
     created_at { Time.now.to_s }
     updated_at { Time.now.to_s }
-    content_type { 'audio/mpeg' }
+    content_type { Faker::File.mime_type }
+    asset { "#{Faker::Lorem.word.downcase}.#{Faker::File.extension}" }
+    filesize { rand((100.kilobytes)..(2.gigabytes)) }
 
     trait :peepy do
       peepy { true }
@@ -21,14 +23,10 @@ FactoryBot.define do
     end
 
     trait :transfered do
-      content_type { Faker::File.mime_type }
-      asset { "#{Faker::Lorem.word.downcase}.#{Faker::File.extension}" }
-      filesize { rand((100.kilobytes)..(2.gigabytes)) }
       state { 'transfered' }
     end
 
     trait :completed do
-      transfered
       state { 'completed' }
     end
 
@@ -48,6 +46,13 @@ FactoryBot.define do
       content_type { 'application/pdf' }
       filesize { rand((750.kilobytes)..(10.megabytes)) }
       asset { "#{Faker::Lorem.word.downcase}.pdf" }
+    end
+
+    trait :test_mp3 do
+      md5 { 'F45C04D717F3ED6720AE0A3A67981FE4' }
+      asset { 'test.mp3' }
+      content_type { 'audio/mpeg' }
+      filesize { 4365 }
     end
   end
 end
