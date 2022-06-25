@@ -57,7 +57,7 @@ describe Eivu::Client::CloudFile, vcr: true do
       let(:md5) { '==============ERROR=============' }
 
       it 'raises an error' do
-        expect { instance }.to raise_error(RestClient::NotFound)
+        expect { instance }.to raise_error(Eivu::Client::Errors::CloudStorage::MissingResource)
       end
     end
   end

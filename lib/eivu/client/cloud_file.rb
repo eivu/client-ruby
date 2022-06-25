@@ -40,9 +40,9 @@ module Eivu
             { 'Authorization' => "Token #{Eivu::Client.configuration.user_token}" }
           )
 
-          raise Errors::Connection, "Failed connection: #{response.code}" if response.code != 200
-
           CloudFile.new Oj.load(response.body).symbolize_keys
+        rescue RestClient::NotFound
+          raise Errors::CloudStorage::MissingResource, "Cloud file #{md5} not found"
         end
 
         def post_request(action:, md5:, payload:)
