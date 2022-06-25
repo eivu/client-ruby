@@ -51,7 +51,7 @@ module Eivu
             payload,
             { 'Authorization' => "Token #{Eivu::Client.configuration.user_token}" }
           )
-
+binding.pry
           case response.code
           when 200
             :ok
@@ -81,6 +81,8 @@ module Eivu
           CloudFile.new parsed_body
         rescue RestClient::UnprocessableEntity
           raise Errors::Server::InvalidCloudFileState, "Failed to reserve file: #{md5}"
+        rescue RestClient::BadRequest
+          raise Errors::Server::Connection, 'Bucket does not exist'
         end
       end
 

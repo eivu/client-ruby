@@ -5,16 +5,16 @@ http_interactions:
     uri: "<EIVU_SERVER_HOST>/api/v1/cloud_files/198918F40ECC7CAB0FC4231ADAF67C96/reserve"
     body:
       encoding: UTF-8
-      string: bucket_name=not-a-bucket&peepy=false&nsfw=false
+      string: bucket_name=missing-bucket&peepy=false&nsfw=false
     headers:
       Accept:
       - "*/*"
       User-Agent:
-      - rest-client/2.1.0 (darwin20 x86_64) ruby/3.0.2p107
+      - rest-client/2.1.0 (darwin20 x86_64) ruby/3.1.2p20
       Authorization:
       - Token <EIVU_USER_TOKEN>
       Content-Length:
-      - '47'
+      - '49'
       Content-Type:
       - application/x-www-form-urlencoded
       Accept-Encoding:
@@ -43,12 +43,12 @@ http_interactions:
       Cache-Control:
       - no-cache
       X-Request-Id:
-      - 9d238684-73b6-4d83-a1b4-cbf51519188d
+      - df3632d2-371a-423d-8f90-8e0c049ab521
       X-Runtime:
-      - '0.040311'
+      - '0.241256'
       Server-Timing:
-      - start_processing.action_controller;dur=0.197021484375, sql.active_record;dur=4.621826171875,
-        instantiation.active_record;dur=0.397216796875, process_action.action_controller;dur=10.52587890625
+      - start_processing.action_controller;dur=0.179931640625, sql.active_record;dur=25.478271484375,
+        instantiation.active_record;dur=4.26416015625, process_action.action_controller;dur=67.6708984375
       Vary:
       - Origin
       Set-Cookie:
@@ -57,6 +57,6 @@ http_interactions:
       - chunked
     body:
       encoding: UTF-8
-      string: '{"message":"bucket does exist"}'
-  recorded_at: Sun, 24 Apr 2022 05:55:33 GMT
-recorded_with: VCR 6.0.0
+      string: '{"message":"bucket does not exist"}'
+  recorded_at: Sat, 25 Jun 2022 04:54:32 GMT
+recorded_with: VCR 6.1.0
