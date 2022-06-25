@@ -68,6 +68,8 @@ module Eivu
           payload     = { bucket_name:, peepy:, nsfw: }
           parsed_body = post_request(action: :reserve, md5:, payload:)
           CloudFile.new parsed_body
+        rescue RestClient::UnprocessableEntity
+          raise Errors::Server::InvalidCloudFileState, "Failed to reserve file: #{md5}"
         end
       end
 

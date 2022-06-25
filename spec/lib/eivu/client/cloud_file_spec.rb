@@ -97,7 +97,7 @@ describe Eivu::Client::CloudFile, vcr: true do
 
         it 'raises an error' do
           aggregate_failures do
-            expect { reservation }.to raise_error(RestClient::UnprocessableEntity)
+            expect { reservation }.to raise_error(Eivu::Client::Errors::Server::InvalidCloudFileState)
           end
         end
       end
