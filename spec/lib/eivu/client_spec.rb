@@ -56,9 +56,11 @@ describe Eivu::Client do
           expect(dummy_cloud_file).to receive(:s3_folder).and_return('/path/to/s3/folder')
           expect_any_instance_of(Eivu::Client).to receive(:write_to_s3).and_return(true)
           # true tests below
-          expect(dummy_cloud_file).to receive(:transfer).with(content_type:, asset:, filesize:)
-          expect(dummy_cloud_file).to receive(:complete).with(rating:, metadata_list:, year: nil, release_pos: nil,
-                                                              matched_recording: nil)
+          expect(dummy_cloud_file).to receive(:reserved?).and_return(true)
+          expect(dummy_cloud_file).to receive(:transfered?).and_return(true)
+          expect(dummy_cloud_file).to receive(:transfer!).with(content_type:, asset:, filesize:)
+          expect(dummy_cloud_file).to receive(:complete!).with(rating:, metadata_list:, year: nil, release_pos: nil,
+                                                               matched_recording: nil)
         end
 
         let(:dummy_cloud_file) { instance_double(Eivu::Client::CloudFile) }
@@ -91,10 +93,10 @@ describe Eivu::Client do
     end
 
     context 'failure' do
-
       before do
         expect(Eivu::Client::CloudFile).to receive(:reserve).and_return(dummy_cloud_file)
         expect(dummy_cloud_file).to receive(:s3_folder).and_return('/path/to/s3/folder')
+        allow(dummy_cloud_file).to receive(:reserved?).and_return(true)
         expect_any_instance_of(Eivu::Client).to receive(:write_to_s3).and_return(false)
       end
 
@@ -130,6 +132,7 @@ describe Eivu::Client do
         before do
           allow(Eivu::Client::CloudFile).to receive(:reserve).and_return(dummy_cloud_file)
           allow(dummy_cloud_file).to receive(:s3_folder).and_return('/path/to/s3/folder')
+          allow(dummy_cloud_file).to receive(:reserved?).and_return(true)
           allow_any_instance_of(Eivu::Client).to receive(:write_to_s3).and_return(false)
         end
 
@@ -144,12 +147,16 @@ describe Eivu::Client do
         end
       end
 
-      context 'fails to connect to eivu server', vcr: true do
-        it 'writes the file to S3 and returns a collection of success statements' do
+      context 'fails to connect to eivu server' do
+        before do
+          expect(RestClient).to receive(:post).and_raise(Errno::ECONNREFUSED).exactly(5).times
+        end
+
+        it 'fails to connect to the server and returns a collection of errors' do
           aggregate_failures do
             expect(result[:success].count).to eq(0)
             expect(result[:failure].count).to eq(5)
-            expect(result[:failure].values).to all(be_a(Eivu::Client::Errors::Server::InvalidCloudFileState))
+            expect(result[:failure].values).to all(be_a(Eivu::Client::Errors::Server::Connection))
           end
         end
       end

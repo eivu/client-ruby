@@ -203,8 +203,8 @@ describe Eivu::Client::CloudFile, vcr: true do
     end
   end
 
-  describe '#transfer' do
-    subject(:transference) { instance.transfer(content_type:, asset:, filesize:) }
+  describe '#transfer!' do
+    subject(:transference) { instance.transfer!(content_type:, asset:, filesize:) }
 
     let(:instance) { build :cloud_file, :test_mp3 }
     let(:md5) { described_class.generate_md5(path_to_file) }
@@ -242,9 +242,9 @@ describe Eivu::Client::CloudFile, vcr: true do
     end
   end
 
-  describe '#complete' do
+  describe '#complete!' do
     subject(:completion) do
-      instance.complete(year:, rating:, release_pos:, metadata_list:)
+      instance.complete!(year:, rating:, release_pos:, metadata_list:)
     end
 
     let(:instance) { described_class.fetch(md5) }

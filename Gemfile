@@ -6,6 +6,7 @@ ruby '3.1.2'
 gem 'activesupport', '~> 7.0', '>= 7.0.1', require: 'active_support/all' # handy rails functions
 gem 'aws-sdk-s3', '~> 1.111', '>= 1.111.1'
 gem 'dry-struct', '~> 1.4' # structs with default values
+gem 'dry-struct-setters', '~> 0.4.0'
 gem 'factory_bot', '~> 6.2.1' # factory_bot provides a framework and DSL for defining and using factories
 gem 'faker', '~> 2.18' # Faker, a port of Data::Faker from Perl, is used to easily generate fake data: names, addresses, phone numbers, etc.
 gem 'mimemagic', '~> 0.4.3' # Fast mime detection by extension or content (Uses freedesktop.org.xml shared-mime-info database

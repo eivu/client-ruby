@@ -8,8 +8,13 @@ require 'dry-struct'
 module Eivu
   class Client
     class CloudFile < Dry::Struct
+      include Dry::Struct::Setters
+      include Dry::Struct::Setters::MassAssignment
+
       attribute  :md5, Types::String
       attribute  :state, Types::String
+      attribute? :user_uuid, Types::String
+      attribute? :folder_uuid, Types::String.optional
       attribute? :bucket_uuid, Types::String
       attribute? :bucket_name, Types::String
       attribute  :created_at, Types::JSON::DateTime
@@ -84,18 +89,20 @@ module Eivu
         end
       end
 
-      def transfer(content_type:, asset:, filesize:)
+      def transfer!(content_type:, asset:, filesize:)
         payload     = { content_type:, asset:, filesize: }
         # post_request will raise an error if there is a problem
         parsed_body = post_request(action: :transfer, payload:)
-        CloudFile.new parsed_body
+        assign_attributes(parsed_body)
+        self
       end
 
-      def complete(year: nil, rating: nil, release_pos: nil, metadata_list: [], matched_recording: nil)
+      def complete!(year: nil, rating: nil, release_pos: nil, metadata_list: [], matched_recording: nil)
         matched_recording.nil? # trying to avoid rubocop error because it is not used yet
         payload = { year:, rating:, release_pos:, metadata_list: }
         parsed_body = post_request(action: :complete, payload:)
-        CloudFile.new parsed_body
+        assign_attributes(parsed_body)
+        self
       end
 
       def visit
@@ -111,6 +118,18 @@ module Eivu
           end
 
         "#{folder}/#{md5.upcase.scan(/.{2}|.+/).join('/')}"
+      end
+
+      def reserved?
+        state == 'reserved'
+      end
+
+      def transfered?
+        state == 'transfered'
+      end
+
+      def completed?
+        state == 'completed'
       end
 
       private
