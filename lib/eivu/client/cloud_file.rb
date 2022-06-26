@@ -11,8 +11,13 @@ module Eivu
       include Dry::Struct::Setters
       include Dry::Struct::Setters::MassAssignment
 
+      STATE_RESERVED = :reserved
+      STATE_TRANSFERED = :transfered
+      STATE_COMPLETED = :completed
+
       attribute  :md5, Types::String
       attribute  :state, Types::String
+      attribute? :state_history, Types::Strict::Array.of(Types::Strict::Symbol)
       attribute? :user_uuid, Types::String
       attribute? :folder_uuid, Types::String.optional
       attribute? :bucket_uuid, Types::String
@@ -85,7 +90,9 @@ module Eivu
           md5         = generate_md5(path_to_file)
           payload     = { bucket_name:, peepy:, nsfw: }
           parsed_body = post_request(action: :reserve, md5:, payload:)
-          CloudFile.new parsed_body
+          instance    = CloudFile.new parsed_body
+          instance.state_history = [STATE_RESERVED]
+          instance
         end
       end
 
