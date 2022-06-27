@@ -13,6 +13,7 @@ FactoryBot.define do
     content_type { Faker::File.mime_type }
     asset { "#{Faker::Lorem.word.downcase}.#{Faker::File.extension}" }
     filesize { rand((100.kilobytes)..(2.gigabytes)) }
+    state_history { [:reserved] }
 
     trait :peepy do
       peepy { true }
@@ -24,10 +25,12 @@ FactoryBot.define do
 
     trait :transfered do
       state { 'transfered' }
+      state_history { [:reserved, :transfered] }
     end
 
     trait :completed do
       state { 'completed' }
+      state_history { [:reserved, :transfered, :completed] }
     end
 
     trait :audio do

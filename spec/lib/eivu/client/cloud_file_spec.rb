@@ -39,7 +39,7 @@ describe Eivu::Client::CloudFile, vcr: true do
 
     context 'success' do
       context 'when md5 exists' do
-        let(:md5) { 'A4FFA621BC8334B4C7F058161BDBABBF' }
+        let(:md5) { 'F45C04D717F3ED6720AE0A3A67981FE4' }
 
         it 'returns a CloudFile instance' do
           expect(instance).to be_kind_of(described_class)
@@ -48,7 +48,7 @@ describe Eivu::Client::CloudFile, vcr: true do
         it 'has the correct attributes' do
           aggregate_failures do
             expect(instance.md5).to eq(md5)
-            expect(instance.name).to eq('Piano_brokencrash-Brandondorf-1164520478.mp3')
+            expect(instance.asset).to eq('test.mp3')
             expect(instance.bucket_uuid).to eq(bucket_uuid)
           end
         end
@@ -153,6 +153,7 @@ describe Eivu::Client::CloudFile, vcr: true do
             expect(reservation.md5).to eq(md5)
             expect(reservation.bucket_name).to eq(bucket_name)
             expect(reservation.state).to eq('reserved')
+            expect(reservation.state_history).to eq(%i[reserved])
           end
         end
       end
@@ -224,6 +225,7 @@ describe Eivu::Client::CloudFile, vcr: true do
             expect(transference.content_type).to eq(content_type)
             expect(transference.filesize).to eq(filesize)
             expect(transference.state).to eq('transfered')
+            expect(transference.state_history).to eq(%i[reserved transfered])
           end
         end
       end
@@ -264,6 +266,7 @@ describe Eivu::Client::CloudFile, vcr: true do
           expect(completion.release_pos).to eq(release_pos)
           expect(completion.metadata).to eq(metadata_list)
           expect(completion.state).to eq('completed')
+          expect(completion.state_history).to eq(%i[reserved transfered completed])
         end
       end
     end

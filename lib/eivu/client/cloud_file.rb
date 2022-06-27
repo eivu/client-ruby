@@ -17,7 +17,7 @@ module Eivu
 
       attribute  :md5, Types::String
       attribute  :state, Types::String
-      attribute? :state_history, Types::Strict::Array.of(Types::Strict::Symbol)
+      attribute  :state_history, Types::Strict::Array.of(Types::Strict::Symbol)
       attribute? :user_uuid, Types::String
       attribute? :folder_uuid, Types::String.optional
       attribute? :bucket_uuid, Types::String
@@ -57,7 +57,15 @@ module Eivu
             { 'Authorization' => "Token #{Eivu::Client.configuration.user_token}" }
           )
 
-          CloudFile.new Oj.load(response.body).symbolize_keys
+          parsed_body = Oj.load(response.body).symbolize_keys
+          parsed_body[:state_history] = [STATE_RESERVED]
+          if parsed_body[:state] == STATE_TRANSFERED.to_s
+            parsed_body[:state_history] << STATE_TRANSFERED
+          else
+            parsed_body[:state_history] += [STATE_TRANSFERED, STATE_COMPLETED]
+          end
+
+          CloudFile.new parsed_body
         rescue RestClient::NotFound
           raise Errors::CloudStorage::MissingResource, "Cloud file #{md5} not found"
         end
@@ -90,9 +98,7 @@ module Eivu
           md5         = generate_md5(path_to_file)
           payload     = { bucket_name:, peepy:, nsfw: }
           parsed_body = post_request(action: :reserve, md5:, payload:)
-          instance    = CloudFile.new parsed_body
-          instance.state_history = [STATE_RESERVED]
-          instance
+          CloudFile.new parsed_body.merge(state_history: [STATE_RESERVED])
         end
       end
 
@@ -101,6 +107,7 @@ module Eivu
         # post_request will raise an error if there is a problem
         parsed_body = post_request(action: :transfer, payload:)
         assign_attributes(parsed_body)
+        state_history << STATE_TRANSFERED
         self
       end
 
@@ -109,6 +116,7 @@ module Eivu
         payload = { year:, rating:, release_pos:, metadata_list: }
         parsed_body = post_request(action: :complete, payload:)
         assign_attributes(parsed_body)
+        state_history << STATE_COMPLETED
         self
       end
 
