@@ -38,13 +38,10 @@ module Eivu
       mime        = MimeMagic.by_magic(File.open(path_to_file)) || MimeMagic.by_path(path_to_file)
       filesize    = File.size(path_to_file)
       s3_resource = instantiate_s3_resource
-      tags        = MetadataExtractor.extract_tags(filename)&.map { |tag| { tag: } }
+      tags        = MetadataExtractor.extract_tags(filename)&.map { |tag| { tag: } }.to_a
       rating      = MetadataExtractor.extract_rating(filename)
-      metadata_list = [{ original_local_path_to_file: path_to_file }]
-      metadata_list += tags.to_a
-
-      cloud_file  = CloudFile.reserve_or_fetch_by(bucket_name: configuration.bucket_name,
-                                      path_to_file:, peepy:, nsfw:)
+      cloud_file  = CloudFile.reserve_or_fetch_by(bucket_name: configuration.bucket_name, path_to_file:, peepy:, nsfw:)
+      metadata_list = [{ original_local_path_to_file: path_to_file }] + tags
 
       if cloud_file.reserved?
         unless write_to_s3(s3_resource:, s3_folder: cloud_file.s3_folder, path_to_file:)

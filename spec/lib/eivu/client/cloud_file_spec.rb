@@ -50,6 +50,7 @@ describe Eivu::Client::CloudFile, vcr: true do
             expect(instance.md5).to eq(md5)
             expect(instance.asset).to eq('test.mp3')
             expect(instance.bucket_uuid).to eq(bucket_uuid)
+            expect(instance.state_history).to eq([])
           end
         end
       end
@@ -83,6 +84,7 @@ describe Eivu::Client::CloudFile, vcr: true do
             expect(instance.md5).to eq(md5)
             expect(instance.name).to be nil
             expect(instance.bucket_uuid).to eq(bucket_uuid)
+            expect(instance.state_history).to eq([])
           end
         end
       end
@@ -97,6 +99,7 @@ describe Eivu::Client::CloudFile, vcr: true do
             expect(instance.md5).to eq(md5)
             expect(instance.asset).to be nil
             expect(instance.bucket_uuid).to eq(bucket_uuid)
+            expect(instance.state_history).to eq(%i[reserved])
           end
         end
       end
@@ -249,7 +252,7 @@ describe Eivu::Client::CloudFile, vcr: true do
       instance.complete!(year:, rating:, release_pos:, metadata_list:)
     end
 
-    let(:instance) { described_class.fetch(md5) }
+    let(:instance) { build :cloud_file, :transfered, :test_mp3 }
     let(:md5) { described_class.generate_md5(path_to_file) }
     let(:year) { 2019 }
     let(:rating) { 4.37 }

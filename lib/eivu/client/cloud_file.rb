@@ -17,7 +17,7 @@ module Eivu
 
       attribute  :md5, Types::String
       attribute  :state, Types::String
-      attribute  :state_history, Types::Strict::Array.of(Types::Strict::Symbol)
+      attribute  :state_history, Types::Strict::Array.of(Types::Strict::Symbol).default([])
       attribute? :user_uuid, Types::String
       attribute? :folder_uuid, Types::String.optional
       attribute? :bucket_uuid, Types::String
@@ -57,15 +57,7 @@ module Eivu
             { 'Authorization' => "Token #{Eivu::Client.configuration.user_token}" }
           )
 
-          parsed_body = Oj.load(response.body).symbolize_keys
-          parsed_body[:state_history] = [STATE_RESERVED]
-          if parsed_body[:state] == STATE_TRANSFERED.to_s
-            parsed_body[:state_history] << STATE_TRANSFERED
-          else
-            parsed_body[:state_history] += [STATE_TRANSFERED, STATE_COMPLETED]
-          end
-
-          CloudFile.new parsed_body
+          CloudFile.new Oj.load(response.body).symbolize_keys
         rescue RestClient::NotFound
           raise Errors::CloudStorage::MissingResource, "Cloud file #{md5} not found"
         end
