@@ -103,13 +103,21 @@ module Eivu
         self
       end
 
-      def complete!(year: nil, rating: nil, release_pos: nil, metadata_list: [], matched_recording: nil)
+      def update_data!(action: :complete, year: nil, rating: nil, release_pos: nil, metadata_list: [], matched_recording: nil)
         matched_recording.nil? # trying to avoid rubocop error because it is not used yet
         payload = { year:, rating:, release_pos:, metadata_list: }
-        parsed_body = post_request(action: :complete, payload:)
+        parsed_body = post_request(action: action, payload:)
         assign_attributes(parsed_body)
         state_history << STATE_COMPLETED
         self
+      end
+
+      def complete!(year: nil, rating: nil, release_pos: nil, metadata_list: [], matched_recording: nil)
+        update_data!(action: :complete, year:, rating:, release_pos:, metadata_list:, matched_recording:)
+      end
+
+      def update_metadata!(year: nil, rating: nil, release_pos: nil, metadata_list: [], matched_recording: nil)
+        update_data!(action: :update_metadata, year:, rating:, release_pos:, metadata_list:, matched_recording:)
       end
 
       def visit

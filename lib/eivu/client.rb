@@ -55,6 +55,10 @@ module Eivu
         cloud_file.complete!(year: nil, rating:, release_pos: nil, metadata_list:, matched_recording: nil)
       end
 
+      if cloud_file.state_history.empty?
+        cloud_file.update_metadata!(year: nil, rating:, release_pos: nil, metadata_list:, matched_recording: nil)
+      end
+
       cloud_file
     end
 
