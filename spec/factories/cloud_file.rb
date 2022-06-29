@@ -25,12 +25,12 @@ FactoryBot.define do
 
     trait :transfered do
       state { 'transfered' }
-      state_history { [:reserved, :transfered] }
+      state_history { %i[reserved transfered] }
     end
 
     trait :completed do
       state { 'completed' }
-      state_history { [:reserved, :transfered, :completed] }
+      state_history { %i[reserved transfered completed] }
     end
 
     trait :audio do

@@ -3,11 +3,30 @@
 module Eivu
   class Client
     module MetadataExtractor
-      DOUBLE_PAREN_REGEX = /\(\(([^)]+)\)\)/
+      TAG_REGEX = /\(\(([^)]+)\)\)/
+      PERFORMER_REGEX = /\(\(p\ ([^)]+)\)\)/
+      STUDIO_REGEX = /\(\(s\ ([^)]+)\)\)/
+      YEAR_REGEX = /\(\(y\ ([^)]+)\)\)/
 
       class << self
-        def extract_tags(string)
-          string.scan(DOUBLE_PAREN_REGEX).flatten.presence
+        def extract_year(string)
+          string.scan(YEAR_REGEX)&.flatten&.first
+        end
+
+        def extract_metadata_list(string)
+          # remove year
+          temp_string = string.gsub(YEAR_REGEX, '')
+          {
+            performer: PERFORMER_REGEX,
+            studio: STUDIO_REGEX,
+            tag: TAG_REGEX # must be last
+          }.collect do |type, regex|
+            extractions = temp_string.scan(regex).flatten.presence
+            next if extractions.blank?
+
+            temp_string.gsub!(regex, '')
+            extractions.collect { |extraction| { type => extraction } }
+          end.flatten.compact.presence.to_a
         end
 
         def extract_rating(string)

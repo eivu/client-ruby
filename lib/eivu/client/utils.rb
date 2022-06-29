@@ -11,7 +11,7 @@ module Eivu
           output = string.dup
           output.gsub!(' ((', '((')
           output.gsub!(')) ', '))')
-          output.gsub!(MetadataExtractor::DOUBLE_PAREN_REGEX, '')
+          output.gsub!(MetadataExtractor::TAG_REGEX, '')
           output.gsub!(RATING_500_475_REGEX, '')
           output.gsub!(RATING_425_REGEX, '')
           output

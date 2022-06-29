@@ -54,39 +54,67 @@ describe Eivu::Client do
         before do
           expect(Eivu::Client::CloudFile).to receive(:reserve).and_return(dummy_cloud_file)
           expect(dummy_cloud_file).to receive(:s3_folder).and_return('/path/to/s3/folder')
+          expect(dummy_cloud_file).to receive(:state_history).and_return(%w[reserved transfered completed])
           expect_any_instance_of(Eivu::Client).to receive(:write_to_s3).and_return(true)
           # true tests below
           expect(dummy_cloud_file).to receive(:reserved?).and_return(true)
           expect(dummy_cloud_file).to receive(:transfered?).and_return(true)
           expect(dummy_cloud_file).to receive(:transfer!).with(content_type:, asset:, filesize:)
-          expect(dummy_cloud_file).to receive(:complete!).with(rating:, metadata_list:, year: nil, release_pos: nil,
+          expect(dummy_cloud_file).to receive(:complete!).with(rating:, metadata_list:, year:, release_pos: nil,
                                                                matched_recording: nil)
         end
 
         let(:dummy_cloud_file) { instance_double(Eivu::Client::CloudFile) }
         let(:filesize) { File.size(path_to_file) }
+        let(:year) { nil }
 
         context 'with rating and metadata' do
-          let(:path_to_file) do
-            File.expand_path(
-              '../../fixtures/samples/other/`Cowboy Bebop - Asteroid Blues ((anime)) ((script)) ((all time best)).txt',
-              __dir__
-            )
-          end
-          let(:asset) { 'Cowboy Bebop - Asteroid Blues.txt' }
-          let(:rating) { 4.25 }
-          let(:content_type) { 'text/plain' }
-          let(:metadata_list) do
-            [
-              { original_local_path_to_file: path_to_file },
-              { tag: 'anime' },
-              { tag: 'script' },
-              { tag: 'all time best' }
-            ]
+          context 'Judge Dredd' do
+            let(:path_to_file) do
+              File.expand_path(
+                '../../fixtures/samples/other/_Dredd ((Comic Book Movie)) ((p Karl Urban)) ((p Lena Headey)) ((s DNA Films)) ((script)) ((y 2012)).txt',
+                __dir__
+              )
+            end
+            let(:asset) { 'Dredd.txt' }
+            let(:rating) { 4.75 }
+            let(:content_type) { 'text/plain' }
+            let(:year) { '2012' }
+            let(:metadata_list) do
+              [
+                { original_local_path_to_file: path_to_file },
+                { performer: 'Karl Urban' }, { performer: 'Lena Headey' },
+                { studio: 'DNA Films' }, { tag: 'Comic Book Movie' }, { tag: 'script' }
+              ]
+            end
+
+            it 'writes the file to S3 and saves data to the server' do
+              result
+            end
           end
 
-          it 'writes the file to S3 and saves data to the server' do
-            result
+          context 'Cowboy Bebdop' do
+            let(:path_to_file) do
+              File.expand_path(
+                '../../fixtures/samples/other/`Cowboy Bebop - Asteroid Blues ((anime)) ((script)) ((all time best)).txt',
+                __dir__
+              )
+            end
+            let(:asset) { 'Cowboy Bebop - Asteroid Blues.txt' }
+            let(:rating) { 4.25 }
+            let(:content_type) { 'text/plain' }
+            let(:metadata_list) do
+              [
+                { original_local_path_to_file: path_to_file },
+                { tag: 'anime' },
+                { tag: 'script' },
+                { tag: 'all time best' }
+              ]
+            end
+
+            it 'writes the file to S3 and saves data to the server' do
+              result
+            end
           end
         end
       end

@@ -38,10 +38,10 @@ module Eivu
       mime        = MimeMagic.by_magic(File.open(path_to_file)) || MimeMagic.by_path(path_to_file)
       filesize    = File.size(path_to_file)
       s3_resource = instantiate_s3_resource
-      tags        = MetadataExtractor.extract_tags(filename)&.map { |tag| { tag: } }.to_a
       rating      = MetadataExtractor.extract_rating(filename)
+      year        = MetadataExtractor.extract_year(filename)
       cloud_file  = CloudFile.reserve_or_fetch_by(bucket_name: configuration.bucket_name, path_to_file:, peepy:, nsfw:)
-      metadata_list = [{ original_local_path_to_file: path_to_file }] + tags
+      metadata_list = [{ original_local_path_to_file: path_to_file }] + MetadataExtractor.extract_metadata_list(filename)
 
       if cloud_file.reserved?
         unless write_to_s3(s3_resource:, s3_folder: cloud_file.s3_folder, path_to_file:)
@@ -52,11 +52,11 @@ module Eivu
       end
 
       if cloud_file.transfered?
-        cloud_file.complete!(year: nil, rating:, release_pos: nil, metadata_list:, matched_recording: nil)
+        cloud_file.complete!(year:, rating:, release_pos: nil, metadata_list:, matched_recording: nil)
       end
 
       if cloud_file.state_history.empty?
-        cloud_file.update_metadata!(year: nil, rating:, release_pos: nil, metadata_list:, matched_recording: nil)
+        cloud_file.update_metadata!(year:, rating:, release_pos: nil, metadata_list:, matched_recording: nil)
       end
 
       cloud_file

@@ -34,6 +34,7 @@ describe Eivu::Client::Folder do
           'spec/fixtures/samples/mov_bbb.mp4',
           'spec/fixtures/samples/sample_640x360_beach.flv',
           'spec/fixtures/samples/test.mp3',
+          'spec/fixtures/samples/other/_Dredd ((Comic Book Movie)) ((p Karl Urban)) ((p Lena Headey)) ((s DNA Films)) ((script)) ((y 2012)).txt',
           'spec/fixtures/samples/other/`Cowboy Bebop - Asteroid Blues ((anime)) ((script)) ((all time best)).txt'
         )
       end
