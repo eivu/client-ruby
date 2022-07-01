@@ -17,7 +17,7 @@ module Eivu
 
       attribute  :md5, Types::String
       attribute  :state, Types::String
-      attribute  :state_history, Types::Strict::Array.of(Types::Strict::Symbol).default([])
+      attribute  :state_history, Types::Strict::Array.of(Types::Strict::Symbol).default([]), shared: true
       attribute? :user_uuid, Types::String
       attribute? :folder_uuid, Types::String.optional
       attribute? :bucket_uuid, Types::String

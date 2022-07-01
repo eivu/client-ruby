@@ -40,22 +40,30 @@ module Eivu
       s3_resource = instantiate_s3_resource
       rating      = MetadataExtractor.extract_rating(filename)
       year        = MetadataExtractor.extract_year(filename)
-      cloud_file  = CloudFile.reserve_or_fetch_by(bucket_name: configuration.bucket_name, path_to_file:, peepy:, nsfw:)
       metadata_list = [{ original_local_path_to_file: path_to_file }] + MetadataExtractor.extract_metadata_list(filename)
+      puts "Working with: #{asset}"
+      puts "  Fetching/Reserving"
+
+      cloud_file  = CloudFile.reserve_or_fetch_by(bucket_name: configuration.bucket_name, path_to_file:, peepy:, nsfw:)
 
       if cloud_file.reserved?
+        puts "   Writing to s3"
+
         unless write_to_s3(s3_resource:, s3_folder: cloud_file.s3_folder, path_to_file:)
           raise Errors::CloudStorage::Connection, 'Failed to write to s3'
         end
+        puts "  Transfering"
 
         cloud_file.transfer!(content_type: mime.type, asset:, filesize:)
       end
 
       if cloud_file.transfered?
+        puts "  Completing"
         cloud_file.complete!(year:, rating:, release_pos: nil, metadata_list:, matched_recording: nil)
       end
 
       if cloud_file.state_history.empty?
+        puts "  Updating"
         cloud_file.update_metadata!(year:, rating:, release_pos: nil, metadata_list:, matched_recording: nil)
       end
 
@@ -82,7 +90,7 @@ module Eivu
       # generate file information for file on s3
       #
       filename  = File.basename(path_to_file)
-      mime      = MimeMagic.by_magic(File.open(path_to_file))
+      mime      = MimeMagic.by_magic(File.open(path_to_file)) || MimeMagic.by_path(path_to_file)
       sanitized_filename = Eivu::Client::Utils.sanitize(filename)
 
       # upload the file to s3
@@ -90,6 +98,12 @@ module Eivu
       # create object on s3
       obj = s3_resource.bucket(configuration.bucket_name)
                        .object("#{s3_folder}/#{sanitized_filename}")
+      # https://stackoverflow.com/questions/12085751/tracking-upload-progress-of-file-to-s3-using-ruby-aws-sdk/12147709#12147709
+      # https://stackoverflow.com/questions/50253068/upload-to-s3-with-progress-in-plain-ruby-script
+      # obj.write(:content_length => file.size) do |writable, n_bytes|
+      #   writable.write(file.read(n_bytes))
+      #   bar.progress += n_bytes
+      # end
       obj.upload_file(path_to_file, acl: 'public-read', content_type: mime.type, metadata: {})
     end
 
