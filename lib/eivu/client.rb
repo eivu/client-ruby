@@ -13,6 +13,10 @@ module Eivu
         @configuration ||= Configuration.new
       end
 
+      def prod!
+        @configuration ||= Configuration.new.merge(bucket_name: configuration.bucket_name.gsub('-test', ''))
+      end
+
       def reset
         configuration.access_key_id = nil
         configuration.secret_key    = nil
@@ -34,7 +38,7 @@ module Eivu
 
     def upload_file(path_to_file:, peepy: false, nsfw: false)
       filename    = File.basename(path_to_file)
-      asset       = Utils.prune_metadata(filename)
+      asset       = Utils.sanitize(filename)
       mime        = MimeMagic.by_magic(File.open(path_to_file)) || MimeMagic.by_path(path_to_file)
       filesize    = File.size(path_to_file)
       s3_resource = instantiate_s3_resource

@@ -17,7 +17,7 @@ module Eivu
 
       attribute  :md5, Types::String
       attribute  :state, Types::String
-      attribute  :state_history, Types::Strict::Array.of(Types::Strict::Symbol).default([]), shared: true
+      attribute  :state_history, Types::Strict::Array.of(Types::Strict::Symbol).default([])
       attribute? :user_uuid, Types::String
       attribute? :folder_uuid, Types::String.optional
       attribute? :bucket_uuid, Types::String
@@ -88,7 +88,7 @@ module Eivu
 
         def reserve(bucket_name:, path_to_file:, peepy: false, nsfw: false)
           md5         = generate_md5(path_to_file)
-          payload     = { bucket_name:, peepy:, nsfw: }
+          payload     = { bucket_name:, peepy:, nsfw:, fullpath:'.'}
           parsed_body = post_request(action: :reserve, md5:, payload:)
           CloudFile.new parsed_body.merge(state_history: [STATE_RESERVED])
         end

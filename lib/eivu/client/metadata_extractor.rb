@@ -25,7 +25,7 @@ module Eivu
             next if extractions.blank?
 
             temp_string.gsub!(regex, '')
-            extractions.collect { |extraction| { type => extraction } }
+            extractions.compact.collect { |extraction| { type => extraction&.downcase&.strip } }
           end.flatten.compact.presence.to_a
         end
 

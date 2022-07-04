@@ -57,7 +57,7 @@ module Eivu
       def initialize
         @access_key_id = ENV['EIVU_ACCESS_KEY_ID']
         @secret_key    = ENV['EIVU_SECRET_ACCESS_KEY']
-        @bucket_name   = ENV['EIVU_BUCKET_NAME']
+        @bucket_name   = 'eivu' #ENV['EIVU_BUCKET_NAME']
         @region        = ENV['EIVU_REGION']
         @user_token    = ENV['EIVU_USER_TOKEN']
         @host          = ENV['EIVU_SERVER_HOST']
