@@ -91,6 +91,11 @@ module Eivu
     end
 
     def write_to_s3(s3_resource:, s3_folder:, path_to_file:)
+      progress = Proc.new do |bytes, totals|
+        puts bytes.map.with_index { |b, i| "Part #{i+1}: #{b} / #{totals[i]}"}.join(' ')# + "Total: #{100.0 * bytes.sum / totals.sum }%" }
+      end
+
+
       # generate file information for file on s3
       #
       filename  = File.basename(path_to_file)
@@ -108,7 +113,7 @@ module Eivu
       #   writable.write(file.read(n_bytes))
       #   bar.progress += n_bytes
       # end
-      obj.upload_file(path_to_file, acl: 'public-read', content_type: mime.type, metadata: {})
+      obj.upload_file(path_to_file, acl: 'public-read', content_type: mime.type, metadata: {}, progress_callback: progress)
     end
 
     private
