@@ -51,8 +51,6 @@ module Eivu
       cloud_file  = CloudFile.reserve_or_fetch_by(bucket_name: configuration.bucket_name, path_to_file:, peepy:, nsfw:)
 
       if cloud_file.reserved?
-        puts "   Writing to s3"
-
         unless write_to_s3(s3_resource:, s3_folder: cloud_file.s3_folder, path_to_file:)
           raise Errors::CloudStorage::Connection, 'Failed to write to s3'
         end
@@ -91,8 +89,26 @@ module Eivu
     end
 
     def write_to_s3(s3_resource:, s3_folder:, path_to_file:)
+      n = 0
+      temp_bytes = nil
+      temp_totals = nil
+      size = File.size(path_to_file)
+      bar = ProgressBar.create(:title => "Uploading action", :starting_at => 0, :total => size)
       progress = Proc.new do |bytes, totals|
-        puts bytes.map.with_index { |b, i| "Part #{i+1}: #{b} / #{totals[i]}"}.join(' ')# + "Total: #{100.0 * bytes.sum / totals.sum }%" }
+        # binding.pry
+        # # binding.pry
+        # bar.progress += bytes.first
+        # binding.pry
+        # print "#{index} done. Progress: %.2f%" % (index.to_f / items * 100).round(2) + "\r" if (index % 10) == 0
+        percent = '%.2f' % (100.0 * bytes.sum / totals.sum)
+        suffix = "\r" if percent.to_f < 100
+        # print "bytes #{bytes.first} | #{percent }% | #{totals.sum} | #{size}#{suffix}"
+        print "  Writing to s3: #{percent}%#{suffix}"
+        # puts "totals #{totals.first} | #{totals.last} | #{size}"
+
+        # temp_bytes = bytes
+        # temp_totals = totals
+        # puts bytes.map.with_index { |b, i| "Part #{i+1}: #{b} / #{totals[i]}"}.join(' ')# + "Total: #{100.0 * bytes.sum / totals.sum }%" }
       end
 
 
