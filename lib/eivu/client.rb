@@ -101,7 +101,7 @@ module Eivu
         # binding.pry
         # print "#{index} done. Progress: %.2f%" % (index.to_f / items * 100).round(2) + "\r" if (index % 10) == 0
         percent = '%.2f' % (100.0 * bytes.sum / totals.sum)
-        suffix = "\r" if percent.to_f < 100
+        suffix = percent.to_f < 100 ? "\r" : "\n"
         # print "bytes #{bytes.first} | #{percent }% | #{totals.sum} | #{size}#{suffix}"
         print "  Writing to s3: #{percent}%#{suffix}"
         # puts "totals #{totals.first} | #{totals.last} | #{size}"
