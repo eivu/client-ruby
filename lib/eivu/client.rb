@@ -44,16 +44,31 @@ module Eivu
       s3_resource = instantiate_s3_resource
       rating      = MetadataExtractor.extract_rating(filename)
       year        = MetadataExtractor.extract_year(filename)
-      metadata_list = [{ original_local_path_to_file: path_to_file }] + MetadataExtractor.extract_metadata_list(filename)
+      metadata_list    = [{ original_local_path_to_file: path_to_file }] + MetadataExtractor.extract_metadata_list(filename)
+
       puts "Working with: #{asset}"
       puts "  Fetching/Reserving"
 
       cloud_file  = CloudFile.reserve_or_fetch_by(bucket_name: configuration.bucket_name, path_to_file:, peepy:, nsfw:)
+      remote_path_to_file = "#{cloud_file.s3_folder}/#{Utils.sanitize(filename)}"
 
       if cloud_file.reserved?
         unless write_to_s3(s3_resource:, s3_folder: cloud_file.s3_folder, path_to_file:)
           raise Errors::CloudStorage::Connection, 'Failed to write to s3'
         end
+
+        # File.open(path_to_file, 'rb') do |file|
+        #   s3_client.put_object(
+        #     acl: 'public-read',
+        #     content_md5: cloud_file.md5,
+        #     bucket: configuration.bucket_name,
+        #     key: remote_full_path, body: file
+        #   )
+        # end
+
+        validated_remote_md5!(remote_path_to_file:, path_to_file:)
+
+
         puts "  Transfering"
 
         cloud_file.transfer!(content_type: mime.type, asset:, filesize:)
@@ -132,7 +147,28 @@ module Eivu
       obj.upload_file(path_to_file, acl: 'public-read', content_type: mime.type, metadata: {}, progress_callback: progress)
     end
 
+    def validated_remote_md5!(remote_path_to_file:, path_to_file:)
+      remote_md5 = s3_client.head_object({
+        bucket: configuration.bucket_name, 
+        key: remote_path_to_file
+      })&.etag&.gsub(/"/,'')
+
+      etag = `./notes/s3etag.sh "#{path_to_file}" 5`&.strip
+      md5  = Eivu::Client::CloudFile.generate_md5(path_to_file)&.downcase
+
+      unless [md5, etag].include?(remote_md5)
+        raise Errors::CloudStorage::InvalidMd5, "Expected: #{md5}, Got: #{remote_md5}"
+      end
+    end
+
     private
+
+    def s3_client
+      @s3_client ||= Aws::S3::Client.new(
+        region: configuration.region,
+        credentials: s3_credentials,
+      )
+    end
 
     def s3_credentials
       @s3_credentials ||= Aws::Credentials.new(configuration.access_key_id, configuration.secret_key)

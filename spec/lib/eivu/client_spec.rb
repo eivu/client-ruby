@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-describe Eivu::Client do
+describe Eivu::Client, vcr: true  do
   let(:bucket_name) { 'eivu-test' }
   let(:instance) { described_class.new }
 
@@ -188,6 +188,12 @@ describe Eivu::Client do
           end
         end
       end
+    end
+  end
+
+  describe '#remote_md5' do
+    it 'returns the md5' do
+      raise 'fix this'
     end
   end
 end
