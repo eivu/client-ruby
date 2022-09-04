@@ -3,7 +3,7 @@
 module Eivu
   class Client
     class Configuration
-      attr_writer :access_key_id, :secret_key, :bucket_name, :region, :user_token, :host
+      attr_writer :access_key_id, :secret_key, :bucket_name, :region, :user_token, :host, :endpoint, :bucket_location
 
       # Adds global configuration settings to the gem, including:
       #
@@ -55,12 +55,15 @@ module Eivu
       #
 
       def initialize
-        @access_key_id = ENV['EIVU_ACCESS_KEY_ID']
-        @secret_key    = ENV['EIVU_SECRET_ACCESS_KEY']
-        @bucket_name   = 'eivu' #ENV['EIVU_BUCKET_NAME']
-        @region        = ENV['EIVU_REGION']
-        @user_token    = ENV['EIVU_USER_TOKEN']
-        @host          = ENV['EIVU_SERVER_HOST']
+        @access_key_id   = ENV.fetch('EIVU_ACCESS_KEY_ID')
+        @secret_key      = ENV.fetch('EIVU_SECRET_ACCESS_KEY')
+        @bucket_name     = ENV.fetch('EIVU_BUCKET_NAME')
+        @bucket_location = ENV.fetch('EIVU_BUCKET_LOCATION') || :aws
+        @region          = ENV.fetch('EIVU_REGION')
+        @user_token      = ENV.fetch('EIVU_USER_TOKEN')
+        @host            = ENV.fetch('EIVU_SERVER_HOST')
+        @endpoint        = ENV.fetch('EIVU_ENDPOINT')
+        @bucket_location
       end
 
       def access_key_id
@@ -109,9 +112,22 @@ module Eivu
       end
 
       def host
-        raise Errors::Configuration, 'Eivu host missing! See the documentation for configuration settings.' unless @host
-
+        unless @host
+          raise Errors::Configuration, 'Eivu host missing! See the documentation for configuration settings.'
+        end
         @host
+      end
+
+      def endpoint
+        @endpoint
+      end
+
+      def bucket_location
+        unless @bucket_location
+          raise Errors::Configuration, 'Bucket location missing! See the documentation for configuration settings.'
+        end
+
+        @bucket_location
       end
     end
   end
