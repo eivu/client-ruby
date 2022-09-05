@@ -13,15 +13,13 @@ module Eivu
         @configuration ||= Configuration.new
       end
 
-      def prod!
-        @configuration ||= Configuration.new.merge(bucket_name: configuration.bucket_name.gsub('-test', ''))
-      end
-
       def reset
         configuration.access_key_id = nil
         configuration.secret_key    = nil
         configuration.bucket_name   = nil
+        configuration.bucket_location   = nil
         configuration.region        = nil
+        configuration.endpoint      = nil
         configuration.user_token    = nil
         configuration.host          = nil
         configuration
@@ -29,6 +27,10 @@ module Eivu
 
       def configure
         yield(configuration)
+      end
+
+      def reconfigure
+        @configuration = Configuration.new
       end
     end
 
@@ -41,32 +43,32 @@ module Eivu
       asset       = Utils.sanitize(filename)
       mime        = MimeMagic.by_magic(File.open(path_to_file)) || MimeMagic.by_path(path_to_file)
       filesize    = File.size(path_to_file)
+      md5         = Eivu::Client::CloudFile.generate_md5(path_to_file)&.downcase
       s3_resource = instantiate_s3_resource
       rating      = MetadataExtractor.extract_rating(filename)
       year        = MetadataExtractor.extract_year(filename)
       metadata_list    = [{ original_local_path_to_file: path_to_file }] + MetadataExtractor.extract_metadata_list(filename)
 
-      puts "Working with: #{asset}"
+      puts "Working with: #{asset}: "
       puts "  Fetching/Reserving"
 
       cloud_file  = CloudFile.reserve_or_fetch_by(bucket_name: configuration.bucket_name, path_to_file:, peepy:, nsfw:)
       remote_path_to_file = "#{cloud_file.s3_folder}/#{Utils.sanitize(filename)}"
 
       if cloud_file.reserved?
-        unless write_to_s3(s3_resource:, s3_folder: cloud_file.s3_folder, path_to_file:)
-          raise Errors::CloudStorage::Connection, 'Failed to write to s3'
+        # unless write_to_s3(s3_resource:, s3_folder: cloud_file.s3_folder, path_to_file:)
+        #   raise Errors::CloudStorage::Connection, 'Failed to write to s3'
+        # end
+        puts "  Writing to S3"
+        File.open(path_to_file, 'rb') do |file|
+          s3_client.put_object(
+            acl: 'public-read',
+            bucket: configuration.bucket_name,
+            key: remote_path_to_file, body: file
+          )
         end
 
-        # File.open(path_to_file, 'rb') do |file|
-        #   s3_client.put_object(
-        #     acl: 'public-read',
-        #     content_md5: cloud_file.md5,
-        #     bucket: configuration.bucket_name,
-        #     key: remote_full_path, body: file
-        #   )
-        # end
-
-        validated_remote_md5!(remote_path_to_file:, path_to_file:)
+        validated_remote_md5!(remote_path_to_file:, path_to_file:, md5:)
 
 
         puts "  Transfering"
@@ -77,10 +79,11 @@ module Eivu
       if cloud_file.transfered?
         puts "  Completing"
         cloud_file.complete!(year:, rating:, release_pos: nil, metadata_list:, matched_recording: nil)
-      end
-
-      if cloud_file.state_history.empty?
-        puts "  Updating"
+#       end
+      else
+# binding.pry
+#       if cloud_file.state_history.empty?
+        puts "  Updating/Skipping"
         cloud_file.update_metadata!(year:, rating:, release_pos: nil, metadata_list:, matched_recording: nil)
       end
 
@@ -147,27 +150,28 @@ module Eivu
       obj.upload_file(path_to_file, acl: 'public-read', content_type: mime.type, metadata: {}, progress_callback: progress)
     end
 
-    def validated_remote_md5!(remote_path_to_file:, path_to_file:)
+    def validated_remote_md5!(remote_path_to_file:, path_to_file:, md5:)
       remote_md5 = s3_client.head_object({
         bucket: configuration.bucket_name, 
         key: remote_path_to_file
       })&.etag&.gsub(/"/,'')
 
       etag = `./notes/s3etag.sh "#{path_to_file}" 5`&.strip
-      md5  = Eivu::Client::CloudFile.generate_md5(path_to_file)&.downcase
 
-      unless [md5, etag].include?(remote_md5)
-        raise Errors::CloudStorage::InvalidMd5, "Expected: #{md5}, Got: #{remote_md5}"
+      unless [md5.downcase, etag].include?(remote_md5)
+        raise Errors::CloudStorage::InvalidMd5, "Expected: #{md5.downcase}, Got: #{remote_md5}"
       end
     end
 
     private
 
     def s3_client
-      @s3_client ||= Aws::S3::Client.new(
+      settings = {
         region: configuration.region,
         credentials: s3_credentials,
-      )
+        endpoint: configuration.endpoint
+      }.compact
+      @s3_client ||= Aws::S3::Client.new(settings)
     end
 
     def s3_credentials
@@ -175,7 +179,7 @@ module Eivu
     end
 
     def instantiate_s3_resource
-      Aws::S3::Resource.new(credentials: s3_credentials, region: 'us-east-1')
+      Aws::S3::Resource.new(credentials: s3_credentials, region: configuration.region )
     end
   end
 end
