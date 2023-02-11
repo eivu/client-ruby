@@ -14,14 +14,14 @@ module Eivu
       end
 
       def reset
-        configuration.access_key_id = nil
-        configuration.secret_key    = nil
-        configuration.bucket_name   = nil
-        configuration.bucket_location   = nil
-        configuration.region        = nil
-        configuration.endpoint      = nil
-        configuration.user_token    = nil
-        configuration.host          = nil
+        configuration.access_key_id   = nil
+        configuration.secret_key      = nil
+        configuration.bucket_name     = nil
+        configuration.bucket_location = nil
+        configuration.region          = nil
+        configuration.endpoint        = nil
+        configuration.user_token      = nil
+        configuration.host            = nil
         configuration
       end
 
@@ -52,6 +52,7 @@ module Eivu
       puts "Working with: #{asset}: "
       puts "  Fetching/Reserving"
 
+      binding.pry
       cloud_file  = CloudFile.reserve_or_fetch_by(bucket_name: configuration.bucket_name, path_to_file:, peepy:, nsfw:)
       remote_path_to_file = "#{cloud_file.s3_folder}/#{Utils.sanitize(filename)}"
 
@@ -135,7 +136,6 @@ module Eivu
       filename  = File.basename(path_to_file)
       mime      = MimeMagic.by_magic(File.open(path_to_file)) || MimeMagic.by_path(path_to_file)
       sanitized_filename = Eivu::Client::Utils.sanitize(filename)
-
       # upload the file to s3
       #
       # create object on s3
@@ -179,7 +179,7 @@ module Eivu
     end
 
     def instantiate_s3_resource
-      Aws::S3::Resource.new(credentials: s3_credentials, region: configuration.region )
+      Aws::S3::Resource.new(credentials: s3_credentials, region: configuration.region)
     end
   end
 end

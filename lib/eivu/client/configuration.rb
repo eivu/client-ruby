@@ -63,7 +63,6 @@ module Eivu
         @user_token      = ENV.fetch('EIVU_USER_TOKEN')
         @host            = ENV.fetch('EIVU_SERVER_HOST')
         @endpoint        = ENV.fetch('EIVU_ENDPOINT')
-        @bucket_location
       end
 
       def access_key_id
