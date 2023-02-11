@@ -46,11 +46,13 @@ module Eivu
       attribute? :metadata, Types::JSON::Array.of(Types::JSON::Hash)
 
       class << self
-        def reserve_or_fetch_by(bucket_name:, path_to_file:, peepy: false, nsfw: false)
-          reserve(bucket_name:, path_to_file:, peepy:, nsfw:)
+        def reserve_or_fetch_by(bucket_name:, provider:, path_to_file:, peepy: false, nsfw: false)
+          reserve(bucket_name:, provider:, path_to_file:, peepy:, nsfw:)
         rescue Errors::Server::InvalidCloudFileState
           md5 = generate_md5(path_to_file)
-          fetch(md5)
+          cloud_file = fetch(md5)
+          cloud_file.content_type = Client::Utils.detect_mime(path_to_file).type
+          cloud_file
         end
 
         def fetch(md5)
@@ -88,11 +90,12 @@ module Eivu
           Digest::MD5.file(path_to_file).hexdigest.upcase
         end
 
-        def reserve(bucket_name:, path_to_file:, peepy: false, nsfw: false)
-          md5         = generate_md5(path_to_file)
-          payload     = { bucket_name:, peepy:, nsfw:, fullpath:'.'}
-          parsed_body = post_request(action: :reserve, md5:, payload:)
-          CloudFile.new parsed_body.merge(state_history: [STATE_RESERVED])
+        def reserve(bucket_name:, provider:, path_to_file:, peepy: false, nsfw: false)
+          md5          = generate_md5(path_to_file)
+          payload      = { bucket_name:, provider:, peepy:, nsfw:, fullpath: '.' }
+          parsed_body  = post_request(action: :reserve, md5:, payload:)
+          content_type = Client::Utils.detect_mime(path_to_file).type
+          CloudFile.new parsed_body.merge(state_history: [STATE_RESERVED], content_type:)
         end
       end
 
