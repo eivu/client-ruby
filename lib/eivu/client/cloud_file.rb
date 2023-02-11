@@ -1,9 +1,11 @@
 # frozen_string_literal: true
 
-require 'rest_client'
+require 'aws-sdk-s3'
+require 'dry/struct'
+require 'dry/struct/setters'
 require 'pry'
 require 'oj'
-require 'dry-struct'
+require 'rest_client'
 
 module Eivu
   class Client

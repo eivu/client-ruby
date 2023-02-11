@@ -3,7 +3,9 @@
 require 'rest_client'
 require 'pry'
 require 'oj'
-
+require 'mimemagic'
+require 'mime/types'
+ require 'dry-struct'
 module Eivu
   class Client
     attr_reader :status
@@ -41,7 +43,13 @@ module Eivu
     def upload_file(path_to_file:, peepy: false, nsfw: false)
       filename    = File.basename(path_to_file)
       asset       = Utils.sanitize(filename)
-      mime        = MimeMagic.by_magic(File.open(path_to_file)) || MimeMagic.by_path(path_to_file)
+      # binding.pry
+      mime        =
+        if path_to_file.ends_with?('.m4a')
+          MimeMagic.by_extension('m4a')
+        else
+          MimeMagic.by_magic(File.open(path_to_file)) || MimeMagic.by_path(path_to_file)
+        end
       filesize    = File.size(path_to_file)
       md5         = Eivu::Client::CloudFile.generate_md5(path_to_file)&.downcase
       s3_resource = instantiate_s3_resource
@@ -52,7 +60,6 @@ module Eivu
       puts "Working with: #{asset}: "
       puts "  Fetching/Reserving"
 
-      binding.pry
       cloud_file  = CloudFile.reserve_or_fetch_by(bucket_name: configuration.bucket_name, path_to_file:, peepy:, nsfw:)
       remote_path_to_file = "#{cloud_file.s3_folder}/#{Utils.sanitize(filename)}"
 
