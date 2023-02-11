@@ -18,6 +18,14 @@ module Eivu
           output
         end
 
+        def detect_mime(path_to_file)
+          if path_to_file.ends_with?('.m4a')
+            MimeMagic.by_extension('m4a')
+          else
+            MimeMagic.by_magic(File.open(path_to_file)) || MimeMagic.by_path(path_to_file)
+          end
+        end
+
         def sanitize(name)
           name = prune_metadata(name)
           name = name.tr('\\', '/') # work-around for IE
