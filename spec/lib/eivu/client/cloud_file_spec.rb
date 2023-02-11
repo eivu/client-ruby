@@ -211,12 +211,11 @@ describe Eivu::Client::CloudFile, vcr: true do
   end
 
   describe '#transfer!' do
-    subject(:transference) { instance.transfer!(content_type:, asset:, filesize:) }
+    subject(:transference) { instance.transfer!(asset:, filesize:) }
 
     let(:instance) { build :cloud_file, :test_mp3 }
     let(:md5) { described_class.generate_md5(path_to_file) }
     let(:asset) { File.basename(path_to_file) }
-    let(:content_type) { MimeMagic.by_magic(File.open(path_to_file)).type }
     let(:filesize) { File.size(path_to_file) }
 
     context 'success' do
@@ -228,7 +227,7 @@ describe Eivu::Client::CloudFile, vcr: true do
             expect(transference).to be_kind_of(described_class)
             expect(transference.md5).to eq(md5)
             expect(transference.asset).to eq(File.basename(path_to_file))
-            expect(transference.content_type).to eq(content_type)
+            expect(transference.content_type).to eq(instance.content_type)
             expect(transference.filesize).to eq(filesize)
             expect(transference.state).to eq('transfered')
             expect(transference.state_history).to eq(%i[reserved transfered])

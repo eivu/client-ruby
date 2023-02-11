@@ -99,7 +99,9 @@ module Eivu
         end
       end
 
-      def transfer!(content_type:, asset:, filesize:)
+      def transfer!(asset:, filesize:)
+        raise Eivu::Client::Errors::Generic, 'content_type can not be empty' if content_type.blank?
+
         payload     = { content_type:, asset:, filesize: }
         # post_request will raise an error if there is a problem
         parsed_body = post_request(action: :transfer, payload:)

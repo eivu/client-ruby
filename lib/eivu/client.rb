@@ -3,9 +3,8 @@
 require 'rest_client'
 require 'pry'
 require 'oj'
-require 'mimemagic'
-require 'mime/types'
- require 'dry-struct'
+require 'dry-struct'
+
 module Eivu
   class Client
     attr_reader :status
@@ -44,12 +43,7 @@ module Eivu
       filename    = File.basename(path_to_file)
       asset       = Utils.sanitize(filename)
       # binding.pry
-      mime        =
-        if path_to_file.ends_with?('.m4a')
-          MimeMagic.by_extension('m4a')
-        else
-          MimeMagic.by_magic(File.open(path_to_file)) || MimeMagic.by_path(path_to_file)
-        end
+      # mime        = Utils.detect_mime(path_to_file)
       filesize    = File.size(path_to_file)
       md5         = Eivu::Client::CloudFile.generate_md5(path_to_file)&.downcase
       s3_resource = instantiate_s3_resource
@@ -60,7 +54,7 @@ module Eivu
       puts "Working with: #{asset}: "
       puts "  Fetching/Reserving"
 
-      cloud_file  = CloudFile.reserve_or_fetch_by(bucket_name: configuration.bucket_name, path_to_file:, peepy:, nsfw:)
+      cloud_file  = CloudFile.reserve_or_fetch_by(bucket_name: configuration.bucket_name, provider: configuration.bucket_location, path_to_file:, peepy:, nsfw:)
       remote_path_to_file = "#{cloud_file.s3_folder}/#{Utils.sanitize(filename)}"
 
       if cloud_file.reserved?
@@ -81,7 +75,7 @@ module Eivu
 
         puts "  Transfering"
 
-        cloud_file.transfer!(content_type: mime.type, asset:, filesize:)
+        cloud_file.transfer!(asset:, filesize:)
       end
 
       if cloud_file.transfered?
@@ -106,6 +100,12 @@ module Eivu
       rescue StandardError => e
         @status[:failure][path_to_file] = e
         @status[:success].delete(path_to_file)
+      end
+      CSV.open('success.csv', 'w') do |success_log|
+        @status[:success].each {|v| success_log << [Time.now, v]}
+      end
+      CSV.open('failure.csv', 'w') do |failure_log|
+        @status[:failure].each {|v| failure_log << [Time.now, v]}
       end
       @status
     end
@@ -141,7 +141,7 @@ module Eivu
       # generate file information for file on s3
       #
       filename  = File.basename(path_to_file)
-      mime      = MimeMagic.by_magic(File.open(path_to_file)) || MimeMagic.by_path(path_to_file)
+      mime      = Utils.detect_mime(path_to_file)
       sanitized_filename = Eivu::Client::Utils.sanitize(filename)
       # upload the file to s3
       #
