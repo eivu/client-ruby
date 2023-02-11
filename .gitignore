@@ -2,6 +2,7 @@
 .bundler
 vendor/bundle
 
+.envrc
 .DS_Store
 *.gem
 *.rbc
