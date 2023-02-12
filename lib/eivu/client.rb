@@ -4,6 +4,7 @@ require 'rest_client'
 require 'pry'
 require 'oj'
 require 'dry-struct'
+require 'csv'
 
 module Eivu
   class Client
@@ -101,10 +102,11 @@ module Eivu
         @status[:failure][path_to_file] = e
         @status[:success].delete(path_to_file)
       end
-      CSV.open('success.csv', 'w') do |success_log|
+      FileUtils.mkdir_p('logs')
+      CSV.open('logs/success.csv', 'a+') do |success_log|
         @status[:success].each {|v| success_log << [Time.now, v]}
       end
-      CSV.open('failure.csv', 'w') do |failure_log|
+      CSV.open('logs/failure.csv', 'a+') do |failure_log|
         @status[:failure].each {|v| failure_log << [Time.now, v]}
       end
       @status
