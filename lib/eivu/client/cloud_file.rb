@@ -134,7 +134,7 @@ module Eivu
       def s3_folder
         folder =
           if peepy
-            'peepshow'
+            'delicates'
           else
             content_type.to_s.split('/')&.first
           end
