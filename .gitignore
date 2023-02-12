@@ -1,7 +1,7 @@
 # Bundler artifacts
 .bundler
 vendor/bundle
-
+logs/
 .envrc
 .DS_Store
 *.gem
