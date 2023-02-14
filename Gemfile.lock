@@ -1,3 +1,24 @@
+GIT
+  remote: https://github.com/eivu/fingerprinter-acoustid-ruby
+  revision: 5a804b101b07b965c15ed42ca7dbc22ce7d50c92
+  specs:
+    eivu-fingerprinter-acoustid (0.1.0)
+      activesupport (>= 6.1.4, < 8.0)
+      amatch (~> 0.4.0)
+      colorize (~> 0.8.1)
+      factory_bot (~> 6.2)
+      faker (~> 2.18)
+      fuzzy_match (~> 2.1)
+      id3tag (~> 0.14.1)
+      levenshtein-ffi (~> 1.1)
+      oj (~> 3.3, >= 3.3.5)
+      pry (~> 0.14.1)
+      rest-client (~> 2.1)
+      rspec (~> 3.10)
+      rubocop (~> 1.17)
+      vcr (~> 6.0)
+      webmock (~> 3.13)
+
 GEM
   remote: https://rubygems.org/
   specs:
@@ -8,6 +29,9 @@ GEM
       tzinfo (~> 2.0)
     addressable (2.8.0)
       public_suffix (>= 2.0.2, < 5.0)
+    amatch (0.4.1)
+      mize
+      tins (~> 1.0)
     ast (2.4.2)
     aws-eventstream (1.2.0)
     aws-partitions (1.547.0)
@@ -26,6 +50,7 @@ GEM
     aws-sigv4 (1.4.0)
       aws-eventstream (~> 1, >= 1.0.2)
     coderay (1.1.3)
+    colorize (0.8.1)
     concurrent-ruby (1.2.2)
     crack (0.4.5)
       rexml
@@ -57,6 +82,8 @@ GEM
       activesupport (>= 5.0.0)
     faker (2.19.0)
       i18n (>= 1.6, < 2)
+    ffi (1.16.3)
+    fuzzy_match (2.1.0)
     hashdiff (1.0.1)
     http-accept (1.7.0)
     http-cookie (1.0.4)
@@ -64,9 +91,12 @@ GEM
     i18n (1.12.0)
       concurrent-ruby (~> 1.0)
     ice_nine (0.11.2)
+    id3tag (0.14.2)
     jmespath (1.6.1)
     json (2.6.3)
     language_server-protocol (3.17.0.3)
+    levenshtein-ffi (1.1.0)
+      ffi (~> 1.9)
     method_source (1.0.0)
     mime-types (3.4.1)
       mime-types-data (~> 3.2015)
@@ -76,6 +106,8 @@ GEM
       rake
     mini_portile2 (2.8.0)
     minitest (5.18.0)
+    mize (0.4.1)
+      protocol (~> 2.0)
     netrc (0.11.0)
     nokogiri (1.13.9)
       mini_portile2 (~> 2.8.0)
@@ -85,6 +117,8 @@ GEM
     parser (3.2.2.4)
       ast (~> 2.4.1)
       racc
+    protocol (2.0.0)
+      ruby_parser (~> 3.0)
     pry (0.14.1)
       coderay (~> 1.1)
       method_source (~> 1.0)
@@ -126,6 +160,12 @@ GEM
     rubocop-ast (1.30.0)
       parser (>= 3.2.1.0)
     ruby-progressbar (1.13.0)
+    ruby_parser (3.20.3)
+      sexp_processor (~> 4.16)
+    sexp_processor (4.17.0)
+    sync (0.5.0)
+    tins (1.32.1)
+      sync
     tzinfo (2.0.6)
       concurrent-ruby (~> 1.0)
     unf (0.1.4)
@@ -147,6 +187,7 @@ DEPENDENCIES
   aws-sdk-s3 (~> 1.111, >= 1.111.1)
   dry-struct (~> 1.6)
   dry-struct-setters (~> 0.4.0)
+  eivu-fingerprinter-acoustid!
   factory_bot (~> 6.2.1)
   faker (~> 2.18)
   mimemagic (~> 0.4.3)

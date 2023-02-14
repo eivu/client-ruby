@@ -21,6 +21,7 @@ Gem::Specification.new do |s|
   s.add_dependency 'activesupport', '~> 7.0', '>= 7.0.1'
   s.add_dependency 'aws-sdk-s3', '~> 1.111', '>= 1.111.1'
   s.add_dependency 'dry-struct', '~> 1.4' # structs with default values
+  s.add_dependency 'eivu-fingerprinter' # acoustid fingerprinter
   s.add_dependency 'nokogiri', '~> 1.13', '>= 1.13.1' # xml parser
   s.add_dependency 'oj', '~> 3.3', '>= 3.3.5' # faster json parsing
   s.add_dependency 'pry', '~> 0.14.1' # Debugger
