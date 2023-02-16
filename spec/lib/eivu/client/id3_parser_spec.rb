@@ -19,7 +19,7 @@ describe Eivu::Client::Id3Parser do
           { 'language' => 'English' },
           { 'publisher' => 'AWS Polly' },
           { 'title' => 'Paragraph #1' },
-          { 'track' => '1' },
+          { 'track_num' => '1' },
           { 'Acoustid Fingerprint' => a_kind_of(String) }
         )
       end
