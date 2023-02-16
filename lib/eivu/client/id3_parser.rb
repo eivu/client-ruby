@@ -6,7 +6,7 @@ require 'id3tag'
 
 module Eivu
   class Client
-    class Id3Tag
+    class Id3Parser
       def initialize(path_to_file)
         @path_to_file = path_to_file
         mp3_file = File.open(path_to_file, 'rb')
@@ -48,14 +48,14 @@ module Eivu
       #       { genre: mp3_info.genre },
       #       { comments: mp3_info.comments },
       #     ],
-      #     year: mp3_info.year&.strip,
-      #     release_pos: mp3_info.track_nr.to_i,
-      #     release: mp3_info.album&.strip,
-      #     name: mp3_info.title&.strip,
-      #     artists: [ {name: mp3_info.artist}],
-      #     release_attributes: {
-      #       name: mp3_info.album&.strip
-      #     },
+          # year: mp3_info.year&.strip,
+          # release_pos: mp3_info.track_nr.to_i,
+          # release: mp3_info.album&.strip,
+          # name: mp3_info.title&.strip,
+          # artists: [ {name: mp3_info.artist}],
+          # release_attributes: {
+          #   name: mp3_info.album&.strip
+          # },
       #   }
 
       #   #     # is_expected.to include({ tag: 'Comic Book Movie' }, { performer: 'Karl Urban' }, { performer: 'Lena Headey' },
@@ -102,9 +102,9 @@ module Eivu
       TCON: 'genre',
       TEN: 'encoded by',
       TENC: 'encoded by',
-      TSS: 'encoder settings',
-      TSSE: 'encoder settings',
-      TDEN: 'encoding time',
+      # TSS: 'encoder settings',
+      # TSSE: 'encoder settings',
+      # TDEN: 'encoding time',
       TOWN: 'file owner',
       TFT: 'file type',
       TFLT: 'file type',
