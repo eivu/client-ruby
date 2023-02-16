@@ -18,8 +18,8 @@ module Eivu
         acoustid_client.generate(@path_to_file)
 
         metadata_list = extract_metadata_from_frames
-        metadata_list << { 'Acoustid Fingerprint' => acoustid_client.fingerprint }
-        metadata_list
+        metadata_list << { 'Acoustid Fingerprint' => acoustid_client.fingerprint } if acoustid_client.fingerprint.present?
+        metadata_list.compact
       end
 
       def extract_metadata_from_frames
