@@ -9,6 +9,25 @@ module Eivu
       YEAR_REGEX = /\(\(y\ ([^)]+)\)\)/
 
       class << self
+        def from_audio_file(path_to_file)
+          metadata_hash = Eivu::Client::Id3Parser.new(path_to_file).extract
+
+          artist_name = metadata_hash.delete('artist')
+          album_name  = metadata_hash.delete('album')
+          release_pos = metadata_hash.delete('track_num')
+          name        = metadata_hash.delete('title')
+          year        = metadata_hash.delete('year')
+
+          {
+            metadata_list:  metadata_hash.map { |k, v| { k => v } },
+            name:,
+            year:,
+            artist_name:,
+            album_name:,
+            release_pos:
+          }
+        end
+
         def extract_year(string)
           string.scan(YEAR_REGEX)&.flatten&.first
         end
