@@ -17,9 +17,9 @@ module Eivu
         acoustid_client = Eivu::Fingerprinter::Acoustid.new
         acoustid_client.generate(@path_to_file)
 
-        metadata_list = extract_metadata_from_frames
-        metadata_list << { 'Acoustid Fingerprint' => acoustid_client.fingerprint } if acoustid_client.fingerprint.present?
-        metadata_list.compact
+        metadata_hash = extract_metadata_from_frames
+        metadata_hash['Acoustid Fingerprint'] =  acoustid_client.fingerprint if acoustid_client.fingerprint.present?
+        metadata_hash.compact
       end
 
       def extract_metadata_from_frames
@@ -30,10 +30,6 @@ module Eivu
         hash = FRAMES.each_with_object({}) do |(key, name), hash|
           hash[name] = @mp3_info.get_frame(key)&.content
         end.compact
-
-        hash.collect do |key, value|
-          { key => value }
-        end
       end
 
       FRAMES = {

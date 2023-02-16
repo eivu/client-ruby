@@ -12,15 +12,15 @@ describe Eivu::Client::Id3Parser do
 
       it 'returns information from id3 tags' do
         expect(extraction).to include(
-          { 'artist' => 'The Brothers Grimm' },
-          { 'comment' => 'First paragraph of the story The Frog Prince by The Brothers Grimm' },
-          { 'copyright' => 'in public domain, originally published December 20, 1812' },
-          { 'genre' => 'Audiobook Sample' },
-          { 'language' => 'English' },
-          { 'publisher' => 'AWS Polly' },
-          { 'title' => 'Paragraph #1' },
-          { 'track_num' => '1' },
-          { 'Acoustid Fingerprint' => a_kind_of(String) }
+          'artist' => 'The Brothers Grimm',
+          'comment' => 'First paragraph of the story The Frog Prince by The Brothers Grimm',
+          'copyright' => 'in public domain, originally published December 20, 1812',
+          'genre' => 'Audiobook Sample',
+          'language' => 'English',
+          'publisher' => 'AWS Polly',
+          'title' => 'Paragraph #1',
+          'track_num' => '1',
+          'Acoustid Fingerprint' => a_kind_of(String)
         )
       end
     end
@@ -31,7 +31,7 @@ describe Eivu::Client::Id3Parser do
 
         it 'only returns the fingerprint' do
           expect(extraction).to include(
-            { 'Acoustid Fingerprint' => a_kind_of(String) }
+            'Acoustid Fingerprint' => a_kind_of(String)
           )
         end
       end
