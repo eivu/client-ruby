@@ -7,7 +7,6 @@ require 'id3tag'
 module Eivu
   class Client
     class Id3Tag
-
       def initialize(path_to_file)
         @path_to_file = path_to_file
         mp3_file = File.open(path_to_file, 'rb')
@@ -62,31 +61,17 @@ module Eivu
       #   #     # is_expected.to include({ tag: 'Comic Book Movie' }, { performer: 'Karl Urban' }, { performer: 'Lena Headey' },
       #   #     #                        { studio: 'DNA Films' }, { tag: 'script' })]]
       #   #     mp3_info        = ID3Tag.read(@file)
-        
-
 
       #   # @mp3_attr[:_source]   = mp3_info.get_frames(:PRIV).try(:first).try(:owner_identifier) #"www.amazon.com" o "PeakValue"
       #   # @mp3_attr[:artists]   = Tagger::Audio.parse_artist_string(mp3_info.artist) #id3_artist
       #   # @mp3_attr[:release]   = mp3_info.album&.strip
       #   # # @artwork_data         = mp3_info.get_frame(:APIC).try(:content)
       # end
-
-
     end
-    
-
-
-
-
-
-
-
-
-
 
     FRAMES = {
       TALB: 'album',
-      TAL: 'album', 
+      TAL: 'album',
       TP1: 'artist',
       TPE1: 'artist',
       WAR: 'artist url',
@@ -219,7 +204,6 @@ module Eivu
       TYER: 'year',
       ITU: 'iTunesU?',
       ITNU: 'iTunesU?'
-  }.freeze
-
+    }.freeze
   end
 end
