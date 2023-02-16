@@ -26,7 +26,7 @@ describe Eivu::Client::Id3Parser do
     end
 
     context 'when reading a mp3 without id3 information' do
-      let(:path_to_file) { 'spec/fixtures/samples/test.mp3' }
+      let(:path_to_file) { 'spec/fixtures/samples/Piano_brokencrash-Brandondorf-1164520478.mp3' }
 
       it 'only returns the fingerprint' do
         expect(extraction).to include(
