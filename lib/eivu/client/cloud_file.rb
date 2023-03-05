@@ -26,6 +26,7 @@ module Eivu
       attribute? :bucket_name, Types::String
       attribute  :created_at, Types::JSON::DateTime
       attribute  :updated_at, Types::JSON::DateTime
+      attribute? :last_viewed_at, Types::JSON::DateTime.optional
       attribute? :name, Types::String.optional
       attribute? :asset, Types::String.optional
       attribute? :content_type, Types::String.optional
