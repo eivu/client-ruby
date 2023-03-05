@@ -1,10 +1,11 @@
 # Bundler artifacts
 .bundler
 vendor/bundle
-
+.envrc
 .DS_Store
 *.gem
 *.rbc
+logs/*
 /.config
 /coverage/
 /InstalledFiles

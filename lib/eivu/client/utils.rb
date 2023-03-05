@@ -1,4 +1,6 @@
 # frozen_string_literal: true
+require 'active_support/all'
+require 'mimemagic'
 
 module Eivu
   class Client
@@ -15,6 +17,14 @@ module Eivu
           output.gsub!(RATING_500_475_REGEX, '')
           output.gsub!(RATING_425_REGEX, '')
           output
+        end
+
+        def detect_mime(path_to_file)
+          if path_to_file.ends_with?('.m4a')
+            MimeMagic.by_extension('m4a')
+          else
+            MimeMagic.by_magic(File.open(path_to_file)) || MimeMagic.by_path(path_to_file)
+          end
         end
 
         def sanitize(name)

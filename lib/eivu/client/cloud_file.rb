@@ -1,9 +1,11 @@
 # frozen_string_literal: true
 
-require 'rest_client'
+require 'aws-sdk-s3'
+require 'dry/struct'
+require 'dry/struct/setters'
 require 'pry'
 require 'oj'
-require 'dry-struct'
+require 'rest_client'
 
 module Eivu
   class Client
@@ -24,6 +26,7 @@ module Eivu
       attribute? :bucket_name, Types::String
       attribute  :created_at, Types::JSON::DateTime
       attribute  :updated_at, Types::JSON::DateTime
+      attribute? :last_viewed_at, Types::JSON::DateTime.optional
       attribute? :name, Types::String.optional
       attribute? :asset, Types::String.optional
       attribute? :content_type, Types::String.optional
@@ -44,11 +47,13 @@ module Eivu
       attribute? :metadata, Types::JSON::Array.of(Types::JSON::Hash)
 
       class << self
-        def reserve_or_fetch_by(bucket_name:, path_to_file:, peepy: false, nsfw: false)
-          reserve(bucket_name:, path_to_file:, peepy:, nsfw:)
+        def reserve_or_fetch_by(bucket_name:, provider:, path_to_file:, peepy: false, nsfw: false)
+          reserve(bucket_name:, provider:, path_to_file:, peepy:, nsfw:)
         rescue Errors::Server::InvalidCloudFileState
           md5 = generate_md5(path_to_file)
-          fetch(md5)
+          cloud_file = fetch(md5)
+          cloud_file.content_type = Client::Utils.detect_mime(path_to_file).type
+          cloud_file
         end
 
         def fetch(md5)
@@ -86,15 +91,18 @@ module Eivu
           Digest::MD5.file(path_to_file).hexdigest.upcase
         end
 
-        def reserve(bucket_name:, path_to_file:, peepy: false, nsfw: false)
-          md5         = generate_md5(path_to_file)
-          payload     = { bucket_name:, peepy:, nsfw:, fullpath:'.'}
-          parsed_body = post_request(action: :reserve, md5:, payload:)
-          CloudFile.new parsed_body.merge(state_history: [STATE_RESERVED])
+        def reserve(bucket_name:, provider:, path_to_file:, peepy: false, nsfw: false)
+          md5          = generate_md5(path_to_file)
+          payload      = { bucket_name:, provider:, peepy:, nsfw:, fullpath: '.' }
+          parsed_body  = post_request(action: :reserve, md5:, payload:)
+          content_type = Client::Utils.detect_mime(path_to_file).type
+          CloudFile.new parsed_body.merge(state_history: [STATE_RESERVED], content_type:)
         end
       end
 
-      def transfer!(content_type:, asset:, filesize:)
+      def transfer!(asset:, filesize:)
+        raise Eivu::Client::Errors::Generic, 'content_type can not be empty' if content_type.blank?
+
         payload     = { content_type:, asset:, filesize: }
         # post_request will raise an error if there is a problem
         parsed_body = post_request(action: :transfer, payload:)
@@ -127,7 +135,7 @@ module Eivu
       def s3_folder
         folder =
           if peepy
-            'peepshow'
+            'delicates'
           else
             content_type.to_s.split('/')&.first
           end
