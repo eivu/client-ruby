@@ -3,7 +3,7 @@
 source 'https://rubygems.org'
 ruby '3.1.2'
 
-gem 'activesupport', '~> 7.0', '>= 7.0.1', require: 'active_support/all' # handy rails functions
+gem 'activesupport', '~> 7.0', require: 'active_support/all' # handy rails functions
 gem 'aws-sdk-s3', '~> 1.111', '>= 1.111.1'
 gem 'dry-struct', '~> 1.6' # structs with default values
 gem 'dry-struct-setters', '~> 0.4.0' # an extension to the Dry::Struct library
