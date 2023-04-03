@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'aws-sdk-s3'
+require 'active_support/core_ext/hash/keys'
 require 'dry/struct'
 require 'dry/struct/setters'
 require 'pry'
