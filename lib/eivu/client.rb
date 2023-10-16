@@ -41,28 +41,27 @@ module Eivu
     end
 
     def upload_file(path_to_file:, peepy: false, nsfw: false)
-      filename    = File.basename(path_to_file)
-      asset       = Utils.sanitize(filename)
-      # binding.pry
+      filename      = File.basename(path_to_file)
+      asset         = Utils.sanitize(filename)
       # mime        = Utils.detect_mime(path_to_file)
-      filesize    = File.size(path_to_file)
-      md5         = Eivu::Client::CloudFile.generate_md5(path_to_file)&.downcase
-      s3_resource = instantiate_s3_resource
-      rating      = MetadataExtractor.extract_rating(filename)
-      year        = MetadataExtractor.extract_year(filename)
-      metadata_list    = [{ original_local_path_to_file: path_to_file }] + MetadataExtractor.extract_metadata_list(filename)
+      filesize      = File.size(path_to_file)
+      md5           = Eivu::Client::CloudFile.generate_md5(path_to_file)&.downcase
+      s3_resource   = instantiate_s3_resource
+      rating        = MetadataExtractor.extract_rating(filename)
+      year          = MetadataExtractor.extract_year(filename)
+      metadata_list = [{ original_local_path_to_file: path_to_file }] + MetadataExtractor.extract_metadata_list(filename)
 
       puts "Working with: #{asset}: "
-      puts "  Fetching/Reserving"
+      puts '  Fetching/Reserving'
 
-      cloud_file  = CloudFile.reserve_or_fetch_by(bucket_name: configuration.bucket_name, provider: configuration.bucket_location, path_to_file:, peepy:, nsfw:)
+      cloud_file = CloudFile.reserve_or_fetch_by(bucket_name: configuration.bucket_name, provider: configuration.bucket_location, path_to_file:, peepy:, nsfw:)
       remote_path_to_file = "#{cloud_file.s3_folder}/#{Utils.sanitize(filename)}"
 
       if cloud_file.reserved?
         # unless write_to_s3(s3_resource:, s3_folder: cloud_file.s3_folder, path_to_file:)
         #   raise Errors::CloudStorage::Connection, 'Failed to write to s3'
         # end
-        puts "  Writing to S3"
+        puts '  Writing to S3'
         File.open(path_to_file, 'rb') do |file|
           s3_client.put_object(
             acl: 'public-read',
@@ -74,16 +73,16 @@ module Eivu
         validated_remote_md5!(remote_path_to_file:, path_to_file:, md5:)
 
 
-        puts "  Transfering"
+        puts '  Transfering'
 
         cloud_file.transfer!(asset:, filesize:)
       end
 
       if cloud_file.transfered?
-        puts "  Completing"
+        puts '  Completing'
         cloud_file.complete!(year:, rating:, release_pos: nil, metadata_list:, matched_recording: nil)
       else
-        puts "  Updating/Skipping"
+        puts '  Updating/Skipping'
         cloud_file.update_metadata!(year:, rating:, release_pos: nil, metadata_list:, matched_recording: nil)
       end
 
