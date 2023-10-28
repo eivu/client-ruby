@@ -3,6 +3,7 @@
 describe Eivu::Client::CloudFile, vcr: true do
   let(:bucket_uuid) { '3b746ff6-82b3-4340-a745-ae6d5d375381' }
   let(:bucket_name) { 'eivu-test' }
+  let(:provider) { 'aws' }
   let(:peepy) { false }
   let(:nsfw) { false }
 
@@ -68,7 +69,7 @@ describe Eivu::Client::CloudFile, vcr: true do
   end
 
   describe '.reserve_or_fetch_by' do
-    subject(:instance) { described_class.reserve_or_fetch_by(bucket_name:, path_to_file:) }
+    subject(:instance) { described_class.reserve_or_fetch_by(bucket_name:, provider:, path_to_file:) }
 
     let(:md5) { described_class.generate_md5(path_to_file) }
     let(:path_to_file) { File.expand_path('../../../fixtures/samples/test.mp3', __dir__) }
@@ -145,7 +146,7 @@ describe Eivu::Client::CloudFile, vcr: true do
   end
 
   describe '.reserve' do
-    subject(:reservation) { described_class.reserve(bucket_name:, path_to_file:) }
+    subject(:reservation) { described_class.reserve(bucket_name:, provider:, path_to_file:) }
 
     context 'success' do
       context 'when md5 does not exist' do
@@ -303,7 +304,7 @@ describe Eivu::Client::CloudFile, vcr: true do
     context 'peepy content' do
       let(:instance) { build :cloud_file, :audio, :peepy, md5: }
 
-      it { is_expected.to eq('peepshow/F4/5C/04/D7/17/F3/ED/67/20/AE/0A/3A/67/98/1F/E4') }
+      it { is_expected.to eq('delicates/F4/5C/04/D7/17/F3/ED/67/20/AE/0A/3A/67/98/1F/E4') }
     end
   end
 end
