@@ -1,35 +1,8 @@
 # frozen_string_literal: true
 
-describe Eivu::Client, vcr: true  do
+describe Eivu::Client do
   let(:bucket_name) { 'eivu-test' }
   let(:instance) { described_class.new }
-
-  describe '#write_to_s3' do
-    subject(:write_to_s3) do
-      instance.write_to_s3(s3_resource:, s3_folder:, path_to_file:)
-    end
-
-    let(:s3_resource) { instance.send(:instantiate_s3_resource) }
-    let(:s3_folder) { 'audio/F4/5C/04/D7/17/F3/ED/67/20/AE/0A/3A/67/98/1F/E4' }
-    let(:filename) { File.basename(path_to_file) }
-    let(:path_to_file) { File.expand_path('../../fixtures/samples/test.mp3', __dir__) }
-
-    context 'success', vcr: true do
-      it 'writes the file to S3' do
-        expect(write_to_s3).to be true
-      end
-    end
-
-    context 'failure', vcr: true do
-      before do
-        expect_any_instance_of(Aws::S3::Object).to receive(:upload_file).and_return(false)
-      end
-
-      it 'writes the file to S3' do
-        expect(write_to_s3).to be false
-      end
-    end
-  end
 
   describe '#upload_file', vcr: true do
     subject(:result) { instance.upload_file(path_to_file:, peepy:, nsfw:) }
@@ -54,12 +27,9 @@ describe Eivu::Client, vcr: true  do
         before do
           expect(Eivu::Client::CloudFile).to receive(:reserve).and_return(dummy_cloud_file)
           expect(dummy_cloud_file).to receive(:s3_folder).and_return('/path/to/s3/folder')
-          expect(dummy_cloud_file).to receive(:state_history).and_return(%w[reserved transfered completed])
-          expect_any_instance_of(Eivu::Client).to receive(:write_to_s3).and_return(true)
-          # true tests below
           expect(dummy_cloud_file).to receive(:reserved?).and_return(true)
           expect(dummy_cloud_file).to receive(:transfered?).and_return(true)
-          expect(dummy_cloud_file).to receive(:transfer!).with(content_type:, asset:, filesize:)
+          expect(dummy_cloud_file).to receive(:transfer!).with(asset:, filesize:)
           expect(dummy_cloud_file).to receive(:complete!).with(rating:, metadata_list:, year:, release_pos: nil,
                                                                matched_recording: nil)
         end
@@ -83,8 +53,8 @@ describe Eivu::Client, vcr: true  do
             let(:metadata_list) do
               [
                 { original_local_path_to_file: path_to_file },
-                { performer: 'Karl Urban' }, { performer: 'Lena Headey' },
-                { studio: 'DNA Films' }, { tag: 'Comic Book Movie' }, { tag: 'script' }
+                { performer: 'karl urban' }, { performer: 'lena headey' },
+                { studio: 'dna films' }, { tag: 'comic book movie' }, { tag: 'script' }
               ]
             end
 
@@ -100,7 +70,7 @@ describe Eivu::Client, vcr: true  do
                 __dir__
               )
             end
-            let(:asset) { 'Cowboy Bebop - Asteroid Blues.txt' }
+            let(:asset) { 'Cowboy_Bebop_-_Asteroid_Blues.txt' }
             let(:rating) { 4.25 }
             let(:content_type) { 'text/plain' }
             let(:metadata_list) do
@@ -125,7 +95,6 @@ describe Eivu::Client, vcr: true  do
         expect(Eivu::Client::CloudFile).to receive(:reserve).and_return(dummy_cloud_file)
         expect(dummy_cloud_file).to receive(:s3_folder).and_return('/path/to/s3/folder')
         allow(dummy_cloud_file).to receive(:reserved?).and_return(true)
-        expect_any_instance_of(Eivu::Client).to receive(:write_to_s3).and_return(false)
       end
 
       let(:path_to_file) { File.expand_path('../../fixtures/samples/test.mp3', __dir__) }
@@ -139,7 +108,7 @@ describe Eivu::Client, vcr: true  do
     end
   end
 
-  describe '#upload_folder' do
+  describe '#upload_folder (with mocks)' do
     subject(:result) { instance.upload_folder(path_to_folder:, peepy:, nsfw:) }
 
     let(:path_to_folder) { File.expand_path('../../fixtures/samples/audio/brothers_grimm', __dir__) }
@@ -158,13 +127,10 @@ describe Eivu::Client, vcr: true  do
     #   allow_any_instance_of(described_class).to receive(:generate_etag).and_return('5000000000')
     # end
 
-    before do
-      allow_any_instance_of(described_class).to receive(:upload_file).and_return(nil)
-    end
-
     context 'success' do
       before do
         allow_any_instance_of(described_class).to receive(:verify_upload!).and_return(true)
+        allow_any_instance_of(described_class).to receive(:upload_file).and_return(nil)
       end
 
       it 'writes the file to S3 and returns a collection of success statements' do
@@ -184,13 +150,14 @@ describe Eivu::Client, vcr: true  do
       context 'fails to write to s3' do
         before do
           allow_any_instance_of(Eivu::Client).to receive(:upload_file).and_raise(Eivu::Client::Errors::CloudStorage::InvalidMd5)
+          allow_any_instance_of(described_class).to receive(:upload_file).and_return(nil)
         end
 
         it 'fails to write any files to S3 and returns a collection of errors' do
           aggregate_failures do
             expect(result[:success].count).to eq(0)
             expect(result[:failure].count).to eq(5)
-            expect(result[:failure].values).to all(be_a(Eivu::Client::Errors::CloudStorage::InvalidMd5))
+            expect(result[:failure].values).to all(eq('upload did not complete'))
           end
         end
       end

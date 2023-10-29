@@ -55,7 +55,6 @@ module Eivu
 
       @logger.info "Working with: #{asset}: "
       @logger.info '  Fetching/Reserving'
-
       cloud_file = CloudFile.reserve_or_fetch_by(bucket_name: configuration.bucket_name,
                                                  provider: configuration.bucket_location, path_to_file:, peepy:, nsfw:)
       remote_path_to_file = "#{cloud_file.s3_folder}/#{Utils.sanitize(filename)}"
