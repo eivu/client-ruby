@@ -55,8 +55,8 @@ describe Eivu::Client::MetadataExtractor do
       end
 
       it {
-        is_expected.to include({ tag: 'Comic Book Movie' }, { performer: 'Karl Urban' }, { performer: 'Lena Headey' },
-                               { studio: 'DNA Films' }, { tag: 'script' })
+        is_expected.to include({ tag: 'comic book movie' }, { performer: 'karl urban' }, { performer: 'lena headey' },
+                               { studio: 'dna films' }, { tag: 'script' })
       }
     end
 
