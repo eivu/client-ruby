@@ -195,8 +195,7 @@ describe Eivu::Client::CloudFile, vcr: true do
         let(:bucket_name) { 'error' }
 
         it 'raises an error' do
-          reservation
-          # expect { reservation }.to raise_error(Eivu::Client::Errors::Server::Security)
+          expect { reservation }.to raise_error(Eivu::Client::Errors::Server::Security)
         end
       end
     end
