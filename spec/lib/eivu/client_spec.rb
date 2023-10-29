@@ -191,9 +191,7 @@ describe Eivu::Client, vcr: true  do
     end
   end
 
-  describe '#remote_md5' do
-    it 'returns the md5' do
-      raise 'fix this'
-    end
+  describe '#validated_remote_md5' do
+    it 'does something good'
   end
 end
