@@ -99,7 +99,7 @@ module Eivu
       @configuration ||= self.class.configuration
     end
 
-    def validated_remote_md5!(remote_path_to_file:, path_to_file:, md5:)
+    def validate_remote_md5!(remote_path_to_file:, path_to_file:, md5:)
       remote_md5 = retrieve_remote_md5(remote_path_to_file)
       etag       = generate_etag(path_to_file)
       return if [md5.downcase, etag].include?(remote_md5)
@@ -121,7 +121,7 @@ module Eivu
         )
       end
 
-      validated_remote_md5!(remote_path_to_file:, path_to_file:, md5:)
+      validate_remote_md5!(remote_path_to_file:, path_to_file:, md5:)
 
       @logger.info '  Transfering'
       cloud_file.transfer!(asset:, filesize:)
