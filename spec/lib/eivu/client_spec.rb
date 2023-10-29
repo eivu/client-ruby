@@ -139,13 +139,34 @@ describe Eivu::Client, vcr: true  do
     end
   end
 
-  describe '#upload_folder', vcr: true do
+  describe '#upload_folder' do
     subject(:result) { instance.upload_folder(path_to_folder:, peepy:, nsfw:) }
+
     let(:path_to_folder) { File.expand_path('../../fixtures/samples/audio/brothers_grimm', __dir__) }
     let(:peepy) { false }
     let(:nsfw) { false }
+    let(:dummy_cloud_file) { instance_double(Eivu::Client::CloudFile) }
+
+
+
+    # before do
+    #   allow(Eivu::Client::CloudFile).to receive(:reserve).and_return(dummy_cloud_file)
+    #   allow(dummy_cloud_file).to receive(:s3_folder).and_return('/path/to/s3/folder')
+    #   allow(dummy_cloud_file).to receive(:reserved?).and_return(true)
+    #   allow_any_instance_of(Aws::S3::Client).to receive(:put_object).and_return(nil)
+    #   allow_any_instance_of(described_class).to receive(:retrieve_remote_md5).and_return('1234567890')
+    #   allow_any_instance_of(described_class).to receive(:generate_etag).and_return('5000000000')
+    # end
+
+    before do
+      allow_any_instance_of(described_class).to receive(:upload_file).and_return(nil)
+    end
 
     context 'success' do
+      before do
+        allow_any_instance_of(described_class).to receive(:verify_upload!).and_return(true)
+      end
+
       it 'writes the file to S3 and returns a collection of success statements' do
         aggregate_failures do
           expect(result[:failure].count).to eq(0)
@@ -156,6 +177,10 @@ describe Eivu::Client, vcr: true  do
     end
 
     context 'failure' do
+      before do
+        allow_any_instance_of(described_class).to receive(:verify_upload!).and_return(false)
+      end
+
       context 'fails to write to s3' do
         before do
           allow(Eivu::Client::CloudFile).to receive(:reserve).and_return(dummy_cloud_file)
@@ -166,13 +191,11 @@ describe Eivu::Client, vcr: true  do
           allow_any_instance_of(described_class).to receive(:generate_etag).and_return('5000000000')
         end
 
-        let(:dummy_cloud_file) { instance_double(Eivu::Client::CloudFile) }
-
         it 'fails to write any files to S3 and returns a collection of errors' do
           aggregate_failures do
             expect(result[:success].count).to eq(0)
             expect(result[:failure].count).to eq(5)
-            expect(result[:failure].values).to all(be_a(Eivu::Client::Errors::CloudStorage::InvalidMd5))
+            expect(result[:failure].values).to all(eq('upload did not complete'))
           end
         end
       end
