@@ -165,7 +165,7 @@ module Eivu
         key: remote_path_to_file
       })&.etag&.gsub(/"/,'')
 
-      etag = `./notes/s3etag.sh "#{path_to_file}" 5`&.strip
+      etag = `./bin/s3etag.sh "#{path_to_file}" 5`&.strip
 
       unless [md5.downcase, etag].include?(remote_md5)
         raise Errors::CloudStorage::InvalidMd5, "Expected: #{md5.downcase}, Got: #{remote_md5}"
