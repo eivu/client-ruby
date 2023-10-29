@@ -20,7 +20,6 @@ AllCops:
 Style/Documentation:
   Enabled: false
 
-
 Metrics/BlockLength:
   Exclude:
     - spec/**/*.rb
@@ -35,8 +34,12 @@ Layout/LineLength:
     - spec/spec_helper.rb
     - spec/support/vcr_helper.rb
 
-# For rationale see Metrics/AbcSize (from max?)
+
+Metrics/ClassLength:
+  Enabled: false
+
 Metrics/MethodLength:
+  Max: 30
   Exclude:
     - spec/**/*.rb
 

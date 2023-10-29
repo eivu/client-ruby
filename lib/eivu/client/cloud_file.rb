@@ -68,6 +68,7 @@ module Eivu
           raise Errors::CloudStorage::MissingResource, "Cloud file #{md5} not found"
         end
 
+        # rubocop:disable Metrics/AbcSize
         def post_request(action:, md5:, payload:)
           response = RestClient.post(
             "#{Eivu::Client.configuration.host}/api/v1/cloud_files/#{md5}/#{action}",
@@ -87,6 +88,8 @@ module Eivu
         rescue Errno::ECONNREFUSED
           raise Errors::Server::Connection, "Failed to connect to eivu server: #{Eivu::Client.configuration.host}"
         end
+        # rubocop:enable Metrics/AbcSize
+
 
         def generate_md5(path_to_file)
           Digest::MD5.file(path_to_file).hexdigest.upcase
@@ -94,7 +97,7 @@ module Eivu
 
         def reserve(bucket_name:, provider:, path_to_file:, peepy: false, nsfw: false)
           md5          = generate_md5(path_to_file)
-          payload      = { bucket_name:, provider:, peepy:, nsfw:, fullpath: '.' }
+          payload      = { bucket_name:, provider:, peepy:, nsfw:, fullpath: path_to_file }
           parsed_body  = post_request(action: :reserve, md5:, payload:)
           content_type = Client::Utils.detect_mime(path_to_file).type
           CloudFile.new parsed_body.merge(state_history: [STATE_RESERVED], content_type:)

@@ -8,3 +8,10 @@ Eivu::Client.new.upload_folder path_to_folder: "/Users/jinx/Downloads/demo"
 Eivu::Client.new.upload_folder peepy: true, nsfw: true, path_to_folder: "/Users/jinx/Downloads/xfer"
 
 ```
+
+
+
+Requirements
+- node
+- python
+- [yt-dlp](https://github.com/yt-dlp/yt-dlp)

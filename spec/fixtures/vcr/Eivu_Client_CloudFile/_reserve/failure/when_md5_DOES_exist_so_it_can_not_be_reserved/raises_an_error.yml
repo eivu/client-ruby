@@ -5,7 +5,7 @@ http_interactions:
     uri: "<EIVU_SERVER_HOST>/api/v1/cloud_files/198918F40ECC7CAB0FC4231ADAF67C96/reserve"
     body:
       encoding: UTF-8
-      string: bucket_name=eivu-test&peepy=false&nsfw=false
+      string: bucket_name=<EIVU_BUCKET_NAME>-test&provider=<EIVU_BUCKET_LOCATION>&peepy=false&nsfw=false&fullpath=%2FUsers%2Fjinx%2Fprojects%2F<EIVU_BUCKET_NAME>%2Fruby_client%2Fspec%2Ffixtures%2Fsamples%2Fmov_bbb.mp4
     headers:
       Accept:
       - "*/*"
