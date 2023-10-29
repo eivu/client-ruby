@@ -105,7 +105,7 @@ describe Eivu::Client, vcr: true  do
             let(:content_type) { 'text/plain' }
             let(:metadata_list) do
               [
-                { original_local_path_to_file: path_to_file },
+                { original_local_path_to_file: path_to_file }, 
                 { tag: 'anime' },
                 { tag: 'script' },
                 { tag: 'all time best' }
@@ -161,7 +161,9 @@ describe Eivu::Client, vcr: true  do
           allow(Eivu::Client::CloudFile).to receive(:reserve).and_return(dummy_cloud_file)
           allow(dummy_cloud_file).to receive(:s3_folder).and_return('/path/to/s3/folder')
           allow(dummy_cloud_file).to receive(:reserved?).and_return(true)
-          allow_any_instance_of(Eivu::Client).to receive(:write_to_s3).and_return(false)
+          allow_any_instance_of(Aws::S3::Client).to receive(:put_object).and_return(nil)
+          allow_any_instance_of(described_class).to receive(:retrieve_remote_md5).and_return('1234567890')
+          allow_any_instance_of(described_class).to receive(:generate_etag).and_return('5000000000')
         end
 
         let(:dummy_cloud_file) { instance_double(Eivu::Client::CloudFile) }
@@ -170,10 +172,7 @@ describe Eivu::Client, vcr: true  do
           aggregate_failures do
             expect(result[:success].count).to eq(0)
             expect(result[:failure].count).to eq(5)
-            # In production the error will be a Eivu::Client::Errors::CloudStorage::Connection in 
-            # specs it will be VCR::Errors::UnhandledHTTPRequestError, both inherit from StandardError
-            # expect(result[:failure].values).to all(be_a(Eivu::Client::Errors::CloudStorage::Connection))
-            expect(result[:failure].values).to all(be_a(StandardError))
+            expect(result[:failure].values).to all(be_a(Eivu::Client::Errors::CloudStorage::InvalidMd5))
           end
         end
       end

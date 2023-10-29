@@ -102,30 +102,29 @@ module Eivu
     def validated_remote_md5!(remote_path_to_file:, path_to_file:, md5:)
       remote_md5 = retrieve_remote_md5(remote_path_to_file)
       etag       = generate_etag(path_to_file)
+      return if [md5.downcase, etag].include?(remote_md5)
 
-      unless [md5.downcase, etag].include?(remote_md5)
-        raise Errors::CloudStorage::InvalidMd5, "Expected: #{md5.downcase}, Got: #{remote_md5}"
-      end
+      raise Errors::CloudStorage::InvalidMd5, "Expected: #{md5.downcase}, Got: #{remote_md5}"
     end
 
     private
 
     def process_reservation_and_transfer(cloud_file:, path_to_file:, remote_path_to_file:, md5:, asset:, filesize:)
-      if cloud_file.reserved?
-        @logger.info '  Writing to S3'
-        File.open(path_to_file, 'rb') do |file|
-          s3_client.put_object(
-            acl: 'public-read',
-            bucket: configuration.bucket_name,
-            key: remote_path_to_file, body: file
-          )
-        end
+      return unless cloud_file.reserved?
 
-        validated_remote_md5!(remote_path_to_file:, path_to_file:, md5:)
-
-        @logger.info '  Transfering'
-        cloud_file.transfer!(asset:, filesize:)
+      @logger.info '  Writing to S3'
+      File.open(path_to_file, 'rb') do |file|
+        s3_client.put_object(
+          acl: 'public-read',
+          bucket: configuration.bucket_name,
+          key: remote_path_to_file, body: file
+        )
       end
+
+      validated_remote_md5!(remote_path_to_file:, path_to_file:, md5:)
+
+      @logger.info '  Transfering'
+      cloud_file.transfer!(asset:, filesize:)
     end
 
     def retrieve_remote_md5(remote_path_to_file)
