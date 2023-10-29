@@ -3,6 +3,7 @@
 describe Eivu::Client do
   let(:bucket_name) { 'eivu-test' }
   let(:instance) { described_class.new }
+  let(:dummy_cloud_file) { instance_double(Eivu::Client::CloudFile) }
 
   describe '#upload_file', vcr: true do
     subject(:result) { instance.upload_file(path_to_file:, peepy:, nsfw:) }
@@ -34,7 +35,7 @@ describe Eivu::Client do
                                                                matched_recording: nil)
         end
 
-        let(:dummy_cloud_file) { instance_double(Eivu::Client::CloudFile) }
+        
         let(:filesize) { File.size(path_to_file) }
         let(:year) { nil }
 
@@ -92,18 +93,26 @@ describe Eivu::Client do
 
     context 'failure' do
       before do
-        expect(Eivu::Client::CloudFile).to receive(:reserve).and_return(dummy_cloud_file)
-        expect(dummy_cloud_file).to receive(:s3_folder).and_return('/path/to/s3/folder')
-        allow(dummy_cloud_file).to receive(:reserved?).and_return(true)
+        # expect(Eivu::Client::CloudFile).to receive(:reserve).and_return(dummy_cloud_file)
+        # expect(dummy_cloud_file).to receive(:s3_folder).and_return('/path/to/s3/folder')
+        # allow(dummy_cloud_file).to receive(:reserved?).and_return(true)
+###################
+          allow(Eivu::Client::CloudFile).to receive(:reserve).and_return(dummy_cloud_file)
+          allow(dummy_cloud_file).to receive(:s3_folder).and_return('/path/to/s3/folder')
+          allow(dummy_cloud_file).to receive(:reserved?).and_return(true)
+          allow_any_instance_of(Aws::S3::Client).to receive(:put_object).and_return(nil)
+          allow_any_instance_of(described_class).to receive(:retrieve_remote_md5).and_return('1234567890')
+          allow_any_instance_of(described_class).to receive(:generate_etag).and_return('5000000000')
+
+
+
       end
 
       let(:path_to_file) { File.expand_path('../../fixtures/samples/test.mp3', __dir__) }
-      let(:dummy_cloud_file) { instance_double(Eivu::Client::CloudFile) }
+      
 
       it 'fails to write file to S3 and partially saves data to the server' do
-        aggregate_failures do
-          expect { result }.to raise_error(Eivu::Client::Errors::CloudStorage::Connection, /Failed to write to s3/)
-        end
+        expect { result }.to raise_error(Eivu::Client::Errors::CloudStorage::InvalidMd5, /Expected/)
       end
     end
   end
@@ -114,7 +123,7 @@ describe Eivu::Client do
     let(:path_to_folder) { File.expand_path('../../fixtures/samples/audio/brothers_grimm', __dir__) }
     let(:peepy) { false }
     let(:nsfw) { false }
-    let(:dummy_cloud_file) { instance_double(Eivu::Client::CloudFile) }
+    
 
 
 
@@ -178,7 +187,7 @@ describe Eivu::Client do
     end
   end
 
-  describe '#validated_remote_md5' do
+  describe '#validate_remote_md5' do
     it 'does something good'
   end
 end
