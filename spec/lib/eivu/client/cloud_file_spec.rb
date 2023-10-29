@@ -135,10 +135,7 @@ describe Eivu::Client::CloudFile, vcr: true do
         let(:bucket_name) { 'error' }
 
         it 'raises an error' do
-        instance
-          # aggregate_failures do
-          #   expect { instance }.to raise_error(Eivu::Client::Errors::Server::Security)
-          # end
+          expect { instance }.to raise_error(Eivu::Client::Errors::Server::Security)
         end
       end
     end
