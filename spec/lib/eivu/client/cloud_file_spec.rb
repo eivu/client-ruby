@@ -181,8 +181,7 @@ describe Eivu::Client::CloudFile, vcr: true do
         let(:bucket_name) { 'missing-bucket' }
 
         it 'raises an error' do
-          reservation
-            # expect { reservation }.to raise_error(Eivu::Client::Errors::Server::Connection)
+          expect { reservation }.to raise_error(Eivu::Client::Errors::Server::Connection)
         end
       end
 
