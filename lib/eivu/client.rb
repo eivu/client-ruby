@@ -5,6 +5,7 @@ require 'pry'
 require 'oj'
 require 'dry-struct'
 require 'csv'
+require 'logger'
 
 module Eivu
   class Client
@@ -38,6 +39,7 @@ module Eivu
 
     def initialize
       @status = { success: {}, failure: {} }
+      @logger = Logger.new($stdout)
     end
 
     def upload_file(path_to_file:, peepy: false, nsfw: false)
@@ -51,8 +53,8 @@ module Eivu
       year          = MetadataExtractor.extract_year(filename)
       metadata_list = [{ original_local_path_to_file: path_to_file }] + MetadataExtractor.extract_metadata_list(filename)
 
-      puts "Working with: #{asset}: "
-      puts '  Fetching/Reserving'
+      @logger.info "Working with: #{asset}: "
+      @logger.info '  Fetching/Reserving'
 
       cloud_file = CloudFile.reserve_or_fetch_by(bucket_name: configuration.bucket_name, provider: configuration.bucket_location, path_to_file:, peepy:, nsfw:)
       remote_path_to_file = "#{cloud_file.s3_folder}/#{Utils.sanitize(filename)}"
@@ -61,7 +63,7 @@ module Eivu
         # unless write_to_s3(s3_resource:, s3_folder: cloud_file.s3_folder, path_to_file:)
         #   raise Errors::CloudStorage::Connection, 'Failed to write to s3'
         # end
-        puts '  Writing to S3'
+        @logger.info '  Writing to S3'
         File.open(path_to_file, 'rb') do |file|
           s3_client.put_object(
             acl: 'public-read',
@@ -73,16 +75,16 @@ module Eivu
         validated_remote_md5!(remote_path_to_file:, path_to_file:, md5:)
 
 
-        puts '  Transfering'
+        @logger.info '  Transfering'
 
         cloud_file.transfer!(asset:, filesize:)
       end
 
       if cloud_file.transfered?
-        puts '  Completing'
+        @logger.info '  Completing'
         cloud_file.complete!(year:, rating:, release_pos: nil, metadata_list:, matched_recording: nil)
       else
-        puts '  Updating/Skipping'
+        @logger.info '  Updating/Skipping'
         cloud_file.update_metadata!(year:, rating:, release_pos: nil, metadata_list:, matched_recording: nil)
       end
 
@@ -132,11 +134,11 @@ module Eivu
         suffix = percent.to_f < 100 ? "\r" : "\n"
         # print "bytes #{bytes.first} | #{percent }% | #{totals.sum} | #{size}#{suffix}"
         print "  Writing to s3: #{percent}%#{suffix}"
-        # puts "totals #{totals.first} | #{totals.last} | #{size}"
+        # logger.info "totals #{totals.first} | #{totals.last} | #{size}"
 
         # temp_bytes = bytes
         # temp_totals = totals
-        # puts bytes.map.with_index { |b, i| "Part #{i+1}: #{b} / #{totals[i]}"}.join(' ')# + "Total: #{100.0 * bytes.sum / totals.sum }%" }
+        # logger.info bytes.map.with_index { |b, i| "Part #{i+1}: #{b} / #{totals[i]}"}.join(' ')# + "Total: #{100.0 * bytes.sum / totals.sum }%" }
       end
 
 
