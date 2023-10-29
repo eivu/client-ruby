@@ -86,7 +86,7 @@ describe Eivu::Client::CloudFile, vcr: true do
             expect(instance.name).to be nil
             expect(instance.bucket_uuid).to eq(bucket_uuid)
             expect(instance.state_history).to eq([])
-            expect(reservation.content_type).to eq('audio/mpeg')
+            expect(instance.content_type).to eq('audio/mpeg')
           end
         end
       end
@@ -102,7 +102,7 @@ describe Eivu::Client::CloudFile, vcr: true do
             expect(instance.asset).to be nil
             expect(instance.bucket_uuid).to eq(bucket_uuid)
             expect(instance.state_history).to eq(%i[reserved])
-            expect(reservation.content_type).to eq('audio/mpeg')
+            expect(instance.content_type).to eq('audio/mpeg')
           end
         end
       end
