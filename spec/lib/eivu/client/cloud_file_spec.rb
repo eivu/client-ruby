@@ -187,8 +187,7 @@ describe Eivu::Client::CloudFile, vcr: true do
 
       context 'when md5 DOES exist, so it can not be reserved' do
         it 'raises an error' do
-          reservation
-          # expect { reservation }.to raise_error(Eivu::Client::Errors::Server::InvalidCloudFileState)
+          expect { reservation }.to raise_error(Eivu::Client::Errors::Server::InvalidCloudFileState)
         end
       end
 
