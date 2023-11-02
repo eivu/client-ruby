@@ -112,7 +112,7 @@ GEM
     nokogiri (1.13.9)
       mini_portile2 (~> 2.8.0)
       racc (~> 1.4)
-    oj (3.13.11)
+    oj (3.16.1)
     parallel (1.23.0)
     parser (3.2.2.4)
       ast (~> 2.4.1)
@@ -170,14 +170,14 @@ GEM
       concurrent-ruby (~> 1.0)
     unf (0.1.4)
       unf_ext
-    unf_ext (0.0.8)
+    unf_ext (0.0.8.2)
     unicode-display_width (2.5.0)
     vcr (6.1.0)
     webmock (3.14.0)
       addressable (>= 2.8.0)
       crack (>= 0.3.2)
       hashdiff (>= 0.4.0, < 2.0.0)
-    zeitwerk (2.6.7)
+    zeitwerk (2.6.12)
 
 PLATFORMS
   ruby
@@ -192,14 +192,15 @@ DEPENDENCIES
   faker (~> 2.18)
   mimemagic (~> 0.4.3)
   nokogiri (~> 1.13)
-  oj (~> 3.3, >= 3.3.5)
+  oj (~> 3.16, >= 3.16.1)
   pry (~> 0.14.1)
   rest-client (~> 2.1)
   rspec (~> 3.11)
   rubocop (~> 1.57, >= 1.57.2)
+  unf_ext (~> 0.0.8.2)
   vcr (~> 6.1)
   webmock (~> 3.14)
-  zeitwerk (~> 2.6, >= 2.6.7)
+  zeitwerk (~> 2.6, >= 2.6.12)
 
 RUBY VERSION
    ruby 3.1.2p20
