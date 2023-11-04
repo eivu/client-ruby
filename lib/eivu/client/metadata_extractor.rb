@@ -1,5 +1,9 @@
 # frozen_string_literal: true
 
+require 'bundler/setup'
+require 'active_support/core_ext/hash/keys'
+require 'eivu-fingerprinter-acoustid'
+
 module Eivu
   class Client
     module MetadataExtractor
@@ -9,23 +13,26 @@ module Eivu
       YEAR_REGEX = /\(\(y\ ([^)]+)\)\)/
 
       class << self
+        def extract(path_to_file)
+          case Client::Utils.detect_mime(path_to_file).mediatype
+          when 'audio'
+            from_audio_file(path_to_file)
+          else
+            extract_metadata_list(File.basename(path_to_file))
+          end
+        end
+
         def from_audio_file(path_to_file)
-          metadata_hash = Eivu::Client::Id3Parser.new(path_to_file).extract
-
-          artist_name = metadata_hash.delete('artist')
-          album_name  = metadata_hash.delete('album')
-          release_pos = metadata_hash.delete('track_num')
-          name        = metadata_hash.delete('title')
-          year        = metadata_hash.delete('year')
-
-          {
-            metadata_list:  metadata_hash.map { |k, v| { k => v } },
-            name:,
-            year:,
-            artist_name:,
-            album_name:,
-            release_pos:
-          }
+          metadata_hash   = Eivu::Client::Id3Parser.new(path_to_file).extract
+          acoustid_client = Eivu::Fingerprinter::Acoustid.new
+          acoustid_client.generate(path_to_file)
+          metadata_hash['acoustid:fingerprint'] = acoustid_client.fingerprint
+          metadata_hash['acoustid:duration'] = acoustid_client.duration
+          metadata_hash['eivu:release_pos'] = metadata_hash['id3:track_nr']
+          metadata_hash['eivu:year'] = metadata_hash['id3:year']
+          metadata_hash['eivu:duration'] = acoustid_client.duration
+          metadata_hash['eivu:name'] = metadata_hash['id3:title']
+          metadata_hash.compact_blank.map { |k, v| { k => v } }
         end
 
         def extract_year(string)
@@ -33,7 +40,7 @@ module Eivu
         end
 
         def extract_metadata_list(string)
-          # remove year
+          # remove year from string
           temp_string = string.gsub(YEAR_REGEX, '')
           {
             performer: PERFORMER_REGEX,

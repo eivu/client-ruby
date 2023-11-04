@@ -44,5 +44,4 @@ Metrics/MethodLength:
     - spec/**/*.rb
 
 Metrics/AbcSize:
-  Exclude:
-    - spec/**/*.rb
+  Enabled: false

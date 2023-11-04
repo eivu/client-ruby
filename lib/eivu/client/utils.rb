@@ -19,6 +19,13 @@ module Eivu
           output
         end
 
+        def prune_from_metadata_list(metadata_list, key)
+          index = metadata_list.index {|hash| hash[key].present? }
+          return nil if index.nil?
+
+          metadata_list.delete_at(index).values.first
+        end
+
         def detect_mime(path_to_file)
           if path_to_file.ends_with?('.m4a')
             MimeMagic.by_extension('m4a')

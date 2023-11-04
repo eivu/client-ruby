@@ -60,17 +60,20 @@ module Eivu
 
     # rubocop:disable Metrics/AbcSize
     def upload_file(path_to_file:, peepy: false, nsfw: false, metadata_list: [], metadata: {})
-      filename      = File.basename(path_to_file)
-      asset         = Utils.sanitize(filename)
       filesize      = File.size(path_to_file)
+      filename      = File.basename(path_to_file)
+      metadata_list += MetadataExtractor.extract(path_to_file)
+      metadata_list << { original_local_path_to_file: path_to_file }
+      asset         = Utils.sanitize(filename)
       md5           = Eivu::Client::CloudFile.generate_md5(path_to_file)&.downcase
       rating        = MetadataExtractor.extract_rating(filename)
-      year          = MetadataExtractor.extract_year(filename)
-      name          = metadata[:name]
-      metadata_list << { original_local_path_to_file: path_to_file }
-      metadata_list += MetadataExtractor.extract_metadata_list(filename)
+      year          = MetadataExtractor.extract_year(filename) || Utils.prune_from_metadata_list(metadata_list, 'eivu:year')
+      name          = metadata[:name] || Utils.prune_from_metadata_list(metadata_list, 'eivu:name')
+      artwork_md5   = Utils.prune_from_metadata_list(metadata_list, 'eivu:artwork_md5')
+      release_pos   = Utils.prune_from_metadata_list(metadata_list, 'eivu:release_pos')
+      duration      = Utils.prune_from_metadata_list(metadata_list, 'eivu:duration')
 
-      @logger.info "Working with: #{asset}: "
+      @logger.info "Working with: #{asset}: #{md5.upcase}"
       @logger.info '  Fetching/Reserving'
       cloud_file = CloudFile.reserve_or_fetch_by(bucket_name: configuration.bucket_name,
                                                  provider: configuration.bucket_location, path_to_file:, peepy:, nsfw:)
@@ -82,10 +85,10 @@ module Eivu
       # the only difference seems to be what is logged to the screen
       if cloud_file.transfered?
         @logger.info '  Completing'
-        cloud_file.complete!(name:, year:, rating:, release_pos: nil, metadata_list:, matched_recording: nil)
+        cloud_file.complete!(name:, year:, rating:, artwork_md5:, release_pos:, duration:, metadata_list:, matched_recording: nil)
       else
         @logger.info '  Updating/Skipping'
-        cloud_file.update_metadata!(name:, year:, rating:, release_pos: nil, metadata_list:, matched_recording: nil)
+        cloud_file.update_metadata!(name:, year:, rating:, artwork_md5:, release_pos:, duration:, metadata_list:, matched_recording: nil)
       end
 
       cloud_file

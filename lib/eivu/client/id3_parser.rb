@@ -51,7 +51,6 @@ module Eivu
         end.compact
       end
 
-      # rubocop:disable Metrics/AbcSize
       def upload_artwork(tag, metadata = {})
         return if tag.blank? # not all mp3s have artwork
 
@@ -67,7 +66,6 @@ module Eivu
         file.close
         artwork
       end
-      # rubocop:enable Metrics/AbcSize
 
       V2_FRAMES = {
         TALB: 'album',
