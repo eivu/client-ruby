@@ -53,9 +53,11 @@ module Eivu
         return if tag.blank? # not all mp3s have artwork
 
         label = [metadata['id3:artist'], metadata['id3:album']].join(' - ')
+        year  = metadata['id3:year']
         metadata.slice!('id3:artist', 'id3:album', 'id3:genre')
         metadata['id3:track_nr'] = 0
         metadata['id3:disc_nr'] = 0
+        metadata['eivu:year'] = year
         metadata_list = metadata.map { |k, v| { k => v } }
         override = { name: "Cover Art for #{label}", skip_original_local_path_to_file: true }
         file = Tempfile.new(['coverart', '.png'], binmode: true)
