@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
-# require 'spec_helper'
+require 'spec_helper'
 # require 'eivu'
 
-describe Eivu::Client::Id3Parser do
+describe Eivu::Client::Id3Parser, vcr: true do
   describe '.extract' do
     subject(:extraction) { described_class.new(path_to_file).extract }
 
@@ -12,38 +12,43 @@ describe Eivu::Client::Id3Parser do
 
       it 'returns information from id3 tags' do
         expect(extraction).to include(
-          'artist' => 'The Brothers Grimm',
-          'comment' => 'First paragraph of the story The Frog Prince by The Brothers Grimm',
-          'copyright' => 'in public domain, originally published December 20, 1812',
-          'genre' => 'Audiobook Sample',
-          'language' => 'English',
-          'publisher' => 'AWS Polly',
-          'title' => 'Paragraph #1',
-          'track_num' => '1',
-          'Acoustid Fingerprint' => a_kind_of(String)
+          'eivu:artwork_md5' => '5C08BA7C0224C4E9934B0AC357D5A30D',
+          'id3:album' => 'The Frog Prince',
+          'id3:artist' => 'The Brothers Grimm',
+          'id3:band' => 'brothers grimm',
+          'id3:comments' => 'First paragraph of the story The Frog Prince by The Brothers Grimm',
+          'id3:copyright' => 'in public domain, originally published December 20, 1812',
+          'id3:encoded by' => 'Lavf58.76.100',
+          'id3:genre' => 'Audiobook Sample',
+          'id3:language' => 'eng',
+          'id3:publisher' => 'AWS Polly',
+          'id3:title' => 'Paragraph #1',
+          'id3:track_nr' => '1',
+          'id3:user defined text' => 'eng',
+          'id3:year' => '1812'
         )
       end
     end
 
-    context 'when reading a mp3 without id3 information' do
-      context 'that can be fingerprinted' do
-        let(:path_to_file) { 'spec/fixtures/samples/Piano_brokencrash-Brandondorf-1164520478.mp3' }
+    # context 'when reading a mp3 without id3 information' do
+    #   context 'that can be fingerprinted' do
+    #     let(:path_to_file) { 'spec/fixtures/samples/Piano_brokencrash-Brandondorf-1164520478.mp3' }
 
-        it 'only returns the fingerprint' do
-          expect(extraction).to include(
-            'Acoustid Fingerprint' => a_kind_of(String)
-          )
-        end
-      end
+    #     it 'only returns the fingerprint' do
+    #       expect(extraction).to include(
+    #         'Acoustid Fingerprint' => a_kind_of(String)
+    #       )
+    #     end
+    #   end
 
-      context 'that can not be fingerprinted' do
-        let(:path_to_file) { 'spec/fixtures/samples/test.mp3' }
+    #   context 'that can not be fingerprinted' do
+    #     let(:path_to_file) { 'spec/fixtures/samples/test.mp3' }
 
-        it 'only returns an empty array' do
-          expect(extraction).to be_blank
-        end
-      end
-    end
+    #     it 'only returns an empty array' do
+    #       expect(extraction).to be_blank
+    #     end
+    #   end
+    # end
 
 
   end

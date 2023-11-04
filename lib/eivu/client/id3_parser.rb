@@ -21,7 +21,6 @@ module Eivu
         extract_v1_frames.merge(extract_v2_frames).compact
       end
 
-      # rubocop:disable Metrics/AbcSize
       def extract_v2_frames
         return {} if @mp3_info.v2_frames.empty?
 
@@ -39,7 +38,6 @@ module Eivu
         info['eivu:artwork_md5'] = artwork.md5 if artwork.present?
         info
       end
-      # rubocop:enable Metrics/AbcSize
 
       def extract_v1_frames
         return {} if @mp3_info.v1_frames.empty?
@@ -59,10 +57,10 @@ module Eivu
         metadata['id3:track_nr'] = 0
         metadata['id3:disc_nr'] = 0
         metadata_list = metadata.map { |k, v| { k => v } }
-        attributes = { name: "Cover Art for #{label}" }
+        override = { name: "Cover Art for #{label}", skip_original_local_path_to_file: true }
         file = Tempfile.new(['coverart', '.png'], binmode: true)
         file.write(tag.content)
-        artwork = Client.upload_file(path_to_file: file.path, metadata_list:, metadata: attributes)
+        artwork = Client.upload_file(path_to_file: file.path, metadata_list:, override:)
         file.close
         artwork
       end

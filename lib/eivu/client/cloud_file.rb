@@ -69,7 +69,6 @@ module Eivu
           raise Errors::CloudStorage::MissingResource, "Cloud file #{md5} not found"
         end
 
-        # rubocop:disable Metrics/AbcSize
         def post_request(action:, md5:, payload:)
           response = RestClient.post(
             "#{Eivu::Client.configuration.host}/api/v1/cloud_files/#{md5}/#{action}",
@@ -89,8 +88,6 @@ module Eivu
         rescue Errno::ECONNREFUSED
           raise Errors::Server::Connection, "Failed to connect to eivu server: #{Eivu::Client.configuration.host}"
         end
-        # rubocop:enable Metrics/AbcSize
-
 
         def generate_md5(path_to_file)
           Digest::MD5.file(path_to_file).hexdigest.upcase
