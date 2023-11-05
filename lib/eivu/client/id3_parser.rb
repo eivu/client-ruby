@@ -2,6 +2,7 @@
 
 require 'bundler/setup'
 require 'id3tag'
+require 'wahwah'
 require 'active_support/core_ext/enumerable'
 require 'active_support/core_ext/object/blank'
 require 'active_support/core_ext/hash/slice'
@@ -11,32 +12,27 @@ module Eivu
     class Id3Parser
       def initialize(path_to_file)
         @path_to_file = path_to_file
-        mp3_file     = File.open(path_to_file, 'rb')
-        @mp3_info    = ID3Tag.read(mp3_file)
-        @artwork_tag = nil
-        @artwork_cf  = nil
+        mp3_file      = File.open(path_to_file, 'rb')
+        @mp3_info     = ID3Tag.read(mp3_file)
+        @wahwah_tag   = WahWah.open(path_to_file)
       end
 
       def extract
-        extract_v1_frames.merge(extract_v2_frames).compact
+        info = extract_v1_frames.merge(extract_v2_frames).compact
+        artwork = upload_artwork(info.dup)
+        info['eivu:artwork_md5'] = artwork.md5 if artwork.present?
+        info
       end
 
       def extract_v2_frames
         return {} if @mp3_info.v2_frames.empty?
 
-        info = @mp3_info.v2_frames.each_with_object({}) do |tag, hash|
-          next if V2_FRAMES.keys.exclude?(tag.id)
-
+        @mp3_info.v2_frames.each_with_object({}) do |tag, hash|
           parsed_tag_id = V2_FRAMES[tag.id]
-          if parsed_tag_id == 'image'
-            @artwork_tag = tag
-          elsif tag.content.present?
-            hash["id3:#{parsed_tag_id}"] = tag.content
-          end
+          next if parsed_tag_id.blank?
+
+          hash["id3:#{parsed_tag_id}"] = tag.content if tag.content.present?
         end.compact
-        artwork = upload_artwork(@artwork_tag, info.dup)
-        info['eivu:artwork_md5'] = artwork.md5 if artwork.present?
-        info
       end
 
       def extract_v1_frames
@@ -49,8 +45,8 @@ module Eivu
         end.compact
       end
 
-      def upload_artwork(tag, metadata = {})
-        return if tag.blank? # not all mp3s have artwork
+      def upload_artwork(metadata = {})
+        return if @wahwah_tag.images&.dig(0, :data).blank? # not all mp3s have artwork
 
         label = [metadata['id3:artist'], metadata['id3:album']].join(' - ')
         year  = metadata['id3:year']
@@ -61,7 +57,7 @@ module Eivu
         metadata_list = metadata.map { |k, v| { k => v } }
         override = { name: "Cover Art for #{label}", skip_original_local_path_to_file: true }
         file = Tempfile.new(['coverart', '.png'], binmode: true)
-        file.write(tag.content)
+        file.write(@wahwah_tag.images&.dig(0, :data))
         artwork = Client.upload_file(path_to_file: file.path, metadata_list:, override:)
         file.close
         artwork
@@ -111,8 +107,8 @@ module Eivu
         TT1: 'grouping',
         GRP1: 'grouping',
         TIT1: 'grouping',
-        APIC: 'image',
-        PIC: 'image',
+        # APIC: 'image',
+        # PIC: 'image',
         TRC: 'isrc',
         TSRC: 'isrc',
         TKE: 'initial key',

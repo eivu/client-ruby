@@ -16,13 +16,30 @@ module Eivu
         def extract(path_to_file)
           case Client::Utils.detect_mime(path_to_file).mediatype
           when 'audio'
+            from_mp3_file(path_to_file)
+          when 'audio'
             from_audio_file(path_to_file)
           else
             extract_metadata_list(File.basename(path_to_file))
           end
         end
 
+        def from_mp3_file(path_to_file)
+          metadata_hash   = Eivu::Client::Id3Parser.new(path_to_file).extract
+          acoustid_client = Eivu::Fingerprinter::Acoustid.new
+          acoustid_client.generate(path_to_file)
+          metadata_hash['acoustid:fingerprint'] = acoustid_client.fingerprint
+          metadata_hash['acoustid:duration'] = acoustid_client.duration
+          metadata_hash['eivu:release_pos'] = metadata_hash['id3:track_nr']
+          metadata_hash['eivu:year'] = metadata_hash['id3:year']
+          metadata_hash['eivu:duration'] = acoustid_client.duration
+          metadata_hash['eivu:name'] = metadata_hash['id3:title']
+          metadata_hash.compact_blank.map { |k, v| { k => v } }
+        end
+
         def from_audio_file(path_to_file)
+          raise 'not implemented'
+
           metadata_hash   = Eivu::Client::Id3Parser.new(path_to_file).extract
           acoustid_client = Eivu::Fingerprinter::Acoustid.new
           acoustid_client.generate(path_to_file)
