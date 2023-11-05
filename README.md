@@ -7,7 +7,6 @@ Eivu::Client.new.upload_file path_to_file: '/Users/jinx/Downloads/PXL_20230124_1
 Eivu::Client.new.upload_file path_to_file: 'spec/fixtures/samples/audio/brothers_grimm/the_frog_prince/paragraph1.mp3'
 Eivu::Client.new.upload_folder path_to_folder: 'spec/fixtures/samples/audio/'
 Eivu::Client.new.upload_folder peepy: true, nsfw: true, path_to_folder: '/Users/jinx/Downloads/xfer'
-
 ```
 
 

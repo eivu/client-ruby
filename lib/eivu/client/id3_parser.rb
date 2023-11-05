@@ -2,7 +2,6 @@
 
 require 'bundler/setup'
 require 'id3tag'
-require 'wahwah'
 require 'active_support/core_ext/enumerable'
 require 'active_support/core_ext/object/blank'
 require 'active_support/core_ext/hash/slice'
@@ -14,14 +13,10 @@ module Eivu
         @path_to_file = path_to_file
         mp3_file      = File.open(path_to_file, 'rb')
         @mp3_info     = ID3Tag.read(mp3_file)
-        @wahwah_tag   = WahWah.open(path_to_file)
       end
 
       def extract
-        info = extract_v1_frames.merge(extract_v2_frames).compact
-        artwork = upload_artwork(info.dup)
-        info['eivu:artwork_md5'] = artwork.md5 if artwork.present?
-        info
+        extract_v1_frames.merge(extract_v2_frames).compact
       end
 
       def extract_v2_frames
@@ -43,24 +38,6 @@ module Eivu
 
           hash["id3:#{tag.id}"] = tag.content
         end.compact
-      end
-
-      def upload_artwork(metadata = {})
-        return if @wahwah_tag.images&.dig(0, :data).blank? # not all mp3s have artwork
-
-        label = [metadata['id3:artist'], metadata['id3:album']].join(' - ')
-        year  = metadata['id3:year']
-        metadata.slice!('id3:artist', 'id3:album', 'id3:genre')
-        metadata['id3:track_nr'] = 0
-        metadata['id3:disc_nr'] = 0
-        metadata['eivu:year'] = year
-        metadata_list = metadata.map { |k, v| { k => v } }
-        override = { name: "Cover Art for #{label}", skip_original_local_path_to_file: true }
-        file = Tempfile.new(['coverart', '.png'], binmode: true)
-        file.write(@wahwah_tag.images&.dig(0, :data))
-        artwork = Client.upload_file(path_to_file: file.path, metadata_list:, override:)
-        file.close
-        artwork
       end
 
       V2_FRAMES = {

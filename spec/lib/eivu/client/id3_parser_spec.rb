@@ -3,7 +3,7 @@
 require 'spec_helper'
 # require 'eivu'
 
-describe Eivu::Client::Id3Parser, vcr: true do
+describe Eivu::Client::Id3Parser do
   describe '.extract' do
     subject(:extraction) { described_class.new(path_to_file).extract }
 
@@ -12,7 +12,6 @@ describe Eivu::Client::Id3Parser, vcr: true do
 
       it 'returns information from id3 tags' do
         expect(extraction).to include(
-          'eivu:artwork_md5' => '5C08BA7C0224C4E9934B0AC357D5A30D',
           'id3:album' => 'The Frog Prince',
           'id3:artist' => 'The Brothers Grimm',
           'id3:band' => 'brothers grimm',
@@ -49,7 +48,5 @@ describe Eivu::Client::Id3Parser, vcr: true do
     #     end
     #   end
     # end
-
-
   end
 end
