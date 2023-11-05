@@ -14,10 +14,10 @@ module Eivu
 
       class << self
         def extract(path_to_file)
-          case Client::Utils.detect_mime(path_to_file).mediatype
-          when 'audio'
+          mime = Client::Utils.detect_mime(path_to_file)
+          if mime.type == 'audio/mpeg'
             from_mp3_file(path_to_file)
-          when 'audio'
+          elsif mime.mediatype == 'audio'
             from_audio_file(path_to_file)
           else
             extract_metadata_list(File.basename(path_to_file))
@@ -34,6 +34,7 @@ module Eivu
           metadata_hash['eivu:year'] = metadata_hash['id3:year']
           metadata_hash['eivu:duration'] = acoustid_client.duration
           metadata_hash['eivu:name'] = metadata_hash['id3:title']
+          binding.pry
           metadata_hash.compact_blank.map { |k, v| { k => v } }
         end
 
