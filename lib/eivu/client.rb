@@ -6,6 +6,7 @@ require 'oj'
 require 'dry-struct'
 require 'csv'
 require 'logger'
+require 'concurrent'
 
 module Eivu
   class Client
@@ -104,6 +105,28 @@ module Eivu
       end
       write_logs
       @status
+    end
+
+    def upload_folder_via_multithread(path_to_folder:, peepy: false, nsfw: false)
+      pool = Concurrent::FixedThreadPool.new(5)
+
+      Folder.traverse(path_to_folder) do |path_to_file|
+        pool.post do
+          upload_file(path_to_file:, peepy:, nsfw:)
+          if verify_upload!(path_to_file)
+            track_success(path_to_file)
+          else
+            track_failure(path_to_file, 'upload did not complete')
+          end
+        rescue StandardError => e
+          track_failure(path_to_file, e)
+        end
+        write_logs
+        @status
+      end
+
+      pool.shutdown
+      pool.wait_for_termination
     end
 
     def verify_upload!(path_to_file)
