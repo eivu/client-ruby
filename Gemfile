@@ -12,7 +12,7 @@ gem 'factory_bot', '~> 6.2.1' # factory_bot provides a framework and DSL for def
 gem 'faker', '~> 2.18' # Faker, a port of Data::Faker from Perl, is used to easily generate fake data: names, addresses, phone numbers, etc.
 gem 'id3tag', '~> 1.1' # Native Ruby ID3 tag reader that aims for 100% coverage of ID3v2.x and ID3v1.x standards
 gem 'mimemagic', '~> 0.4.3' # Fast mime detection by extension or content (Uses freedesktop.org.xml shared-mime-info database
-gem 'nokogiri', '~> 1.13' # xml parser
+gem 'nokogiri', '~> 1.14' # xml parser
 gem 'oj', '~> 3.16', '>= 3.16.1' # faster json parsing
 gem 'pry', '~> 0.14.1' # Debugger
 gem 'rest-client', '~> 2.1' # A simple HTTP and REST client for Ruby, inspired by the Sinatra microframework style of specifying actions
