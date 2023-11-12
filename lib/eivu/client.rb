@@ -69,6 +69,8 @@ module Eivu
       artwork_md5   = Utils.prune_from_metadata_list(metadata_list, 'eivu:artwork_md5')
       release_pos   = Utils.prune_from_metadata_list(metadata_list, 'eivu:release_pos')
       duration      = Utils.prune_from_metadata_list(metadata_list, 'eivu:duration')
+      artist_name        = Utils.prune_from_metadata_list(metadata_list, 'eivu:artist_name')
+      release_name       = Utils.prune_from_metadata_list(metadata_list, 'eivu:release_name')
 
       @logger.info "Working with: #{asset}: #{md5.upcase}"
       @logger.info '  Fetching/Reserving'
@@ -80,10 +82,10 @@ module Eivu
 
       if cloud_file.transfered?
         @logger.info '  Completing'
-        cloud_file.complete!(name:, year:, rating:, artwork_md5:, release_pos:, duration:, metadata_list:, matched_recording: nil)
+        cloud_file.complete!(artist_name:, release_name:, name:, year:, rating:, artwork_md5:, release_pos:, duration:, metadata_list:, matched_recording: nil)
       else
         @logger.info '  Updating/Skipping'
-        cloud_file.update_metadata!(name:, year:, rating:, artwork_md5:, release_pos:, duration:, metadata_list:, matched_recording: nil)
+        cloud_file.update_metadata!(artist_name:, release_name:, name:, year:, rating:, artwork_md5:, release_pos:, duration:, metadata_list:, matched_recording: nil)
       end
 
       cloud_file

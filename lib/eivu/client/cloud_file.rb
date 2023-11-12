@@ -37,7 +37,7 @@ module Eivu
       attribute? :nsfw, Types::Bool.default(false)
       attribute? :peepy, Types::Bool.default(false)
       attribute? :folder_id, Types::Coercible::Integer.optional
-      attribute? :ext_id, Types::Coercible::Integer.optional
+      attribute? :ext_id, Types::String.optional
       attribute? :data_source_id, Types::Coercible::Integer.optional
       attribute? :release_id, Types::Coercible::Integer.optional
       attribute? :artwork_md5, Types::Coercible::String.optional
@@ -113,21 +113,21 @@ module Eivu
         self
       end
 
-      def update_data!(action: :complete, year: nil, name: nil, rating: nil, release_pos: nil, duration: nil, metadata_list: [], matched_recording: nil, artwork_md5: nil)
+      def update_data!(action: :complete, artist_name: nil, release_name: nil, year: nil, name: nil, rating: nil, release_pos: nil, duration: nil, metadata_list: [], matched_recording: nil, artwork_md5: nil)
         matched_recording.nil? # trying to avoid rubocop error because it is not used yet
-        payload = { name:, year:, rating:, release_pos:, duration:, metadata_list:, artwork_md5: }
+        payload = { artist_name:, release_name:, name:, year:, rating:, release_pos:, duration:, metadata_list:, artwork_md5: }
         parsed_body = post_request(action:, payload:)
         assign_attributes(parsed_body)
         state_history << STATE_COMPLETED
         self
       end
 
-      def complete!(year: nil, name: nil, rating: nil, release_pos: nil, duration: nil, metadata_list: [], matched_recording: nil, artwork_md5: nil)
-        update_data!(action: :complete, year:, name:, rating:, release_pos:, duration:, metadata_list:, matched_recording:, artwork_md5:)
+      def complete!(year: nil, artist_name: nil, release_name: nil, name: nil, rating: nil, release_pos: nil, duration: nil, metadata_list: [], matched_recording: nil, artwork_md5: nil)
+        update_data!(action: :complete, year:, artist_name:, release_name:, name:, rating:, release_pos:, duration:, metadata_list:, matched_recording:, artwork_md5:)
       end
 
-      def update_metadata!(year: nil, name: nil, rating: nil, release_pos: nil, duration: nil, metadata_list: [], matched_recording: nil, artwork_md5: nil)
-        update_data!(action: :update_metadata, year:, name:, rating:, release_pos:, duration:, metadata_list:, matched_recording:, artwork_md5:)
+      def update_metadata!(year: nil, artist_name: nil, release_name: nil, name: nil, rating: nil, release_pos: nil, duration: nil, metadata_list: [], matched_recording: nil, artwork_md5: nil)
+        update_data!(action: :update_metadata, year:, artist_name:, release_name:, name:, rating:, release_pos:, duration:, metadata_list:, matched_recording:, artwork_md5:)
       end
 
       def visit

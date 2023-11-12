@@ -41,6 +41,8 @@ module Eivu
           metadata_hash['eivu:year']            = metadata_hash['id3:year']
           metadata_hash['eivu:duration']        = acoustid_client.duration
           metadata_hash['eivu:name']            = metadata_hash['id3:title']
+          metadata_hash['eivu:artist_name']     = metadata_hash['id3:artist']
+          metadata_hash['eivu:release_name']    = metadata_hash['id3:album']
           artwork = upload_audio_artwork(path_to_file, metadata_hash.dup)
           metadata_hash['eivu:artwork_md5'] = artwork.md5 if artwork.present?
           metadata_hash.compact_blank.map { |k, v| { k => v } }
