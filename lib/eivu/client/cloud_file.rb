@@ -37,9 +37,10 @@ module Eivu
       attribute? :nsfw, Types::Bool.default(false)
       attribute? :peepy, Types::Bool.default(false)
       attribute? :folder_id, Types::Coercible::Integer.optional
-      attribute? :ext_id, Types::Coercible::Integer.optional
+      attribute? :ext_id, Types::String.optional
       attribute? :data_source_id, Types::Coercible::Integer.optional
       attribute? :release_id, Types::Coercible::Integer.optional
+      attribute? :artwork_md5, Types::Coercible::String.optional
       attribute? :release_pos, Types::Coercible::Integer.optional
       attribute? :num_plays, Types::Coercible::Integer.optional
       attribute? :year, Types::Coercible::Integer.optional
@@ -68,7 +69,6 @@ module Eivu
           raise Errors::CloudStorage::MissingResource, "Cloud file #{md5} not found"
         end
 
-        # rubocop:disable Metrics/AbcSize
         def post_request(action:, md5:, payload:)
           response = RestClient.post(
             "#{Eivu::Client.configuration.host}/api/v1/cloud_files/#{md5}/#{action}",
@@ -88,8 +88,6 @@ module Eivu
         rescue Errno::ECONNREFUSED
           raise Errors::Server::Connection, "Failed to connect to eivu server: #{Eivu::Client.configuration.host}"
         end
-        # rubocop:enable Metrics/AbcSize
-
 
         def generate_md5(path_to_file)
           Digest::MD5.file(path_to_file).hexdigest.upcase
@@ -115,21 +113,21 @@ module Eivu
         self
       end
 
-      def update_data!(action: :complete, year: nil, rating: nil, release_pos: nil, metadata_list: [], matched_recording: nil)
+      def update_data!(action: :complete, artist_name: nil, release_name: nil, year: nil, name: nil, rating: nil, release_pos: nil, duration: nil, metadata_list: [], matched_recording: nil, artwork_md5: nil)
         matched_recording.nil? # trying to avoid rubocop error because it is not used yet
-        payload = { year:, rating:, release_pos:, metadata_list: }
+        payload = { artist_name:, release_name:, name:, year:, rating:, release_pos:, duration:, metadata_list:, artwork_md5: }
         parsed_body = post_request(action:, payload:)
         assign_attributes(parsed_body)
         state_history << STATE_COMPLETED
         self
       end
 
-      def complete!(year: nil, rating: nil, release_pos: nil, metadata_list: [], matched_recording: nil)
-        update_data!(action: :complete, year:, rating:, release_pos:, metadata_list:, matched_recording:)
+      def complete!(year: nil, artist_name: nil, release_name: nil, name: nil, rating: nil, release_pos: nil, duration: nil, metadata_list: [], matched_recording: nil, artwork_md5: nil)
+        update_data!(action: :complete, year:, artist_name:, release_name:, name:, rating:, release_pos:, duration:, metadata_list:, matched_recording:, artwork_md5:)
       end
 
-      def update_metadata!(year: nil, rating: nil, release_pos: nil, metadata_list: [], matched_recording: nil)
-        update_data!(action: :update_metadata, year:, rating:, release_pos:, metadata_list:, matched_recording:)
+      def update_metadata!(year: nil, artist_name: nil, release_name: nil, name: nil, rating: nil, release_pos: nil, duration: nil, metadata_list: [], matched_recording: nil, artwork_md5: nil)
+        update_data!(action: :update_metadata, year:, artist_name:, release_name:, name:, rating:, release_pos:, duration:, metadata_list:, matched_recording:, artwork_md5:)
       end
 
       def visit

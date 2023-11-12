@@ -34,6 +34,29 @@ describe Eivu::Client::MetadataExtractor do
     end
   end
 
+  describe '.from_audio_file' do
+    subject(:payload) { described_class.from_audio_file(path_to_file) }
+
+    context 'when reading a mp3 with id3 information' do
+      let(:path_to_file) { 'spec/fixtures/samples/audio/brothers_grimm/the_frog_prince/paragraph1.mp3' }
+
+      it 'returns information from id3 tags' do
+        payload
+        # expect(extraction).to include(
+        #   { 'artist' => 'The Brothers Grimm' },
+        #   { 'comment' => 'First paragraph of the story The Frog Prince by The Brothers Grimm' },
+        #   { 'copyright' => 'in public domain, originally published December 20, 1812' },
+        #   { 'genre' => 'Audiobook Sample' },
+        #   { 'language' => 'English' },
+        #   { 'publisher' => 'AWS Polly' },
+        #   { 'title' => 'Paragraph #1' },
+        #   { 'track' => '1' },
+        #   { 'Acoustid Fingerprint' => a_kind_of(String) }
+        # )
+      end
+    end
+  end
+
   describe '.extract_metadata_list' do
     subject(:metadata_list) { described_class.extract_metadata_list(string) }
 

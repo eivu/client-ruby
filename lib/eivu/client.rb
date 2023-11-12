@@ -35,6 +35,20 @@ module Eivu
       def reconfigure
         @configuration = Configuration.new
       end
+
+      # def upload_file(*args)
+      #   new.upload_file(*args)
+      # end
+      def upload_file(path_to_file:, peepy: false, nsfw: false, metadata_list: [], override:)
+        new.upload_file(path_to_file:, peepy:, nsfw:, metadata_list:, override:)
+      end
+
+      # def upload_folder(*args)
+      #   new.upload_folder(*args)
+      # end
+      def upload_folder(path_to_folder:, peepy: false, nsfw: false)
+        new.upload_folder(path_to_folder:, peepy:, nsfw:)
+      end
     end
 
     def initialize
@@ -42,18 +56,23 @@ module Eivu
       @logger = Logger.new($stdout)
     end
 
-    # rubocop:disable Metrics/AbcSize
-    def upload_file(path_to_file:, peepy: false, nsfw: false)
-      filename      = File.basename(path_to_file)
-      asset         = Utils.sanitize(filename)
-      # mime        = Utils.detect_mime(path_to_file)
+    def upload_file(path_to_file:, peepy: false, nsfw: false, metadata_list: [], override: {})
       filesize      = File.size(path_to_file)
+      filename      = File.basename(path_to_file)
+      metadata_list += MetadataExtractor.extract(path_to_file)
+      metadata_list << { original_local_path_to_file: path_to_file } unless override[:skip_original_local_path_to_file]
+      asset         = Utils.sanitize(filename)
       md5           = Eivu::Client::CloudFile.generate_md5(path_to_file)&.downcase
       rating        = MetadataExtractor.extract_rating(filename)
-      year          = MetadataExtractor.extract_year(filename)
-      metadata_list = [{ original_local_path_to_file: path_to_file }] + MetadataExtractor.extract_metadata_list(filename)
+      year          = MetadataExtractor.extract_year(filename) || Utils.prune_from_metadata_list(metadata_list, 'eivu:year')
+      name          = override[:name] || Utils.prune_from_metadata_list(metadata_list, 'eivu:name')
+      artwork_md5   = Utils.prune_from_metadata_list(metadata_list, 'eivu:artwork_md5')
+      release_pos   = Utils.prune_from_metadata_list(metadata_list, 'eivu:release_pos')
+      duration      = Utils.prune_from_metadata_list(metadata_list, 'eivu:duration')
+      artist_name        = Utils.prune_from_metadata_list(metadata_list, 'eivu:artist_name')
+      release_name       = Utils.prune_from_metadata_list(metadata_list, 'eivu:release_name')
 
-      @logger.info "Working with: #{asset}: "
+      @logger.info "Working with: #{asset}: #{md5.upcase}"
       @logger.info '  Fetching/Reserving'
       cloud_file = CloudFile.reserve_or_fetch_by(bucket_name: configuration.bucket_name,
                                                  provider: configuration.bucket_location, path_to_file:, peepy:, nsfw:)
@@ -63,15 +82,14 @@ module Eivu
 
       if cloud_file.transfered?
         @logger.info '  Completing'
-        cloud_file.complete!(year:, rating:, release_pos: nil, metadata_list:, matched_recording: nil)
+        cloud_file.complete!(artist_name:, release_name:, name:, year:, rating:, artwork_md5:, release_pos:, duration:, metadata_list:, matched_recording: nil)
       else
         @logger.info '  Updating/Skipping'
-        cloud_file.update_metadata!(year:, rating:, release_pos: nil, metadata_list:, matched_recording: nil)
+        cloud_file.update_metadata!(artist_name:, release_name:, name:, year:, rating:, artwork_md5:, release_pos:, duration:, metadata_list:, matched_recording: nil)
       end
 
       cloud_file
     end
-    # rubocop:enable Metrics/AbcSize
 
     def upload_folder(path_to_folder:, peepy: false, nsfw: false)
       Folder.traverse(path_to_folder) do |path_to_file|

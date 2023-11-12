@@ -32,6 +32,34 @@ describe Eivu::Client::Utils do
     end
   end
 
+  describe '.prune_from_metadata_list' do
+    subject(:pruning) { described_class.prune_from_metadata_list(metadata_list, key) }
+
+    let(:metadata_list) { [{ title: 'Cowboy Bebop' }, { studio: 'Sunrise' }, { tag: 'anime' }] }
+
+    context 'when value exists in metadata_list' do
+      let(:key) { :studio }
+
+      it 'removes the key from the metadata_list and returns the value' do
+        aggregate_failures do
+          expect(pruning).to eq('Sunrise')
+          expect(metadata_list).to eq([{ title: 'Cowboy Bebop' }, { tag: 'anime' }])
+        end
+      end
+    end
+
+    context 'when value does not exist in metadata_list' do
+      let(:key) { :year }
+
+      it 'returns nil' do
+        aggregate_failures do
+          expect(pruning).to be_nil
+          expect(metadata_list).to eq([{ title: 'Cowboy Bebop' }, { studio: 'Sunrise' }, { tag: 'anime' }])
+        end
+      end
+    end
+  end
+
   describe '.sanitize' do
     subject(:extraction) { described_class.sanitize(string) }
 

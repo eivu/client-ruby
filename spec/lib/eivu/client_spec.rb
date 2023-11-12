@@ -77,7 +77,7 @@ describe Eivu::Client, vcr: false do
             let(:content_type) { 'text/plain' }
             let(:metadata_list) do
               [
-                { original_local_path_to_file: path_to_file }, 
+                { original_local_path_to_file: path_to_file },
                 { tag: 'anime' },
                 { tag: 'script' },
                 { tag: 'all time best' }
