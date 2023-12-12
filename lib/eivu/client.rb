@@ -122,12 +122,12 @@ module Eivu
         rescue StandardError => e
           track_failure(path_to_file, e)
         end
-        write_logs
-        @status
       end
 
       pool.shutdown
       pool.wait_for_termination
+      write_logs
+      @status
     end
 
     def verify_upload!(path_to_file)
