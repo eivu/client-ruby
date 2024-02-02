@@ -5,8 +5,8 @@ require 'pry'
 require 'oj'
 require 'dry-struct'
 require 'csv'
-require 'logger'
 require 'concurrent'
+require 'semantic_logger'
 
 module Eivu
   class Client
@@ -53,13 +53,14 @@ module Eivu
     end
 
     def initialize
+      SemanticLogger.add_appender(io: $stdout)
       @status = { success: {}, failure: {} }
-      @logger = Logger.new($stdout)
     end
 
     def upload_file(path_to_file:, peepy: false, nsfw: false, metadata_list: [], override: {})
       filesize      = File.size(path_to_file)
       filename      = File.basename(path_to_file)
+
       metadata_list += MetadataExtractor.extract(path_to_file)
       metadata_list << { original_local_path_to_file: path_to_file } unless override[:skip_original_local_path_to_file]
       asset         = Utils.sanitize(filename)
@@ -70,11 +71,11 @@ module Eivu
       artwork_md5   = Utils.prune_from_metadata_list(metadata_list, 'eivu:artwork_md5')
       release_pos   = Utils.prune_from_metadata_list(metadata_list, 'eivu:release_pos')
       duration      = Utils.prune_from_metadata_list(metadata_list, 'eivu:duration')
+      log_tag       = "#{md5.first(5)}:#{asset}"
       artist_name        = Utils.prune_from_metadata_list(metadata_list, 'eivu:artist_name')
       release_name       = Utils.prune_from_metadata_list(metadata_list, 'eivu:release_name')
 
-      @logger.info "Working with: #{asset}: #{md5.upcase}"
-      @logger.info '  Fetching/Reserving'
+      Eivu::Logger.info 'Fetching/Reserving', tags: log_tag, label: Eivu::Client
       cloud_file = CloudFile.reserve_or_fetch_by(bucket_name: configuration.bucket_name,
                                                  provider: configuration.bucket_location, path_to_file:, peepy:, nsfw:)
       remote_path_to_file = "#{cloud_file.s3_folder}/#{Utils.sanitize(filename)}"
@@ -82,10 +83,10 @@ module Eivu
       process_reservation_and_transfer(cloud_file:, path_to_file:, remote_path_to_file:, md5:, asset:, filesize:)
 
       if cloud_file.transfered?
-        @logger.info '  Completing'
+        Eivu::Logger.info 'Completing', tags: log_tag, label: Eivu::Client
         cloud_file.complete!(artist_name:, release_name:, name:, year:, rating:, artwork_md5:, release_pos:, duration:, metadata_list:, matched_recording: nil)
       else
-        @logger.info '  Updating/Skipping'
+        Eivu::Logger.info 'Updating/Skipping', tags: log_tag, label: Eivu::Client
         cloud_file.update_metadata!(artist_name:, release_name:, name:, year:, rating:, artwork_md5:, release_pos:, duration:, metadata_list:, matched_recording: nil)
       end
 
@@ -121,12 +122,12 @@ module Eivu
         rescue StandardError => e
           track_failure(path_to_file, e)
         end
-        write_logs
-        @status
       end
 
       pool.shutdown
       pool.wait_for_termination
+      write_logs
+      @status
     end
 
     def verify_upload!(path_to_file)
@@ -152,7 +153,9 @@ module Eivu
     def process_reservation_and_transfer(cloud_file:, path_to_file:, remote_path_to_file:, md5:, asset:, filesize:)
       return unless cloud_file.reserved?
 
-      @logger.info '  Writing to S3'
+      log_tag = "#{md5.first(5)}:#{asset}"
+      Eivu::Logger.info 'Writing to S3', tags: log_tag, label: Eivu::Client
+
       File.open(path_to_file, 'rb') do |file|
         s3_client.put_object(
           acl: 'public-read',
@@ -163,7 +166,7 @@ module Eivu
 
       validate_remote_md5!(remote_path_to_file:, path_to_file:, md5:)
 
-      @logger.info '  Transfering'
+      Eivu::Logger.info 'Transfering', tags: log_tag, label: Eivu::Client
       cloud_file.transfer!(asset:, filesize:)
     end
 
