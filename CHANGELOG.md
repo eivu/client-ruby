@@ -1,3 +1,10 @@
+# [1.1.0](https://github.com/eivu/client-ruby/compare/v1.0.0...v1.1.0) (2024-02-02)
+
+
+### Features
+
+* Adding support for itunes lib ingestion and better logging ([f7f82ce](https://github.com/eivu/client-ruby/commit/f7f82ce35b20f9805b0350d34fb83ec73e812b49))
+
 # 1.0.0 (2023-04-08)
 
 
