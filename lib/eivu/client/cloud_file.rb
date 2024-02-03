@@ -49,11 +49,11 @@ module Eivu
       attribute? :metadata, Types::JSON::Array.of(Types::JSON::Hash)
 
       class << self
-        def reserve_or_fetch_by(bucket_uuid:, path_to_file:, peepy: false, nsfw: false)
-          reserve(bucket_uuid:, path_to_file:, peepy:, nsfw:)
+        def reserve_or_fetch_by(path_to_file:, peepy: false, nsfw: false, bucket_uuid: Eivu::Client.configuration.bucket_uuid)
+          reserve(path_to_file:, peepy:, nsfw:, bucket_uuid:)
         rescue Errors::Server::InvalidCloudFileState
           md5 = generate_md5(path_to_file)
-          cloud_file = fetch(md5)
+          cloud_file = fetch(md5, bucket_uuid:)
           cloud_file.content_type = Client::Utils.detect_mime(path_to_file).type
           cloud_file
         end
@@ -71,11 +71,9 @@ module Eivu
           raise Errors::CloudStorage::MissingResource, "Cloud file #{md5} not found"
         end
 
-        def post_request(action:, md5:, payload:)
-          host = Eivu::Client.configuration.host
-          bucket_uuid = Eivu::Client.configuration.bucket_uuid
+        def post_request(action:, md5:, payload:, bucket_uuid: Eivu::Client.configuration.bucket_uuid)
           response = RestClient.post(
-            "#{host}/api/v1/buckets/#{bucket_uuid}/cloud_files/#{md5}/#{action}",
+            "#{Eivu::Client.configuration.host}/api/v1/buckets/#{bucket_uuid}/cloud_files/#{md5}/#{action}",
             payload,
             { 'Authorization' => "Token #{Eivu::Client.configuration.user_token}" }
           )
@@ -95,10 +93,10 @@ module Eivu
           Digest::MD5.file(path_to_file).hexdigest.upcase
         end
 
-        def reserve(bucket_uuid:, path_to_file:, peepy: false, nsfw: false)
+        def reserve(path_to_file:, peepy: false, nsfw: false, bucket_uuid: Eivu::Client.configuration.bucket_uuid)
           md5          = generate_md5(path_to_file)
-          payload      = { bucket_uuid:, peepy:, nsfw: }
-          parsed_body  = post_request(action: :reserve, md5:, payload:)
+          payload      = { peepy:, nsfw: }
+          parsed_body  = post_request(action: :reserve, md5:, payload:, bucket_uuid:)
           content_type = Client::Utils.detect_mime(path_to_file).type
           CloudFile.new parsed_body.merge(state_history: [STATE_RESERVED], content_type:)
         end
