@@ -113,21 +113,20 @@ module Eivu
         self
       end
 
-      def update_data!(path_to_file:, action: :complete, artist_name: nil, release_name: nil, year: nil, name: nil, rating: nil, release_pos: nil, duration: nil, metadata_list: [], matched_recording: nil, artwork_md5: nil)
-        matched_recording.nil? # trying to avoid rubocop error because it is not used yet
-        payload = { path_to_file:, artist_name:, release_name:, name:, year:, rating:, release_pos:, duration:, metadata_list:, artwork_md5: }
+      def update_data!(data_profile, action: :complete)
+        payload = data_profile
         parsed_body = post_request(action:, payload:)
         assign_attributes(parsed_body)
         state_history << STATE_COMPLETED
         self
       end
 
-      def complete!(path_to_file:, year: nil, artist_name: nil, release_name: nil, name: nil, rating: nil, release_pos: nil, duration: nil, metadata_list: [], matched_recording: nil, artwork_md5: nil)
-        update_data!(action: :complete, path_to_file:, year:, artist_name:, release_name:, name:, rating:, release_pos:, duration:, metadata_list:, matched_recording:, artwork_md5:)
+      def complete!(data_profile)
+        update_data!(data_profile, action: :complete)
       end
 
-      def update_metadata!(path_to_file:, year: nil, artist_name: nil, release_name: nil, name: nil, rating: nil, release_pos: nil, duration: nil, metadata_list: [], matched_recording: nil, artwork_md5: nil)
-        update_data!(action: :update_metadata, path_to_file:, year:, artist_name:, release_name:, name:, rating:, release_pos:, duration:, metadata_list:, matched_recording:, artwork_md5:)
+      def update_metadata!(data_profile)
+        update_data!(data_profile, action: :update_metadata)
       end
 
       def visit

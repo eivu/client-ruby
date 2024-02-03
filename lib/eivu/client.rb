@@ -57,39 +57,24 @@ module Eivu
       @status = { success: {}, failure: {} }
     end
 
-    def upload_file(path_to_file:, peepy: false, nsfw: false, metadata_list: [], override: {})
-      filesize      = File.size(path_to_file)
-      filename      = File.basename(path_to_file)
-
-      # aggregate metadata below
-      metadata_list += MetadataExtractor.extract(path_to_file)
-      metadata_list << { original_local_path_to_file: path_to_file } unless override[:skip_original_local_path_to_file]
-      asset         = Utils.sanitize(filename)
+    def upload_file(path_to_file:, peepy: false, nsfw: false, override: {}, metadata_list: [])
+      asset         = Utils.sanitize(File.basename(path_to_file))
       md5           = Eivu::Client::CloudFile.generate_md5(path_to_file)&.downcase
-      rating        = MetadataExtractor.extract_rating(filename)
-      year          = MetadataExtractor.extract_year(filename) || Utils.prune_from_metadata_list(metadata_list, 'eivu:year')
-      name          = override[:name] || Utils.prune_from_metadata_list(metadata_list, 'eivu:name')
-      artwork_md5   = Utils.prune_from_metadata_list(metadata_list, 'eivu:artwork_md5')
-      release_pos   = Utils.prune_from_metadata_list(metadata_list, 'eivu:release_pos')
-      duration      = Utils.prune_from_metadata_list(metadata_list, 'eivu:duration')
       log_tag       = "#{md5.first(5)}:#{asset}"
-      artist_name   = Utils.prune_from_metadata_list(metadata_list, 'eivu:artist_name')
-      release_name  = Utils.prune_from_metadata_list(metadata_list, 'eivu:release_name')
-      # aggregate metadata above
+      data_profile  = data_profile(path_to_file:, override:, metadata_list:)
 
       Eivu::Logger.info 'Fetching/Reserving', tags: log_tag, label: Eivu::Client
       cloud_file = CloudFile.reserve_or_fetch_by(bucket_uuid: configuration.bucket_uuid,
                                                  path_to_file:, peepy:, nsfw:)
-      remote_path_to_file = "#{cloud_file.s3_folder}/#{Utils.sanitize(filename)}"
 
-      process_reservation_and_transfer(cloud_file:, path_to_file:, remote_path_to_file:, md5:, asset:, filesize:)
+      process_reservation_and_transfer(cloud_file:, path_to_file:, md5:, asset:)
 
       if cloud_file.transfered?
         Eivu::Logger.info 'Completing', tags: log_tag, label: Eivu::Client
-        cloud_file.complete!(path_to_file:, artist_name:, release_name:, name:, year:, rating:, artwork_md5:, release_pos:, duration:, metadata_list:)
+        cloud_file.complete!(data_profile)
       else
         Eivu::Logger.info 'Updating/Skipping', tags: log_tag, label: Eivu::Client
-        cloud_file.update_metadata!(path_to_file:, artist_name:, release_name:, name:, year:, rating:, artwork_md5:, release_pos:, duration:, metadata_list:)
+        cloud_file.update_metadata!(data_profile)
       end
 
       cloud_file
@@ -152,8 +137,11 @@ module Eivu
 
     private
 
-    def process_reservation_and_transfer(cloud_file:, path_to_file:, remote_path_to_file:, md5:, asset:, filesize:)
+    def process_reservation_and_transfer(cloud_file:, path_to_file:, md5:, asset:)
       return unless cloud_file.reserved?
+
+      filesize      = File.size(path_to_file)
+      remote_path_to_file = "#{cloud_file.s3_folder}/#{Utils.sanitize(File.basename(path_to_file))}"
 
       log_tag = "#{md5.first(5)}:#{asset}"
       Eivu::Logger.info 'Writing to S3', tags: log_tag, label: Eivu::Client
@@ -220,6 +208,30 @@ module Eivu
 
     def s3_credentials
       @s3_credentials ||= Aws::Credentials.new(configuration.access_key_id, configuration.secret_key)
+    end
+
+    def data_profile(path_to_file:, override: {}, metadata_list: [])
+      metadata_list += MetadataExtractor.extract(path_to_file)
+      metadata_list << { original_local_path_to_file: path_to_file } unless override[:skip_original_local_path_to_file]
+      year          = MetadataExtractor.extract_year(path_to_file) || Utils.prune_from_metadata_list(metadata_list, 'eivu:year')
+      name          = override[:name] || Utils.prune_from_metadata_list(metadata_list, 'eivu:name')
+      artwork_md5   = Utils.prune_from_metadata_list(metadata_list, 'eivu:artwork_md5')
+      release_pos   = Utils.prune_from_metadata_list(metadata_list, 'eivu:release_pos')
+      duration      = Utils.prune_from_metadata_list(metadata_list, 'eivu:duration')
+      artist_name   = Utils.prune_from_metadata_list(metadata_list, 'eivu:artist_name')
+      release_name  = Utils.prune_from_metadata_list(metadata_list, 'eivu:release_name')
+
+      {
+        path_to_file: override[:skip_original_local_path_to_file].blank? && path_to_file,
+        rating: MetadataExtractor.extract_rating(path_to_file),
+        name:,
+        year:,
+        duration:,
+        artist_name:,
+        release_info: { name: release_name, year:, postion: release_pos, artwork_md5: },
+        # matched_recording:,
+        metadata_list:
+      }
     end
   end
 end
