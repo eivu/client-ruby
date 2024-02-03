@@ -7,7 +7,7 @@ require 'vcr'
 VCR.configure do |config|
   config.cassette_library_dir = 'spec/fixtures/vcr'
   config.default_cassette_options = { match_requests_on: %i[method uri body], record: :once }
-  %w[EIVU_ACCESS_KEY_ID EIVU_SECRET_ACCESS_KEY EIVU_SERVER_HOST EIVU_BUCKET_LOCATION EIVU_REGION EIVU_USER_TOKEN EIVU_BUCKET_NAME].each do |value|
+  %w[EIVU_ACCESS_KEY_ID EIVU_SECRET_ACCESS_KEY EIVU_SERVER_HOST EIVU_BUCKET_LOCATION EIVU_REGION EIVU_USER_TOKEN EIVU_BUCKET_NAME EIVU_BUCKET_UUID].each do |value|
     config.filter_sensitive_data("<#{value}>") { ENV[value] }
   end
   config.configure_rspec_metadata! # enables :vcr tag
