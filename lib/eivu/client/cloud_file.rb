@@ -49,8 +49,8 @@ module Eivu
       attribute? :metadata, Types::JSON::Array.of(Types::JSON::Hash)
 
       class << self
-        def reserve_or_fetch_by(bucket_name:, provider:, path_to_file:, peepy: false, nsfw: false)
-          reserve(bucket_name:, provider:, path_to_file:, peepy:, nsfw:)
+        def reserve_or_fetch_by(bucket_uuid:, path_to_file:, peepy: false, nsfw: false)
+          reserve(bucket_uuid:, path_to_file:, peepy:, nsfw:)
         rescue Errors::Server::InvalidCloudFileState
           md5 = generate_md5(path_to_file)
           cloud_file = fetch(md5)
@@ -58,20 +58,24 @@ module Eivu
           cloud_file
         end
 
-        def fetch(md5)
+        def fetch(md5, bucket_uuid: Eivu::Client.configuration.bucket_uuid)
           response = RestClient.get(
-            "#{Eivu::Client.configuration.host}/api/v1/cloud_files/#{md5}",
+            "#{Eivu::Client.configuration.host}/api/v1/buckets/#{bucket_uuid}/cloud_files/#{md5}",
             { 'Authorization' => "Token #{Eivu::Client.configuration.user_token}" }
           )
 
           CloudFile.new Oj.load(response.body).symbolize_keys
+        rescue RestClient::Forbidden
+          raise Errors::CloudStorage::MissingResource, "No bucket found with uuid: #{Eivu::Client.configuration.bucket_uuid}"
         rescue RestClient::NotFound
           raise Errors::CloudStorage::MissingResource, "Cloud file #{md5} not found"
         end
 
         def post_request(action:, md5:, payload:)
+          host = Eivu::Client.configuration.host
+          bucket_uuid = Eivu::Client.configuration.bucket_uuid
           response = RestClient.post(
-            "#{Eivu::Client.configuration.host}/api/v1/cloud_files/#{md5}/#{action}",
+            "#{host}/api/v1/buckets/#{bucket_uuid}/cloud_files/#{md5}/#{action}",
             payload,
             { 'Authorization' => "Token #{Eivu::Client.configuration.user_token}" }
           )
@@ -79,12 +83,10 @@ module Eivu
           raise Errors::Server::Connection, "Failed connection: #{response.code}" unless response.code == 200
 
           Oj.load(response.body).deep_symbolize_keys
-        rescue RestClient::Unauthorized
-          raise Errors::Server::Security, 'Bucket does is not owned by user'
+        rescue RestClient::Forbidden
+          raise Errors::CloudStorage::MissingResource, "No bucket found with uuid: #{Eivu::Client.configuration.bucket_uuid}"
         rescue RestClient::UnprocessableEntity
           raise Errors::Server::InvalidCloudFileState, "Failed to reserve file: #{md5}"
-        rescue RestClient::BadRequest
-          raise Errors::Server::Connection, 'Bucket does not exist'
         rescue Errno::ECONNREFUSED
           raise Errors::Server::Connection, "Failed to connect to eivu server: #{Eivu::Client.configuration.host}"
         end
@@ -93,9 +95,9 @@ module Eivu
           Digest::MD5.file(path_to_file).hexdigest.upcase
         end
 
-        def reserve(bucket_name:, provider:, path_to_file:, peepy: false, nsfw: false)
+        def reserve(bucket_uuid:, path_to_file:, peepy: false, nsfw: false)
           md5          = generate_md5(path_to_file)
-          payload      = { bucket_name:, provider:, peepy:, nsfw:, fullpath: path_to_file }
+          payload      = { bucket_uuid:, peepy:, nsfw: }
           parsed_body  = post_request(action: :reserve, md5:, payload:)
           content_type = Client::Utils.detect_mime(path_to_file).type
           CloudFile.new parsed_body.merge(state_history: [STATE_RESERVED], content_type:)
@@ -113,21 +115,21 @@ module Eivu
         self
       end
 
-      def update_data!(action: :complete, artist_name: nil, release_name: nil, year: nil, name: nil, rating: nil, release_pos: nil, duration: nil, metadata_list: [], matched_recording: nil, artwork_md5: nil)
+      def update_data!(path_to_file:, action: :complete, artist_name: nil, release_name: nil, year: nil, name: nil, rating: nil, release_pos: nil, duration: nil, metadata_list: [], matched_recording: nil, artwork_md5: nil)
         matched_recording.nil? # trying to avoid rubocop error because it is not used yet
-        payload = { artist_name:, release_name:, name:, year:, rating:, release_pos:, duration:, metadata_list:, artwork_md5: }
+        payload = { path_to_file:, artist_name:, release_name:, name:, year:, rating:, release_pos:, duration:, metadata_list:, artwork_md5: }
         parsed_body = post_request(action:, payload:)
         assign_attributes(parsed_body)
         state_history << STATE_COMPLETED
         self
       end
 
-      def complete!(year: nil, artist_name: nil, release_name: nil, name: nil, rating: nil, release_pos: nil, duration: nil, metadata_list: [], matched_recording: nil, artwork_md5: nil)
-        update_data!(action: :complete, year:, artist_name:, release_name:, name:, rating:, release_pos:, duration:, metadata_list:, matched_recording:, artwork_md5:)
+      def complete!(path_to_file:, year: nil, artist_name: nil, release_name: nil, name: nil, rating: nil, release_pos: nil, duration: nil, metadata_list: [], matched_recording: nil, artwork_md5: nil)
+        update_data!(action: :complete, path_to_file:, year:, artist_name:, release_name:, name:, rating:, release_pos:, duration:, metadata_list:, matched_recording:, artwork_md5:)
       end
 
-      def update_metadata!(year: nil, artist_name: nil, release_name: nil, name: nil, rating: nil, release_pos: nil, duration: nil, metadata_list: [], matched_recording: nil, artwork_md5: nil)
-        update_data!(action: :update_metadata, year:, artist_name:, release_name:, name:, rating:, release_pos:, duration:, metadata_list:, matched_recording:, artwork_md5:)
+      def update_metadata!(path_to_file:, year: nil, artist_name: nil, release_name: nil, name: nil, rating: nil, release_pos: nil, duration: nil, metadata_list: [], matched_recording: nil, artwork_md5: nil)
+        update_data!(action: :update_metadata, path_to_file:, year:, artist_name:, release_name:, name:, rating:, release_pos:, duration:, metadata_list:, matched_recording:, artwork_md5:)
       end
 
       def visit

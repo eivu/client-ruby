@@ -61,6 +61,7 @@ module Eivu
       filesize      = File.size(path_to_file)
       filename      = File.basename(path_to_file)
 
+      # aggregate metadata below
       metadata_list += MetadataExtractor.extract(path_to_file)
       metadata_list << { original_local_path_to_file: path_to_file } unless override[:skip_original_local_path_to_file]
       asset         = Utils.sanitize(filename)
@@ -72,22 +73,23 @@ module Eivu
       release_pos   = Utils.prune_from_metadata_list(metadata_list, 'eivu:release_pos')
       duration      = Utils.prune_from_metadata_list(metadata_list, 'eivu:duration')
       log_tag       = "#{md5.first(5)}:#{asset}"
-      artist_name        = Utils.prune_from_metadata_list(metadata_list, 'eivu:artist_name')
-      release_name       = Utils.prune_from_metadata_list(metadata_list, 'eivu:release_name')
+      artist_name   = Utils.prune_from_metadata_list(metadata_list, 'eivu:artist_name')
+      release_name  = Utils.prune_from_metadata_list(metadata_list, 'eivu:release_name')
+      # aggregate metadata above
 
       Eivu::Logger.info 'Fetching/Reserving', tags: log_tag, label: Eivu::Client
-      cloud_file = CloudFile.reserve_or_fetch_by(bucket_name: configuration.bucket_name,
-                                                 provider: configuration.bucket_location, path_to_file:, peepy:, nsfw:)
+      cloud_file = CloudFile.reserve_or_fetch_by(bucket_uuid: configuration.bucket_uuid,
+                                                 path_to_file:, peepy:, nsfw:)
       remote_path_to_file = "#{cloud_file.s3_folder}/#{Utils.sanitize(filename)}"
 
       process_reservation_and_transfer(cloud_file:, path_to_file:, remote_path_to_file:, md5:, asset:, filesize:)
 
       if cloud_file.transfered?
         Eivu::Logger.info 'Completing', tags: log_tag, label: Eivu::Client
-        cloud_file.complete!(artist_name:, release_name:, name:, year:, rating:, artwork_md5:, release_pos:, duration:, metadata_list:, matched_recording: nil)
+        cloud_file.complete!(path_to_file:, artist_name:, release_name:, name:, year:, rating:, artwork_md5:, release_pos:, duration:, metadata_list:)
       else
         Eivu::Logger.info 'Updating/Skipping', tags: log_tag, label: Eivu::Client
-        cloud_file.update_metadata!(artist_name:, release_name:, name:, year:, rating:, artwork_md5:, release_pos:, duration:, metadata_list:, matched_recording: nil)
+        cloud_file.update_metadata!(path_to_file:, artist_name:, release_name:, name:, year:, rating:, artwork_md5:, release_pos:, duration:, metadata_list:)
       end
 
       cloud_file
