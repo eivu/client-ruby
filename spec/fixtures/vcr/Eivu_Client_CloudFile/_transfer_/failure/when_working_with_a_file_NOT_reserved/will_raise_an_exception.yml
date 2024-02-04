@@ -2,15 +2,15 @@
 http_interactions:
 - request:
     method: post
-    uri: "<EIVU_SERVER_HOST>/api/v1/cloud_files/F45C04D717F3ED6720AE0A3A67981FE4/transfer"
+    uri: "<EIVU_SERVER_HOST>/api/v1/buckets/<EIVU_BUCKET_UUID>/cloud_files/F45C04D717F3ED6720AE0A3A67981FE4/transfer"
     body:
       encoding: UTF-8
-      string: content_type=audio%2Fmpeg&asset=Piano_brokencrash-Brandondorf-1164520478.mp3&filesize=134899
+      string: content_type=audio%2Fmpeg&asset=Piano_brokencrash-Brandondorf-1164520478.mp3&filesize=134771
     headers:
       Accept:
       - "*/*"
       User-Agent:
-      - rest-client/2.1.0 (darwin20 x86_64) ruby/3.1.2p20
+      - rest-client/2.1.0 (darwin23 arm64) ruby/3.1.2p20
       Authorization:
       - Token <EIVU_USER_TOKEN>
       Content-Length:
@@ -24,7 +24,7 @@ http_interactions:
   response:
     status:
       code: 422
-      message: Unprocessable Entity
+      message: Unprocessable Content
     headers:
       X-Frame-Options:
       - SAMEORIGIN
@@ -43,20 +43,20 @@ http_interactions:
       Cache-Control:
       - no-cache
       X-Request-Id:
-      - 83dab235-375d-4ce0-a205-478c4e9c0a79
+      - 8cdaca6f-7131-4a20-8934-4bdd60657ee0
       X-Runtime:
-      - '0.025983'
+      - '0.142496'
       Server-Timing:
-      - start_processing.action_controller;dur=0.187255859375, sql.active_record;dur=4.916748046875,
-        instantiation.active_record;dur=0.275146484375, process_action.action_controller;dur=10.220947265625
+      - start_processing.action_controller;dur=0.07, sql.active_record;dur=37.62,
+        instantiation.active_record;dur=12.32, process_action.action_controller;dur=127.06
       Vary:
       - Origin
       Set-Cookie:
-      - __profilin=p%3Dt; path=/; HttpOnly; SameSite=Lax
-      Transfer-Encoding:
-      - chunked
+      - __profilin=p%3Dt; path=/; httponly; SameSite=Lax
+      Content-Length:
+      - '44'
     body:
       encoding: UTF-8
       string: '{"message":"md5 is not for a reserved file"}'
-  recorded_at: Sun, 26 Jun 2022 05:43:41 GMT
+  recorded_at: Sun, 04 Feb 2024 22:42:35 GMT
 recorded_with: VCR 6.1.0
