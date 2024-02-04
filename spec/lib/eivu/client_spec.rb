@@ -109,7 +109,7 @@ describe Eivu::Client, vcr: false do
 
       end
 
-      let(:path_to_file) { File.expand_path('../../fixtures/samples/test.mp3', __dir__) }
+      let(:path_to_file) { File.expand_path('../../fixtures/samples/audio/test.mp3', __dir__) }
       
 
       it 'fails to write file to S3 and partially saves data to the server' do
