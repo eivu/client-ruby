@@ -124,18 +124,18 @@ describe Eivu::Client::CloudFile, vcr: true do
       end
 
       context 'when bucket does not exist' do
-        let(:bucket_name) { 'missing-bucket' }
+        let(:bucket_uuid) { 'missing-bucket' }
 
         it 'raises an error' do
-          expect { instance }.to raise_error(Eivu::Client::Errors::Server::Connection)
+          expect { instance }.to raise_error(Eivu::Client::Errors::CloudStorage::MissingResource, /No bucket found with uuid/)
         end
       end
 
-      context 'when reserving file in wrong bucket' do
-        let(:bucket_name) { 'error' }
+      context 'when reserving file in bucket not owned by user' do
+        let(:bucket_uuid) { 'error' }
 
         it 'raises an error' do
-          expect { instance }.to raise_error(Eivu::Client::Errors::Server::Security)
+          expect { instance }.to raise_error(Eivu::Client::Errors::CloudStorage::MissingResource, /No bucket found with uuid/)
         end
       end
     end

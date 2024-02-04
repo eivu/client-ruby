@@ -98,7 +98,9 @@ module Eivu
           payload      = { peepy:, nsfw: }
           parsed_body  = post_request(action: :reserve, md5:, payload:, bucket_uuid:)
           content_type = Client::Utils.detect_mime(path_to_file).type
-          CloudFile.new parsed_body.merge(state_history: [STATE_RESERVED], content_type:)
+          instance     = CloudFile.new parsed_body.merge(content_type:)
+          instance.state_history << STATE_RESERVED
+          instance
         end
       end
 
