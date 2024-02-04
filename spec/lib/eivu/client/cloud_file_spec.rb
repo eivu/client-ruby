@@ -2,6 +2,7 @@
 
 describe Eivu::Client::CloudFile, vcr: true do
   let(:bucket_name) { 'eivu-test' }
+  let(:bucket_uuid) { Eivu::Client.configuration.bucket_uuid }
   let(:provider) { 'wasabi' }
   let(:peepy) { false }
   let(:nsfw) { false }
@@ -141,7 +142,7 @@ describe Eivu::Client::CloudFile, vcr: true do
   end
 
   describe '.reserve' do
-    subject(:reservation) { described_class.reserve(path_to_file:) }
+    subject(:reservation) { described_class.reserve(path_to_file:, bucket_uuid:) }
 
     context 'success' do
       context 'when md5 does not exist' do
@@ -177,10 +178,10 @@ describe Eivu::Client::CloudFile, vcr: true do
       end
 
       context 'when bucket does not exist' do
-        let(:bucket_name) { 'missing-bucket' }
+        let(:bucket_uuid) { 'missing-bucket' }
 
         it 'raises an error' do
-          expect { reservation }.to raise_error(Eivu::Client::Errors::Server::Connection)
+          expect { reservation }.to raise_error(Eivu::Client::Errors::CloudStorage::MissingResource, /No bucket found with uuid/)
         end
       end
 
@@ -191,7 +192,7 @@ describe Eivu::Client::CloudFile, vcr: true do
       end
 
       context 'when reserving file in wrong bucket' do
-        let(:bucket_name) { 'error' }
+        let(:bucket_uuid) { 'error' }
 
         it 'raises an error' do
           expect { reservation }.to raise_error(Eivu::Client::Errors::Server::Security)
@@ -229,7 +230,7 @@ describe Eivu::Client::CloudFile, vcr: true do
     context 'failure' do
       context 'when working with a file NOT reserved' do
         let(:path_to_file) do
-          File.expand_path('../../../fixtures/samples/Piano_brokencrash-Brandondorf-1164520478.mp3', __dir__)
+          File.expand_path('../../../fixtures/samples/audio/Piano_brokencrash-Brandondorf-1164520478.mp3', __dir__)
         end
 
         it 'will raise an exception' do
