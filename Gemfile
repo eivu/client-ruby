@@ -15,7 +15,7 @@ gem 'faker', '~> 2.18' # Faker, a port of Data::Faker from Perl, is used to easi
 gem 'id3tag', '~> 1.1' # Native Ruby ID3 tag reader that aims for 100% coverage of ID3v2.x and ID3v1.x standards
 gem 'itunes_parser', '~> 1.1', '>= 1.1.3' # Parses iTunes Library XML files
 gem 'mimemagic', '~> 0.4.3' # Fast mime detection by extension or content (Uses freedesktop.org.xml shared-mime-info database
-gem 'nokogiri', '~> 1.14' # xml parser
+gem 'nokogiri', '~> 1.16' # xml parser
 gem 'oj', '~> 3.16', '>= 3.16.1' # faster json parsing
 gem 'pry', '~> 0.14.1' # Debugger
 gem 'rest-client', '~> 2.1' # A simple HTTP and REST client for Ruby, inspired by the Sinatra microframework style of specifying actions
