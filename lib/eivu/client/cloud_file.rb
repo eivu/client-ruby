@@ -64,7 +64,9 @@ module Eivu
             { 'Authorization' => "Token #{Eivu::Client.configuration.user_token}" }
           )
 
-          CloudFile.new Oj.load(response.body).symbolize_keys
+          cloud_file = CloudFile.new Oj.load(response.body).symbolize_keys
+          cloud_file.infer_state_history!
+          cloud_file
         rescue RestClient::Forbidden
           raise Errors::CloudStorage::MissingResource, "No bucket found with uuid: #{Eivu::Client.configuration.bucket_uuid}"
         rescue RestClient::NotFound
@@ -99,7 +101,7 @@ module Eivu
           parsed_body  = post_request(action: :reserve, md5:, payload:, bucket_uuid:)
           content_type = Client::Utils.detect_mime(path_to_file).type
           instance     = CloudFile.new parsed_body.merge(content_type:)
-          instance.state_history << STATE_RESERVED
+          instance.state_history = [STATE_RESERVED]
           instance
         end
       end
@@ -156,6 +158,18 @@ module Eivu
 
       def completed?
         state == 'completed'
+      end
+
+      def infer_state_history!
+        self.state_history =
+          case state
+          when 'reserved'
+            [STATE_RESERVED]
+          when 'transfered'
+            [STATE_RESERVED, STATE_TRANSFERED]
+          when 'completed'
+            [STATE_RESERVED, STATE_TRANSFERED, STATE_COMPLETED]
+          end
       end
 
       private

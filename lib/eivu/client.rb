@@ -227,8 +227,8 @@ module Eivu
         name:,
         year:,
         duration:,
-        artist_name:,
-        release_info: { name: release_name, year:, postion: release_pos, artwork_md5: },
+        artists: [{ name: artist_name }],
+        release: { name: release_name, year:, postion: release_pos, artwork_md5: },
         # matched_recording:,
         metadata_list:
       }

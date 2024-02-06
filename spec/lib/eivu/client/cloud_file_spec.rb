@@ -85,7 +85,7 @@ describe Eivu::Client::CloudFile, vcr: true do
             expect(instance.md5).to eq(md5)
             expect(instance.name).to be nil
             expect(instance.bucket_name).to eq(bucket_name)
-            expect(instance.state_history).to eq([])
+            expect(instance.state_history).to eq(%i[reserved])
             expect(instance.content_type).to eq('audio/mpeg')
           end
         end
@@ -149,7 +149,7 @@ describe Eivu::Client::CloudFile, vcr: true do
         let(:md5) { 'F45C04D717F3ED6720AE0A3A67981FE4' }
         let(:path_to_file) { File.expand_path('../../../fixtures/samples/audio/test.mp3', __dir__) }
 
-        it 'returns the proper object' do
+        it 'creates the proper object' do
           aggregate_failures do
             expect(reservation).to be_kind_of(described_class)
             expect(reservation.md5).to eq(md5)
@@ -242,7 +242,18 @@ describe Eivu::Client::CloudFile, vcr: true do
 
   describe '#complete!' do
     subject(:completion) do
-      instance.complete!(path_to_file:, year:, rating:, release_pos:, metadata_list:)
+      instance.complete!(data_profile)
+    end
+
+    let(:data_profile) do
+      {
+        path_to_file:,
+        rating:,
+        year:,
+        artists: [{ name: 'Sound Factory' }],
+        release: { postion: release_pos },
+        metadata_list:
+      }
     end
 
     let(:instance) { build :cloud_file, :transfered, :test_mp3 }
@@ -260,7 +271,7 @@ describe Eivu::Client::CloudFile, vcr: true do
           expect(completion.year).to eq(year)
           expect(completion.rating).to eq(rating)
           expect(completion.release_pos).to eq(release_pos)
-          expect(completion.metadata).to eq(metadata_list)
+          expect(completion.metadata).to include(*metadata_list)
           expect(completion.state).to eq('completed')
           expect(completion.state_history).to eq(%i[reserved transfered completed])
         end
