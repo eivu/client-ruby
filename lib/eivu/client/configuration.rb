@@ -3,7 +3,7 @@
 module Eivu
   class Client
     class Configuration
-      attr_writer :access_key_id, :secret_key, :bucket_name, :region, :user_token, :host, :endpoint, :bucket_location
+      attr_writer :access_key_id, :secret_key, :bucket_name, :bucket_uuid, :region, :user_token, :host, :endpoint, :bucket_location
 
       # Adds global configuration settings to the gem, including:
       #

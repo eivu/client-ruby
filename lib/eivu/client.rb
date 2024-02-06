@@ -26,6 +26,7 @@ module Eivu
         configuration.endpoint        = nil
         configuration.user_token      = nil
         configuration.host            = nil
+        configuration.bucket_uuid     = nil
         configuration
       end
 

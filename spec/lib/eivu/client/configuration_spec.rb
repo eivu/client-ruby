@@ -12,6 +12,7 @@ describe Eivu::Client::Configuration do
   let(:server_host) { 'https://www.eivu.io' }
   let(:bucket_location) { :provider}
   let(:endpoint) { 'https://s3.provider.com' }
+  let(:bucket_uuid) { '867e9826-c541-400a-8985-3c9f6f12856e' }
 
   before do
     allow(ENV).to receive(:fetch).with('EIVU_ACCESS_KEY_ID').and_return(access_key_id)
@@ -22,6 +23,9 @@ describe Eivu::Client::Configuration do
     allow(ENV).to receive(:fetch).with('EIVU_USER_TOKEN').and_return(user_token)
     allow(ENV).to receive(:fetch).with('EIVU_SERVER_HOST').and_return(server_host)
     allow(ENV).to receive(:fetch).with('EIVU_ENDPOINT').and_return(endpoint)
+    allow(ENV).to receive(:fetch).with('EIVU_BUCKET_UUID').and_return(bucket_uuid)
+
+
     Eivu::Client.configure do |config|
       config.access_key_id = access_key_id
       config.secret_key    = secret_access_key
@@ -29,8 +33,9 @@ describe Eivu::Client::Configuration do
       config.region        = region
       config.user_token    = user_token
       config.host          = server_host
+      config.endpoint      = endpoint
+      config.bucket_uuid   = bucket_uuid
       config.bucket_location = bucket_location
-      config.endpoint = endpoint
     end
   end
 
@@ -45,6 +50,10 @@ describe Eivu::Client::Configuration do
 
     it 'returns the correct bucket_name' do
       expect(Eivu::Client.configuration.bucket_name).to eq(bucket_name)
+    end
+
+    it 'returns the correct bucket_uuid' do
+      expect(Eivu::Client.configuration.bucket_uuid).to eq(bucket_uuid)
     end
 
     it 'returns the correct region' do
@@ -64,7 +73,6 @@ describe Eivu::Client::Configuration do
       context 'have not been set' do
         let(:bucket_location) { nil }
         let(:endpoint) { nil }
-
 
         it 'returns aws as the default bucket_location' do
           expect(Eivu::Client.configuration.bucket_location).to eq(:aws)
