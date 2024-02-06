@@ -51,7 +51,8 @@ describe Eivu::Client::CloudFile, vcr: true do
             expect(instance.md5).to eq(md5)
             expect(instance.asset).to eq('test.mp3')
             expect(instance.bucket_name).to eq(bucket_name)
-            expect(instance.state_history).to eq([])
+            expect(instance.state).to eq('completed')
+            expect(instance.state_history).to eq(%i[reserved transfered completed])
           end
         end
       end
