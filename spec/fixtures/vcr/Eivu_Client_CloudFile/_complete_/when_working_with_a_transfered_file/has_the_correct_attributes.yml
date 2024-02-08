@@ -5,7 +5,7 @@ http_interactions:
     uri: "<EIVU_SERVER_HOST>/api/v1/buckets/<EIVU_BUCKET_UUID>/cloud_files/F45C04D717F3ED6720AE0A3A67981FE4/complete"
     body:
       encoding: UTF-8
-      string: path_to_file=%2FUsers%2Fjinx%2Fprojects%2Feivu%2Fclient-ruby%2Fspec%2Ffixtures%2Fsamples%2Faudio%2Ftest.mp3&rating=4.37&year=2019&artists[][name]=Sound+Factory&release[postion]=1&metadata_list[][name]=title&metadata_list[][genre]=sample&metadata_list[][performer]=aws&metadata_list[][performer]=Polly
+      string:  path_to_file=%2FUsers%2Fjinx%2Fprojects%2Feivu%2Fclient-ruby%2Fspec%2Ffixtures%2Fsamples%2Faudio%2Ftest.mp3&rating=4.37&year=2019&artists[][name]=Sound+Factory&release[primary_artist_name]=Sound+Factory&release[postion]=1&metadata_list[][name]=title&metadata_list[][genre]=sample&metadata_list[][performer]=aws&metadata_list[][performer]=Polly
     headers:
       Accept:
       - "*/*"
@@ -14,7 +14,7 @@ http_interactions:
       Authorization:
       - Token <EIVU_USER_TOKEN>
       Content-Length:
-      - '300'
+      - '345'
       Content-Type:
       - application/x-www-form-urlencoded
       Accept-Encoding:

@@ -252,7 +252,7 @@ describe Eivu::Client::CloudFile, vcr: true do
         rating:,
         year:,
         artists: [{ name: 'Sound Factory' }],
-        release: { postion: release_pos },
+        release: { primary_artist_name: 'Sound Factory', postion: release_pos },
         metadata_list:
       }
     end
@@ -262,6 +262,7 @@ describe Eivu::Client::CloudFile, vcr: true do
     let(:year) { 2019 }
     let(:rating) { 4.37 }
     let(:release_pos) { 1 }
+    let(:artist_name) { 'Polly' }
     let(:metadata_list) { [{ name: 'title' }, { genre: 'sample' }, { performer: 'aws' }, { performer: 'Polly' }] }
 
     context 'when working with a transfered file' do
