@@ -21,12 +21,12 @@ module Eivu
         configuration.access_key_id   = nil
         configuration.secret_key      = nil
         configuration.bucket_name     = nil
+        configuration.bucket_uuid     = nil
         configuration.bucket_location = nil
         configuration.region          = nil
         configuration.endpoint        = nil
         configuration.user_token      = nil
         configuration.host            = nil
-        configuration.bucket_uuid     = nil
         configuration
       end
 
@@ -62,7 +62,7 @@ module Eivu
       asset         = Utils.sanitize(File.basename(path_to_file))
       md5           = Eivu::Client::CloudFile.generate_md5(path_to_file)&.downcase
       log_tag       = "#{md5.first(5)}:#{asset}"
-      data_profile  = data_profile(path_to_file:, override:, metadata_list:)
+      data_profile  = Utils.generate_data_profile(path_to_file:, override:, metadata_list:)
 
       Eivu::Logger.info 'Fetching/Reserving', tags: log_tag, label: Eivu::Client
       cloud_file = CloudFile.reserve_or_fetch_by(bucket_uuid: configuration.bucket_uuid,
@@ -209,30 +209,6 @@ module Eivu
 
     def s3_credentials
       @s3_credentials ||= Aws::Credentials.new(configuration.access_key_id, configuration.secret_key)
-    end
-
-    def data_profile(path_to_file:, override: {}, metadata_list: [])
-      metadata_list += MetadataExtractor.extract(path_to_file)
-      metadata_list << { original_local_path_to_file: path_to_file } unless override[:skip_original_local_path_to_file]
-      year          = MetadataExtractor.extract_year(path_to_file) || Utils.prune_from_metadata_list(metadata_list, 'eivu:year')
-      name          = override[:name] || Utils.prune_from_metadata_list(metadata_list, 'eivu:name')
-      artwork_md5   = Utils.prune_from_metadata_list(metadata_list, 'eivu:artwork_md5')
-      release_pos   = Utils.prune_from_metadata_list(metadata_list, 'eivu:release_pos')
-      duration      = Utils.prune_from_metadata_list(metadata_list, 'eivu:duration')
-      artist_name   = Utils.prune_from_metadata_list(metadata_list, 'eivu:artist_name')
-      release_name  = Utils.prune_from_metadata_list(metadata_list, 'eivu:release_name')
-
-      {
-        path_to_file: override[:skip_original_local_path_to_file].blank? && path_to_file,
-        rating: MetadataExtractor.extract_rating(path_to_file),
-        name:,
-        year:,
-        duration:,
-        artists: [{ name: artist_name }],
-        release: { name: release_name, year:, postion: release_pos, artwork_md5: },
-        # matched_recording:,
-        metadata_list:
-      }
     end
   end
 end

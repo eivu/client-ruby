@@ -1,15 +1,20 @@
 # frozen_string_literal: true
 
 describe Eivu::Client, vcr: false do
+  before { Eivu::Client.reconfigure }
+
   let(:bucket_name) { 'eivu-test' }
   let(:instance) { described_class.new }
   let(:dummy_cloud_file) { instance_double(Eivu::Client::CloudFile) }
 
   describe '#upload_file', vcr: true do
     subject(:result) { instance.upload_file(path_to_file:, peepy:, nsfw:) }
+
     let(:peepy) { false }
     let(:nsfw) { false }
     let(:md5) { Digest::MD5.file(path_to_file).hexdigest.upcase }
+    let(:release_pos) { nil }
+    let(:data_profile) { Eivu::Client::Utils.generate_data_profile(path_to_file:) }
 
     context 'success' do
       # context 'live test' do
@@ -33,8 +38,7 @@ describe Eivu::Client, vcr: false do
           expect(dummy_cloud_file).to receive(:reserved?).and_return(true)
           expect(dummy_cloud_file).to receive(:transfered?).and_return(true)
           expect(dummy_cloud_file).to receive(:transfer!).with(asset:, filesize:)
-          expect(dummy_cloud_file).to receive(:complete!).with(rating:, metadata_list:, year:, release_pos: nil,
-                                                               matched_recording: nil)
+          expect(dummy_cloud_file).to receive(:complete!).with(data_profile)
         end
 
         let(:filesize) { File.size(path_to_file) }
@@ -94,23 +98,15 @@ describe Eivu::Client, vcr: false do
 
     context 'failure' do
       before do
-        # expect(Eivu::Client::CloudFile).to receive(:reserve).and_return(dummy_cloud_file)
-        # expect(dummy_cloud_file).to receive(:s3_folder).and_return('/path/to/s3/folder')
-        # allow(dummy_cloud_file).to receive(:reserved?).and_return(true)
-###################
-          allow(Eivu::Client::CloudFile).to receive(:reserve).and_return(dummy_cloud_file)
-          allow(dummy_cloud_file).to receive(:s3_folder).and_return('/path/to/s3/folder')
-          allow(dummy_cloud_file).to receive(:reserved?).and_return(true)
-          allow_any_instance_of(Aws::S3::Client).to receive(:put_object).and_return(nil)
-          allow_any_instance_of(described_class).to receive(:retrieve_remote_md5).and_return('1234567890')
-          allow_any_instance_of(described_class).to receive(:generate_etag).and_return('5000000000')
-
-
-
+        allow(Eivu::Client::CloudFile).to receive(:reserve).and_return(dummy_cloud_file)
+        allow(dummy_cloud_file).to receive(:s3_folder).and_return('/path/to/s3/folder')
+        allow(dummy_cloud_file).to receive(:reserved?).and_return(true)
+        allow_any_instance_of(Aws::S3::Client).to receive(:put_object).and_return(nil)
+        allow_any_instance_of(described_class).to receive(:retrieve_remote_md5).and_return('1234567890')
+        allow_any_instance_of(described_class).to receive(:generate_etag).and_return('5000000000')
       end
 
       let(:path_to_file) { File.expand_path('../../fixtures/samples/audio/test.mp3', __dir__) }
-      
 
       it 'fails to write file to S3 and partially saves data to the server' do
         expect { result }.to raise_error(Eivu::Client::Errors::CloudStorage::InvalidMd5, /Expected/)
@@ -124,18 +120,6 @@ describe Eivu::Client, vcr: false do
     let(:path_to_folder) { File.expand_path('../../fixtures/samples/audio/brothers_grimm', __dir__) }
     let(:peepy) { false }
     let(:nsfw) { false }
-    
-
-
-
-    # before do
-    #   allow(Eivu::Client::CloudFile).to receive(:reserve).and_return(dummy_cloud_file)
-    #   allow(dummy_cloud_file).to receive(:s3_folder).and_return('/path/to/s3/folder')
-    #   allow(dummy_cloud_file).to receive(:reserved?).and_return(true)
-    #   allow_any_instance_of(Aws::S3::Client).to receive(:put_object).and_return(nil)
-    #   allow_any_instance_of(described_class).to receive(:retrieve_remote_md5).and_return('1234567890')
-    #   allow_any_instance_of(described_class).to receive(:generate_etag).and_return('5000000000')
-    # end
 
     context 'success' do
       before do
