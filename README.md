@@ -18,4 +18,5 @@ Requirements
 - node
 - python
 - [yt-dlp](https://github.com/yt-dlp/yt-dlp)
+- Download the [fpcalc binary](https://acoustid.org/chromaprint)
 
