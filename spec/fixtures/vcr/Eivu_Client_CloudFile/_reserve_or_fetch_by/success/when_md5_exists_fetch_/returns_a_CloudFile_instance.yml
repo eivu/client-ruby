@@ -2,19 +2,19 @@
 http_interactions:
 - request:
     method: post
-    uri: "<EIVU_SERVER_HOST>/api/v1/cloud_files/F45C04D717F3ED6720AE0A3A67981FE4/reserve"
+    uri: "<EIVU_SERVER_HOST>/api/v1/buckets/<EIVU_BUCKET_UUID>/cloud_files/F45C04D717F3ED6720AE0A3A67981FE4/reserve"
     body:
       encoding: UTF-8
-      string: bucket_name=<EIVU_BUCKET_NAME>-test&provider=<EIVU_BUCKET_LOCATION>&peepy=false&nsfw=false&fullpath=%2FUsers%2Fjinx%2Fprojects%2F<EIVU_BUCKET_NAME>%2Fruby_client%2Fspec%2Ffixtures%2Fsamples%2Ftest.mp3
+      string: peepy=false&nsfw=false
     headers:
       Accept:
       - "*/*"
       User-Agent:
-      - rest-client/2.1.0 (darwin20 x86_64) ruby/3.1.2p20
+      - rest-client/2.1.0 (darwin23 arm64) ruby/3.1.2p20
       Authorization:
       - Token <EIVU_USER_TOKEN>
       Content-Length:
-      - '44'
+      - '22'
       Content-Type:
       - application/x-www-form-urlencoded
       Accept-Encoding:
@@ -24,7 +24,7 @@ http_interactions:
   response:
     status:
       code: 422
-      message: Unprocessable Entity
+      message: Unprocessable Content
     headers:
       X-Frame-Options:
       - SAMEORIGIN
@@ -43,26 +43,25 @@ http_interactions:
       Cache-Control:
       - no-cache
       X-Request-Id:
-      - 27618c79-e7dc-4adf-ba2e-fff9f87983c2
+      - cb4a9369-5a65-4fc8-af07-ab34d9e7ee49
       X-Runtime:
-      - '0.030306'
+      - '0.015014'
       Server-Timing:
-      - start_processing.action_controller;dur=0.290283203125, sql.active_record;dur=7.090087890625,
-        instantiation.active_record;dur=0.189208984375, unpermitted_parameters.action_controller;dur=0.10693359375,
-        process_action.action_controller;dur=12.28076171875
+      - start_processing.action_controller;dur=0.03, sql.active_record;dur=3.63, instantiation.active_record;dur=0.12,
+        unpermitted_parameters.action_controller;dur=0.00, process_action.action_controller;dur=7.28
       Vary:
       - Origin
       Set-Cookie:
-      - __profilin=p%3Dt; path=/; HttpOnly; SameSite=Lax
-      Transfer-Encoding:
-      - chunked
+      - __profilin=p%3Dt; path=/; httponly; SameSite=Lax
+      Content-Length:
+      - '47'
     body:
       encoding: UTF-8
       string: '{"message":"md5 already exists in this folder"}'
-  recorded_at: Sat, 25 Jun 2022 22:47:43 GMT
+  recorded_at: Sun, 04 Feb 2024 23:39:22 GMT
 - request:
     method: get
-    uri: "<EIVU_SERVER_HOST>/api/v1/cloud_files/F45C04D717F3ED6720AE0A3A67981FE4"
+    uri: "<EIVU_SERVER_HOST>/api/v1/buckets/<EIVU_BUCKET_UUID>/cloud_files/F45C04D717F3ED6720AE0A3A67981FE4"
     body:
       encoding: US-ASCII
       string: ''
@@ -70,7 +69,7 @@ http_interactions:
       Accept:
       - "*/*"
       User-Agent:
-      - rest-client/2.1.0 (darwin20 x86_64) ruby/3.1.2p20
+      - rest-client/2.1.0 (darwin23 arm64) ruby/3.1.2p20
       Authorization:
       - Token <EIVU_USER_TOKEN>
       Accept-Encoding:
@@ -99,24 +98,24 @@ http_interactions:
       Cache-Control:
       - no-store, must-revalidate, private, max-age=0
       X-Request-Id:
-      - e04f18ed-ad0c-416a-8841-3aaa9215c29b
+      - 8da08623-b29f-4052-97d3-d22050ada8f8
       X-Runtime:
-      - '0.046373'
+      - '0.017532'
       Server-Timing:
-      - start_processing.action_controller;dur=0.23388671875, sql.active_record;dur=13.106201171875,
-        instantiation.active_record;dur=0.715087890625, process_action.action_controller;dur=21.661865234375
+      - start_processing.action_controller;dur=0.02, sql.active_record;dur=7.99, instantiation.active_record;dur=0.20,
+        process_action.action_controller;dur=12.87
       Vary:
       - Origin
       X-Miniprofiler-Original-Cache-Control:
       - max-age=0, private, must-revalidate
       X-Miniprofiler-Ids:
-      - dgcqgz437dwb3xtr4sj5,nat8r626flusu8f4vbr5,6j7zijmdl9h0gnb54m31,p2wij0q1c8fpzzyp1wrc,mqx4pn8ai98x9eycth57,h5kqo0307bqt0gqciei2,fgsy3f6r03a14fbueqdw,qinsmu85833ucp0u2xsx,3uz2hgkwkg1ovequxwh,cmxnsa3rlwehod5apgiw,19x40fodx2qfsdiywvw9,x0absxc26z4hrgei9xy6,sp4qcmdjoik3me1btk5d,6r5zldxin4v865xx1xz5,29ikbiju5spec90hzx73,qh337q4yix23zn0ad7v3,cnfl1vxqcle5kmzinv5l,hsg3c7iunekq5kwtj9lz,4nboh3bfyx3k56yr0an4,nblokmgdlxihz3obej2j
+      - gwh4u21y396yan8tekb2,mign9jvfezr3b27y24ov,brbdvrezdyj7h3wovq9o,p0d0lijez7xzisbk70ys,zpvv2un76dd15azxoy8v,u1xzu9ges1tll7wzz2ll,fxoa6uecqewvqsz7tu6t,mikj9hs2y7dq83whd09m,dv3nianixejcj5wlav6y,eamvfpx76fuljjta2g1y,4dse5e73oehc3f9wdf3r,z434fdxj2z1nh834fvg2,rvjp7plgw1kkfckz0676,qjk2pbuknk9kbwsz1ova,c242zsc1sim7r9aybxgq,v8gytgu0yfs5n3m31fwa,baze97lz7blhn6vnhzmz,e5r65dwbu16769xu29gz,u2milg0rsqpsmabjwkdl,wv4ivpge9d3sr9t7bpvp
       Set-Cookie:
-      - __profilin=p%3Dt; path=/; HttpOnly; SameSite=Lax
-      Transfer-Encoding:
-      - chunked
+      - __profilin=p%3Dt; path=/; httponly; SameSite=Lax
+      Content-Length:
+      - '591'
     body:
       encoding: UTF-8
-      string: '{"name":null,"asset":null,"md5":"F45C04D717F3ED6720AE0A3A67981FE4","content_type":null,"filesize":0,"description":null,"rating":null,"nsfw":false,"peepy":false,"created_at":"2022-06-25T22:42:56.058Z","updated_at":"2022-06-25T22:42:56.058Z","info_url":null,"duration":0,"ext_id":null,"data_source_id":null,"release_id":null,"year":null,"release_pos":null,"num_plays":0,"state":"reserved","bucket_uuid":"3b746ff6-82b3-4340-a745-ae6d5d375381","bucket_name":"<EIVU_BUCKET_NAME>","user_uuid":"1bf23eff-c27f-444e-96a9-6f25a6b98674","folder_uuid":null,"metadata":[]}'
-  recorded_at: Sat, 25 Jun 2022 22:47:43 GMT
+      string: '{"name":null,"asset":null,"md5":"F45C04D717F3ED6720AE0A3A67981FE4","content_type":null,"filesize":0,"description":null,"rating":null,"nsfw":false,"peepy":false,"created_at":"2024-02-04T23:39:11.098Z","updated_at":"2024-02-04T23:39:11.098Z","info_url":null,"duration":0,"ext_id":null,"data_source_id":null,"release_id":null,"year":null,"release_pos":null,"num_plays":0,"state":"reserved","last_viewed_at":null,"bucket_uuid":"<EIVU_BUCKET_UUID>","bucket_name":"<EIVU_BUCKET_NAME>","user_uuid":"1bf23eff-c27f-444e-96a9-6f25a6b98674","folder_uuid":null,"artwork_md5":null,"metadata":[]}'
+  recorded_at: Sun, 04 Feb 2024 23:39:22 GMT
 recorded_with: VCR 6.1.0

@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
 describe Eivu::Client::CloudFile, vcr: true do
-  let(:bucket_uuid) { '3b746ff6-82b3-4340-a745-ae6d5d375381' }
   let(:bucket_name) { 'eivu-test' }
+  let(:bucket_uuid) { Eivu::Client.configuration.bucket_uuid }
   let(:provider) { 'wasabi' }
   let(:peepy) { false }
   let(:nsfw) { false }
@@ -11,7 +11,7 @@ describe Eivu::Client::CloudFile, vcr: true do
     subject(:md5) { described_class.generate_md5(path_to_file) }
 
     context 'test.mp3' do
-      let(:path_to_file) { File.expand_path('../../../fixtures/samples/test.mp3', __dir__) }
+      let(:path_to_file) { File.expand_path('../../../fixtures/samples/audio/test.mp3', __dir__) }
 
       it 'returns the correct md5' do
         expect(md5).to eq('F45C04D717F3ED6720AE0A3A67981FE4')
@@ -19,7 +19,7 @@ describe Eivu::Client::CloudFile, vcr: true do
     end
 
     context 'sample_640x360_beach.flv' do
-      let(:path_to_file) { File.expand_path('../../../fixtures/samples/sample_640x360_beach.flv', __dir__) }
+      let(:path_to_file) { File.expand_path('../../../fixtures/samples/video/sample_640x360_beach.flv', __dir__) }
 
       it 'returns the correct md5' do
         expect(md5).to eq('288C872C9F2AE7231847A083A3C74366')
@@ -27,7 +27,7 @@ describe Eivu::Client::CloudFile, vcr: true do
     end
 
     context 'mov_bbb.mp4' do
-      let(:path_to_file) { File.expand_path('../../../fixtures/samples/mov_bbb.mp4', __dir__) }
+      let(:path_to_file) { File.expand_path('../../../fixtures/samples/video/mov_bbb.mp4', __dir__) }
 
       it 'returns the correct md5' do
         expect(md5).to eq('198918F40ECC7CAB0FC4231ADAF67C96')
@@ -50,8 +50,9 @@ describe Eivu::Client::CloudFile, vcr: true do
           aggregate_failures do
             expect(instance.md5).to eq(md5)
             expect(instance.asset).to eq('test.mp3')
-            expect(instance.bucket_uuid).to eq(bucket_uuid)
-            expect(instance.state_history).to eq([])
+            expect(instance.bucket_name).to eq(bucket_name)
+            expect(instance.state).to eq('completed')
+            expect(instance.state_history).to eq(%i[reserved transfered completed])
           end
         end
       end
@@ -69,10 +70,10 @@ describe Eivu::Client::CloudFile, vcr: true do
   end
 
   describe '.reserve_or_fetch_by' do
-    subject(:instance) { described_class.reserve_or_fetch_by(bucket_name:, provider:, path_to_file:) }
+    subject(:instance) { described_class.reserve_or_fetch_by(bucket_uuid:, path_to_file:) }
 
     let(:md5) { described_class.generate_md5(path_to_file) }
-    let(:path_to_file) { File.expand_path('../../../fixtures/samples/test.mp3', __dir__) }
+    let(:path_to_file) { File.expand_path('../../../fixtures/samples/audio/test.mp3', __dir__) }
 
     context 'success' do
       context 'when md5 exists (fetch)' do
@@ -84,8 +85,8 @@ describe Eivu::Client::CloudFile, vcr: true do
           aggregate_failures do
             expect(instance.md5).to eq(md5)
             expect(instance.name).to be nil
-            expect(instance.bucket_uuid).to eq(bucket_uuid)
-            expect(instance.state_history).to eq([])
+            expect(instance.bucket_name).to eq(bucket_name)
+            expect(instance.state_history).to eq(%i[reserved])
             expect(instance.content_type).to eq('audio/mpeg')
           end
         end
@@ -100,7 +101,7 @@ describe Eivu::Client::CloudFile, vcr: true do
           aggregate_failures do
             expect(instance.md5).to eq(md5)
             expect(instance.asset).to be nil
-            expect(instance.bucket_uuid).to eq(bucket_uuid)
+            expect(instance.bucket_name).to eq(bucket_name)
             expect(instance.state_history).to eq(%i[reserved])
             expect(instance.content_type).to eq('audio/mpeg')
           end
@@ -109,7 +110,7 @@ describe Eivu::Client::CloudFile, vcr: true do
     end
 
     context 'failure' do
-      let(:path_to_file) { File.expand_path('../../../fixtures/samples/mov_bbb.mp4', __dir__) }
+      let(:path_to_file) { File.expand_path('../../../fixtures/samples/video/mov_bbb.mp4', __dir__) }
 
       context 'when server is offline' do
         before do
@@ -124,32 +125,32 @@ describe Eivu::Client::CloudFile, vcr: true do
       end
 
       context 'when bucket does not exist' do
-        let(:bucket_name) { 'missing-bucket' }
+        let(:bucket_uuid) { 'missing-bucket' }
 
         it 'raises an error' do
-          expect { instance }.to raise_error(Eivu::Client::Errors::Server::Connection)
+          expect { instance }.to raise_error(Eivu::Client::Errors::CloudStorage::MissingResource, /No bucket found with uuid/)
         end
       end
 
-      context 'when reserving file in wrong bucket' do
-        let(:bucket_name) { 'error' }
+      context 'when reserving file in bucket not owned by user' do
+        let(:bucket_uuid) { 'error' }
 
         it 'raises an error' do
-          expect { instance }.to raise_error(Eivu::Client::Errors::Server::Security)
+          expect { instance }.to raise_error(Eivu::Client::Errors::CloudStorage::MissingResource, /No bucket found with uuid/)
         end
       end
     end
   end
 
   describe '.reserve' do
-    subject(:reservation) { described_class.reserve(bucket_name:, provider:, path_to_file:) }
+    subject(:reservation) { described_class.reserve(path_to_file:, bucket_uuid:) }
 
     context 'success' do
       context 'when md5 does not exist' do
         let(:md5) { 'F45C04D717F3ED6720AE0A3A67981FE4' }
-        let(:path_to_file) { File.expand_path('../../../fixtures/samples/test.mp3', __dir__) }
+        let(:path_to_file) { File.expand_path('../../../fixtures/samples/audio/test.mp3', __dir__) }
 
-        it 'returns the proper object' do
+        it 'creates the proper object' do
           aggregate_failures do
             expect(reservation).to be_kind_of(described_class)
             expect(reservation.md5).to eq(md5)
@@ -163,7 +164,7 @@ describe Eivu::Client::CloudFile, vcr: true do
     end
 
     context 'failure' do
-      let(:path_to_file) { File.expand_path('../../../fixtures/samples/mov_bbb.mp4', __dir__) }
+      let(:path_to_file) { File.expand_path('../../../fixtures/samples/video/mov_bbb.mp4', __dir__) }
 
       context 'when server is offline' do
         before do
@@ -178,10 +179,10 @@ describe Eivu::Client::CloudFile, vcr: true do
       end
 
       context 'when bucket does not exist' do
-        let(:bucket_name) { 'missing-bucket' }
+        let(:bucket_uuid) { 'missing-bucket' }
 
         it 'raises an error' do
-          expect { reservation }.to raise_error(Eivu::Client::Errors::Server::Connection)
+          expect { reservation }.to raise_error(Eivu::Client::Errors::CloudStorage::MissingResource, /No bucket found with uuid/)
         end
       end
 
@@ -191,11 +192,11 @@ describe Eivu::Client::CloudFile, vcr: true do
         end
       end
 
-      context 'when reserving file in wrong bucket' do
-        let(:bucket_name) { 'error' }
+      context 'when reserving file in bucket not owned by user' do
+        let(:bucket_uuid) { 'error' }
 
         it 'raises an error' do
-          expect { reservation }.to raise_error(Eivu::Client::Errors::Server::Security)
+          expect { reservation }.to raise_error(Eivu::Client::Errors::CloudStorage::MissingResource, /No bucket found with uuid/)
         end
       end
     end
@@ -211,7 +212,7 @@ describe Eivu::Client::CloudFile, vcr: true do
 
     context 'success' do
       context 'when working with a reserved file' do
-        let(:path_to_file) { File.expand_path('../../../fixtures/samples/test.mp3', __dir__) }
+        let(:path_to_file) { File.expand_path('../../../fixtures/samples/audio/test.mp3', __dir__) }
 
         it 'has the correct attributes' do
           aggregate_failures do
@@ -230,7 +231,7 @@ describe Eivu::Client::CloudFile, vcr: true do
     context 'failure' do
       context 'when working with a file NOT reserved' do
         let(:path_to_file) do
-          File.expand_path('../../../fixtures/samples/Piano_brokencrash-Brandondorf-1164520478.mp3', __dir__)
+          File.expand_path('../../../fixtures/samples/audio/Piano_brokencrash-Brandondorf-1164520478.mp3', __dir__)
         end
 
         it 'will raise an exception' do
@@ -242,7 +243,18 @@ describe Eivu::Client::CloudFile, vcr: true do
 
   describe '#complete!' do
     subject(:completion) do
-      instance.complete!(year:, rating:, release_pos:, metadata_list:)
+      instance.complete!(data_profile)
+    end
+
+    let(:data_profile) do
+      {
+        path_to_file:,
+        rating:,
+        year:,
+        artists: [{ name: 'Sound Factory' }],
+        release: { primary_artist_name: 'Sound Factory', postion: release_pos },
+        metadata_list:
+      }
     end
 
     let(:instance) { build :cloud_file, :transfered, :test_mp3 }
@@ -250,17 +262,18 @@ describe Eivu::Client::CloudFile, vcr: true do
     let(:year) { 2019 }
     let(:rating) { 4.37 }
     let(:release_pos) { 1 }
+    let(:artist_name) { 'Polly' }
     let(:metadata_list) { [{ name: 'title' }, { genre: 'sample' }, { performer: 'aws' }, { performer: 'Polly' }] }
 
     context 'when working with a transfered file' do
-      let(:path_to_file) { File.expand_path('../../../fixtures/samples/test.mp3', __dir__) }
+      let(:path_to_file) { File.expand_path('../../../fixtures/samples/audio/test.mp3', __dir__) }
 
       it 'has the correct attributes' do
         aggregate_failures do
           expect(completion.year).to eq(year)
           expect(completion.rating).to eq(rating)
           expect(completion.release_pos).to eq(release_pos)
-          expect(completion.metadata).to eq(metadata_list)
+          expect(completion.metadata).to include(*metadata_list)
           expect(completion.state).to eq('completed')
           expect(completion.state_history).to eq(%i[reserved transfered completed])
         end

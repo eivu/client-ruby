@@ -3,7 +3,7 @@
 module Eivu
   class Client
     class Configuration
-      attr_writer :access_key_id, :secret_key, :bucket_name, :region, :user_token, :host, :endpoint, :bucket_location
+      attr_writer :access_key_id, :secret_key, :bucket_name, :bucket_uuid, :region, :user_token, :host, :endpoint, :bucket_location
 
       # Adds global configuration settings to the gem, including:
       #
@@ -58,6 +58,7 @@ module Eivu
         @access_key_id   = ENV.fetch('EIVU_ACCESS_KEY_ID')
         @secret_key      = ENV.fetch('EIVU_SECRET_ACCESS_KEY')
         @bucket_name     = ENV.fetch('EIVU_BUCKET_NAME')
+        @bucket_uuid     = ENV.fetch('EIVU_BUCKET_UUID')
         @bucket_location = ENV.fetch('EIVU_BUCKET_LOCATION') || :aws
         @region          = ENV.fetch('EIVU_REGION')
         @user_token      = ENV.fetch('EIVU_USER_TOKEN')
@@ -68,7 +69,7 @@ module Eivu
       def access_key_id
         unless @access_key_id
           raise Errors::Configuration,
-                'AWS access key id missing! See the documentation for configuration settings.'
+                'S3 access key id missing! See the documentation for configuration settings.'
         end
 
         @access_key_id
@@ -77,7 +78,7 @@ module Eivu
       def secret_key
         unless @secret_key
           raise Errors::Configuration,
-                'AWS secret key missing! See the documentation for configuration settings.'
+                'S3 secret key missing! See the documentation for configuration settings.'
         end
 
         @secret_key
@@ -86,10 +87,19 @@ module Eivu
       def bucket_name
         unless @bucket_name
           raise Errors::Configuration,
-                'AWS bucket name missing! See the documentation for configuration settings.'
+                'S3 bucket name missing! See the documentation for configuration settings.'
         end
 
         @bucket_name
+      end
+
+      def bucket_uuid
+        unless @bucket_uuid
+          raise Errors::Configuration,
+                'Eivu bucket uuid is missing! See the documentation for configuration settings.'
+        end
+
+        @bucket_uuid
       end
 
       def user_token

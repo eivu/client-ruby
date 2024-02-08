@@ -2,7 +2,7 @@
 http_interactions:
 - request:
     method: post
-    uri: "<EIVU_SERVER_HOST>/api/v1/cloud_files/F45C04D717F3ED6720AE0A3A67981FE4/transfer"
+    uri: "<EIVU_SERVER_HOST>/api/v1/buckets/<EIVU_BUCKET_UUID>/cloud_files/F45C04D717F3ED6720AE0A3A67981FE4/transfer"
     body:
       encoding: UTF-8
       string: content_type=audio%2Fmpeg&asset=test.mp3&filesize=4365

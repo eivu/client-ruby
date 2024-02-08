@@ -2,21 +2,76 @@
 http_interactions:
 - request:
     method: post
-    uri: "<EIVU_SERVER_HOST>/api/v1/cloud_files/F45C04D717F3ED6720AE0A3A67981FE4/reserve"
+    uri: "<EIVU_SERVER_HOST>/api/v1/buckets/<EIVU_BUCKET_UUID>/cloud_files/F45C04D717F3ED6720AE0A3A67981FE4/reserve"
     body:
       encoding: UTF-8
-      string: bucket_name=<EIVU_BUCKET_NAME>-test&provider=<EIVU_BUCKET_LOCATION>&peepy=false&nsfw=false&fullpath=%2FUsers%2Fjinx%2Fprojects%2F<EIVU_BUCKET_NAME>%2Fruby_client%2Fspec%2Ffixtures%2Fsamples%2Ftest.mp3
+      string: peepy=false&nsfw=false
     headers:
       Accept:
       - "*/*"
       User-Agent:
-      - rest-client/2.1.0 (darwin20 x86_64) ruby/3.1.2p20
+      - rest-client/2.1.0 (darwin23 arm64) ruby/3.1.2p20
       Authorization:
       - Token <EIVU_USER_TOKEN>
       Content-Length:
-      - '44'
+      - '22'
       Content-Type:
       - application/x-www-form-urlencoded
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Host:
+      - localhost:3000
+  response:
+    status:
+      code: 422
+      message: Unprocessable Content
+    headers:
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Xss-Protection:
+      - 1; mode=block
+      X-Content-Type-Options:
+      - nosniff
+      X-Download-Options:
+      - noopen
+      X-Permitted-Cross-Domain-Policies:
+      - none
+      Referrer-Policy:
+      - strict-origin-when-cross-origin
+      Content-Type:
+      - application/json; charset=utf-8
+      Cache-Control:
+      - no-cache
+      X-Request-Id:
+      - 46ceb710-30e0-4d36-948d-2096dc8a6e5f
+      X-Runtime:
+      - '0.009669'
+      Server-Timing:
+      - start_processing.action_controller;dur=0.03, sql.active_record;dur=1.36, instantiation.active_record;dur=0.11,
+        unpermitted_parameters.action_controller;dur=0.00, process_action.action_controller;dur=4.36
+      Vary:
+      - Origin
+      Set-Cookie:
+      - __profilin=p%3Dt; path=/; httponly; SameSite=Lax
+      Content-Length:
+      - '47'
+    body:
+      encoding: UTF-8
+      string: '{"message":"md5 already exists in this folder"}'
+  recorded_at: Sun, 04 Feb 2024 23:39:11 GMT
+- request:
+    method: get
+    uri: "<EIVU_SERVER_HOST>/api/v1/buckets/<EIVU_BUCKET_UUID>/cloud_files/F45C04D717F3ED6720AE0A3A67981FE4"
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      Accept:
+      - "*/*"
+      User-Agent:
+      - rest-client/2.1.0 (darwin23 arm64) ruby/3.1.2p20
+      Authorization:
+      - Token <EIVU_USER_TOKEN>
       Accept-Encoding:
       - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
       Host:
@@ -43,25 +98,24 @@ http_interactions:
       Cache-Control:
       - no-store, must-revalidate, private, max-age=0
       X-Request-Id:
-      - 0f65b3e6-6eec-4852-afa5-924d5db28211
+      - e47fd3b4-5da3-4a72-a03a-b64d4b3685d7
       X-Runtime:
-      - '0.308698'
+      - '0.014522'
       Server-Timing:
-      - sql.active_record;dur=81.964111328125, start_processing.action_controller;dur=0.19091796875,
-        instantiation.active_record;dur=19.910888671875, unpermitted_parameters.action_controller;dur=0.307861328125,
-        process_action.action_controller;dur=141.340087890625
+      - start_processing.action_controller;dur=0.02, sql.active_record;dur=5.35, instantiation.active_record;dur=0.25,
+        process_action.action_controller;dur=9.58
       Vary:
       - Origin
       X-Miniprofiler-Original-Cache-Control:
       - max-age=0, private, must-revalidate
       X-Miniprofiler-Ids:
-      - xx1mueqpsq5b0tl7573f
+      - mign9jvfezr3b27y24ov,brbdvrezdyj7h3wovq9o,p0d0lijez7xzisbk70ys,zpvv2un76dd15azxoy8v,u1xzu9ges1tll7wzz2ll,fxoa6uecqewvqsz7tu6t,mikj9hs2y7dq83whd09m,dv3nianixejcj5wlav6y,eamvfpx76fuljjta2g1y,4dse5e73oehc3f9wdf3r,z434fdxj2z1nh834fvg2,rvjp7plgw1kkfckz0676,qjk2pbuknk9kbwsz1ova,c242zsc1sim7r9aybxgq,v8gytgu0yfs5n3m31fwa,baze97lz7blhn6vnhzmz,e5r65dwbu16769xu29gz,u2milg0rsqpsmabjwkdl,wv4ivpge9d3sr9t7bpvp,9p96cmeu1l7thqdfcvke
       Set-Cookie:
-      - __profilin=p%3Dt; path=/; HttpOnly; SameSite=Lax
-      Transfer-Encoding:
-      - chunked
+      - __profilin=p%3Dt; path=/; httponly; SameSite=Lax
+      Content-Length:
+      - '591'
     body:
       encoding: UTF-8
-      string: '{"name":null,"asset":null,"md5":"F45C04D717F3ED6720AE0A3A67981FE4","content_type":null,"filesize":0,"description":null,"rating":null,"nsfw":false,"peepy":false,"created_at":"2022-06-28T18:46:25.381Z","updated_at":"2022-06-28T18:46:25.381Z","info_url":null,"duration":0,"ext_id":null,"data_source_id":null,"release_id":null,"year":null,"release_pos":null,"num_plays":0,"state":"reserved","bucket_uuid":"3b746ff6-82b3-4340-a745-ae6d5d375381","bucket_name":"<EIVU_BUCKET_NAME>","user_uuid":"1bf23eff-c27f-444e-96a9-6f25a6b98674","folder_uuid":null,"metadata":[]}'
-  recorded_at: Tue, 28 Jun 2022 18:46:25 GMT
+      string: '{"name":null,"asset":null,"md5":"F45C04D717F3ED6720AE0A3A67981FE4","content_type":null,"filesize":0,"description":null,"rating":null,"nsfw":false,"peepy":false,"created_at":"2024-02-04T23:39:11.098Z","updated_at":"2024-02-04T23:39:11.098Z","info_url":null,"duration":0,"ext_id":null,"data_source_id":null,"release_id":null,"year":null,"release_pos":null,"num_plays":0,"state":"reserved","last_viewed_at":null,"bucket_uuid":"<EIVU_BUCKET_UUID>","bucket_name":"<EIVU_BUCKET_NAME>","user_uuid":"1bf23eff-c27f-444e-96a9-6f25a6b98674","folder_uuid":null,"artwork_md5":null,"metadata":[]}'
+  recorded_at: Sun, 04 Feb 2024 23:39:11 GMT
 recorded_with: VCR 6.1.0

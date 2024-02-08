@@ -20,13 +20,14 @@ module Eivu
           mime = Client::Utils.detect_mime(path_to_file)
           case mime.mediatype
           when 'audio'
-            from_audio_file(mime, path_to_file)
+            from_audio_file(path_to_file, mime:)
           else
             extract_metadata_list(File.basename(path_to_file))
           end
         end
 
-        def from_audio_file(mime, path_to_file)
+        def from_audio_file(path_to_file, mime: nil)
+          mime ||= Client::Utils.detect_mime(path_to_file)
           acoustid_client = Eivu::Fingerprinter::Acoustid.new
           acoustid_client.generate(path_to_file)
           metadata_hash =
@@ -72,10 +73,12 @@ module Eivu
         end
 
         def extract_year(string)
+          string = File.basename(string)
           string.scan(YEAR_REGEX)&.flatten&.first
         end
 
         def extract_metadata_list(string)
+          string = File.basename(string)
           # remove year from string
           temp_string = string.gsub(YEAR_REGEX, '')
           {
@@ -92,6 +95,7 @@ module Eivu
         end
 
         def extract_rating(string)
+          string = File.basename(string)
           if string.starts_with?('__')
             5
           elsif string.starts_with?('_')

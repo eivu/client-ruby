@@ -19,6 +19,36 @@ module Eivu
           output
         end
 
+        def generate_data_profile(path_to_file:, override: {}, metadata_list: [])
+          metadata_list += MetadataExtractor.extract(path_to_file)
+          metadata_list << { original_local_path_to_file: path_to_file } unless override[:skip_original_local_path_to_file]
+          year          = MetadataExtractor.extract_year(path_to_file) || prune_from_metadata_list(metadata_list, 'eivu:year')
+          name          = override[:name] || Utils.prune_from_metadata_list(metadata_list, 'eivu:name')
+          artwork_md5   = prune_from_metadata_list(metadata_list, 'eivu:artwork_md5')
+          release_pos   = prune_from_metadata_list(metadata_list, 'eivu:release_pos')
+          duration      = prune_from_metadata_list(metadata_list, 'eivu:duration')
+          artist_name   = prune_from_metadata_list(metadata_list, 'eivu:artist_name')
+          release_name  = prune_from_metadata_list(metadata_list, 'eivu:release_name')
+          matched_recording = nil
+
+          {
+            path_to_file: override[:skip_original_local_path_to_file].blank? && path_to_file,
+            rating: MetadataExtractor.extract_rating(path_to_file),
+            name:,
+            year:,
+            duration:,
+            artists: [{ name: artist_name }],
+            release: {
+              primary_artist_name: artist_name,
+              name: release_name,
+              year:, postion: release_pos,
+              artwork_md5:
+            },
+            matched_recording:,
+            metadata_list:
+          }
+        end
+
         def prune_from_metadata_list(metadata_list, key)
           index = metadata_list.index {|hash| hash[key].present? }
           return nil if index.nil?
