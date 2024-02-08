@@ -25,17 +25,20 @@ describe Eivu::Client::Folder do
 
       it 'returns a list of files' do
         expect(traversal).to contain_exactly(
+          'spec/fixtures/samples/audio/Piano_brokencrash-Brandondorf-1164520478.mp3',
           'spec/fixtures/samples/audio/brothers_grimm/the_frog_prince/paragraph1.mp3',
           'spec/fixtures/samples/audio/brothers_grimm/the_frog_prince/paragraph2.mp3',
           'spec/fixtures/samples/audio/brothers_grimm/the_frog_prince/paragraph3.mp3',
           'spec/fixtures/samples/audio/brothers_grimm/the_frog_prince/paragraph4.mp3',
           'spec/fixtures/samples/audio/brothers_grimm/the_frog_prince/paragraph5.mp3',
-          'spec/fixtures/samples/Piano_brokencrash-Brandondorf-1164520478.mp3',
-          'spec/fixtures/samples/mov_bbb.mp4',
-          'spec/fixtures/samples/sample_640x360_beach.flv',
-          'spec/fixtures/samples/test.mp3',
+          'spec/fixtures/samples/audio/test.mp3',
           'spec/fixtures/samples/other/_Dredd ((Comic Book Movie)) ((p Karl Urban)) ((p Lena Headey)) ((s DNA Films)) ((script)) ((y 2012)).txt',
-          'spec/fixtures/samples/other/`Cowboy Bebop - Asteroid Blues ((anime)) ((script)) ((all time best)).txt'
+          'spec/fixtures/samples/other/`Cowboy Bebop - Asteroid Blues ((anime)) ((script)) ((all time best)).txt',
+          'spec/fixtures/samples/video/mov_bbb.mp4',
+          'spec/fixtures/samples/video/sample-5s.mp4',
+          'spec/fixtures/samples/video/sample_640x360.mp4',
+          'spec/fixtures/samples/video/sample_640x360_beach.flv',
+          'spec/fixtures/samples/video/sample_640x360_earth_spinning.mp4'
         )
       end
     end
