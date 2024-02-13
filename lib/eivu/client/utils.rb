@@ -25,7 +25,8 @@ module Eivu
           year          = MetadataExtractor.extract_year(path_to_file) || prune_from_metadata_list(metadata_list, 'eivu:year')
           name          = override[:name] || Utils.prune_from_metadata_list(metadata_list, 'eivu:name')
           artwork_md5   = prune_from_metadata_list(metadata_list, 'eivu:artwork_md5')
-          release_pos   = prune_from_metadata_list(metadata_list, 'eivu:release_pos')
+          position      = prune_from_metadata_list(metadata_list, 'eivu:release_pos')
+          bundle_pos    = prune_from_metadata_list(metadata_list, 'eivu:bundle_pos')
           duration      = prune_from_metadata_list(metadata_list, 'eivu:duration')
           artist_name   = prune_from_metadata_list(metadata_list, 'eivu:artist_name')
           release_name  = prune_from_metadata_list(metadata_list, 'eivu:release_name')
@@ -41,7 +42,7 @@ module Eivu
             release: {
               primary_artist_name: artist_name,
               name: release_name,
-              year:, postion: release_pos,
+              year:, position:, bundle_pos:,
               artwork_md5:
             },
             matched_recording:,
