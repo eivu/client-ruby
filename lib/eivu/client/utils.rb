@@ -30,10 +30,11 @@ module Eivu
           duration      = prune_from_metadata_list(metadata_list, 'eivu:duration')
           artist_name   = prune_from_metadata_list(metadata_list, 'eivu:artist_name')
           release_name  = prune_from_metadata_list(metadata_list, 'eivu:release_name')
-          matched_recording = nil
+          matched_recording  = nil
+          param_path_to_file = override[:skip_original_local_path_to_file].present? ? nil : path_to_file
 
           {
-            path_to_file: override[:skip_original_local_path_to_file].blank? && path_to_file,
+            path_to_file: param_path_to_file,
             rating: MetadataExtractor.extract_rating(path_to_file),
             name:,
             year:,
