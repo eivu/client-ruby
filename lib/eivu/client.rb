@@ -59,6 +59,8 @@ module Eivu
     end
 
     def upload_file(path_to_file:, peepy: false, nsfw: false, override: {}, metadata_list: [])
+      raise "Can not upload empty file: #{path_to_file}" if File.empty?(path_to_file)
+
       asset         = Utils.sanitize(File.basename(path_to_file))
       md5           = Eivu::Client::CloudFile.generate_md5(path_to_file)&.downcase
       log_tag       = "#{md5.first(5)}:#{asset}"

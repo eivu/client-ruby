@@ -44,6 +44,8 @@ module Eivu
           metadata_hash['eivu:name']            = metadata_hash['id3:title']
           metadata_hash['eivu:artist_name']     = metadata_hash['id3:artist']
           metadata_hash['eivu:release_name']    = metadata_hash['id3:album']
+          metadata_hash['eivu:bundle_pos']      = metadata_hash['id3:disc_nr']
+          metadata_hash['eivu:album_artist']    = metadata_hash['id3:band']
           artwork = upload_audio_artwork(path_to_file, metadata_hash.dup)
           metadata_hash['eivu:artwork_md5'] = artwork.md5 if artwork.present?
           metadata_hash.compact_blank.map { |k, v| { k => v } }
