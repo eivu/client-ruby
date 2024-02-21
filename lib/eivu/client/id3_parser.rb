@@ -26,7 +26,8 @@ module Eivu
           parsed_tag_id = V2_FRAMES[tag.id]
           next if parsed_tag_id.blank?
 
-          hash["id3:#{parsed_tag_id}"] = tag.content if tag.content.present?
+          content = tag.content&.gsub(/[^[:print:]]/, '')&.strip
+          hash["id3:#{parsed_tag_id}"] = content if content.present?
         end.compact
       end
 
@@ -36,7 +37,8 @@ module Eivu
         @mp3_info.v1_frames.each_with_object({}) do |tag, hash|
           next if tag.content.blank?
 
-          hash["id3:#{tag.id}"] = tag.content
+          content = tag.content&.gsub(/[^[:print:]]/, '')&.strip
+          hash["id3:#{tag.id}"] = content if content.present?
         end.compact
       end
 

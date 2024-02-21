@@ -28,6 +28,7 @@ module Eivu
       attribute  :created_at, Types::JSON::DateTime
       attribute  :updated_at, Types::JSON::DateTime
       attribute? :last_viewed_at, Types::JSON::DateTime.optional
+      attribute? :date_aquired, Types::JSON::DateTime.optional
       attribute? :name, Types::String.optional
       attribute? :asset, Types::String.optional
       attribute? :content_type, Types::String.optional
@@ -36,6 +37,7 @@ module Eivu
       attribute? :rating, Types::Coercible::Float.optional
       attribute? :nsfw, Types::Bool.default(false)
       attribute? :peepy, Types::Bool.default(false)
+      attribute? :deletable, Types::Bool.default(false)
       attribute? :folder_id, Types::Coercible::Integer.optional
       attribute? :ext_id, Types::String.optional
       attribute? :data_source_id, Types::Coercible::Integer.optional

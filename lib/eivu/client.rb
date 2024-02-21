@@ -12,6 +12,8 @@ module Eivu
   class Client
     attr_reader :status
 
+    TIMESTAMP = Time.now.to_f
+
     class << self
       def configuration
         @configuration ||= Configuration.new
@@ -50,6 +52,10 @@ module Eivu
       # end
       def upload_folder(path_to_folder:, peepy: false, nsfw: false)
         new.upload_folder(path_to_folder:, peepy:, nsfw:)
+      end
+
+      def reimport_failures(timestamp, peepy: false, nsfw: false)
+        new.reimport_failures(timestamp, peepy:, nsfw:)
       end
     end
 
@@ -94,7 +100,6 @@ module Eivu
       rescue StandardError => e
         track_failure(path_to_file, e)
       end
-      write_logs
       @status
     end
 
@@ -120,6 +125,22 @@ module Eivu
       @status
     end
 
+    def reimport_failures(timestamp, peepy: false, nsfw: false)
+      CSV.foreach("#{output_path}/output-#{timestamp}-failure.log", col_sep: '|') do |csv|
+        path_to_file = csv[0]
+        next unless File.exists?(path_to_file)
+
+        upload_file(path_to_file:, peepy:, nsfw:)
+        if verify_upload!(path_to_file)
+          track_success(path_to_file)
+        else
+          track_failure(path_to_file, 'upload did not complete')
+        end
+      rescue StandardError => e
+        track_failure(path_to_file, e)
+      end
+    end
+
     def verify_upload!(path_to_file)
       md5 = Eivu::Client::CloudFile.generate_md5(path_to_file)&.downcase
       instance = Eivu::Client::CloudFile.fetch(md5.upcase)
@@ -143,7 +164,7 @@ module Eivu
     def process_reservation_and_transfer(cloud_file:, path_to_file:, md5:, asset:)
       return unless cloud_file.reserved?
 
-      filesize      = File.size(path_to_file)
+      filesize = File.size(path_to_file)
       remote_path_to_file = "#{cloud_file.s3_folder}/#{Utils.sanitize(File.basename(path_to_file))}"
 
       log_tag = "#{md5.first(5)}:#{asset}"
@@ -176,19 +197,10 @@ module Eivu
       `./bin/s3etag.sh "#{path_to_file}" 5`&.strip
     end
 
-    def write_logs
-      FileUtils.mkdir_p('logs')
-      CSV.open('logs/success.csv', 'a+') do |success_log|
-        @status[:success].each { |v| success_log << [Time.now, v] }
-      end
-      CSV.open('logs/failure.csv', 'a+') do |failure_log|
-        @status[:failure].each { |v| failure_log << [Time.now, v] }
-      end
-    end
-
     def track_success(path_to_file)
       md5 = Eivu::Client::CloudFile.generate_md5(path_to_file)
       key = "#{path_to_file}|#{md5}"
+      File.write("#{output_path}/output-#{TIMESTAMP}-success.log", "#{key}|#{Time.now}\n", mode: 'a+')
       @status[:failure].delete(key)
       @status[:success][key] = 'Upload successful'
     end
@@ -196,6 +208,7 @@ module Eivu
     def track_failure(path_to_file, error)
       md5 = Eivu::Client::CloudFile.generate_md5(path_to_file)
       key = "#{path_to_file}|#{md5}"
+      File.write("#{output_path}/output-#{TIMESTAMP}-failure.log", "#{key}|#{Time.now}|#{error}\n", mode: 'a+')
       @status[:failure][key] = error
       @status[:success].delete(key)
     end
@@ -211,6 +224,10 @@ module Eivu
 
     def s3_credentials
       @s3_credentials ||= Aws::Credentials.new(configuration.access_key_id, configuration.secret_key)
+    end
+
+    def output_path
+      File.join(File.dirname(__FILE__), '../../logs')
     end
   end
 end

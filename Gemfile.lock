@@ -39,6 +39,8 @@ GEM
       mize
       tins (~> 1.0)
     amazing_print (1.5.0)
+    andyw8-itunes-library (0.1.4)
+      plist (>= 3.7.0)
     ast (2.4.2)
     aws-eventstream (1.2.0)
     aws-partitions (1.547.0)
@@ -118,12 +120,14 @@ GEM
     mimemagic (0.4.3)
       nokogiri (~> 1)
       rake
+    mini_portile2 (2.8.5)
     minitest (5.20.0)
     mize (0.4.1)
       protocol (~> 2.0)
     mutex_m (0.2.0)
     netrc (0.11.0)
-    nokogiri (1.16.2-arm64-darwin)
+    nokogiri (1.16.2)
+      mini_portile2 (~> 2.8.2)
       racc (~> 1.4)
     nokogiri-plist (0.5.0)
       nokogiri
@@ -132,6 +136,7 @@ GEM
     parser (3.2.2.4)
       ast (~> 2.4.1)
       racc
+    plist (3.7.1)
     protocol (2.0.0)
       ruby_parser (~> 3.0)
     pry (0.14.1)
@@ -205,6 +210,7 @@ PLATFORMS
 DEPENDENCIES
   activesupport (~> 7.1, >= 7.1.2)
   amazing_print (~> 1.5)
+  andyw8-itunes-library (~> 0.1.4)
   aws-sdk-s3 (~> 1.111, >= 1.111.1)
   concurrent-ruby (~> 1.2, >= 1.2.2)
   dry-struct (~> 1.6)
