@@ -47,6 +47,10 @@ module Eivu
         new.upload_file(path_to_file:, peepy:, nsfw:, metadata_list:, override:)
       end
 
+      def prune_successes(timestamp)
+        new.prune_successes(timestamp)
+      end
+
       # def upload_folder(*args)
       #   new.upload_folder(*args)
       # end
@@ -121,24 +125,42 @@ module Eivu
 
       pool.shutdown
       pool.wait_for_termination
-      write_logs
       @status
     end
 
-    def reimport_failures(timestamp, peepy: false, nsfw: false)
-      CSV.foreach("#{output_path}/output-#{timestamp}-failure.log", col_sep: '|') do |csv|
+    def prune_successes(timestamp)
+      CSV.foreach(success_log_path(timestamp)) do |csv|
         path_to_file = csv[0]
-        next unless File.exists?(path_to_file)
-
-        upload_file(path_to_file:, peepy:, nsfw:)
-        if verify_upload!(path_to_file)
-          track_success(path_to_file)
-        else
-          track_failure(path_to_file, 'upload did not complete')
+        if File.exist?(path_to_file)
+          Eivu::Logger.info "Removing #{path_to_file}", tags: 'pruning', label: Eivu::Client
+          File.delete(path_to_file)
         end
-      rescue StandardError => e
-        track_failure(path_to_file, e)
       end
+    end
+
+    def reimport_failures(timestamp, peepy: false, nsfw: false)
+      pool = Concurrent::FixedThreadPool.new(5)
+
+      CSV.foreach(failure_log_path(timestamp)) do |csv|
+        path_to_file = csv[0]
+        next unless File.exist?(path_to_file)
+        next if File.empty?(path_to_file)
+
+        pool.post do
+          upload_file(path_to_file:, peepy:, nsfw:)
+          if verify_upload!(path_to_file)
+            track_success(path_to_file)
+          else
+            track_failure(path_to_file, 'upload did not complete')
+          end
+        rescue StandardError => e
+          track_failure(path_to_file, e)
+        end
+      end
+
+      pool.shutdown
+      pool.wait_for_termination
+      @status
     end
 
     def verify_upload!(path_to_file)
@@ -160,6 +182,14 @@ module Eivu
     end
 
     private
+
+    def failure_log_path(timestamp = TIMESTAMP)
+      "#{output_path}/output-#{timestamp}-failure.csv"
+    end
+
+    def success_log_path(timestamp = TIMESTAMP)
+      "#{output_path}/output-#{timestamp}-success.csv"
+    end
 
     def process_reservation_and_transfer(cloud_file:, path_to_file:, md5:, asset:)
       return unless cloud_file.reserved?
@@ -200,7 +230,15 @@ module Eivu
     def track_success(path_to_file)
       md5 = Eivu::Client::CloudFile.generate_md5(path_to_file)
       key = "#{path_to_file}|#{md5}"
-      File.write("#{output_path}/output-#{TIMESTAMP}-success.log", "#{key}|#{Time.now}\n", mode: 'a+')
+
+      CSV.open(success_log_path, 'a+') do |csv|
+        csv << [
+          path_to_file,
+          md5,
+          Time.now
+        ]
+      end
+
       @status[:failure].delete(key)
       @status[:success][key] = 'Upload successful'
     end
@@ -208,7 +246,16 @@ module Eivu
     def track_failure(path_to_file, error)
       md5 = Eivu::Client::CloudFile.generate_md5(path_to_file)
       key = "#{path_to_file}|#{md5}"
-      File.write("#{output_path}/output-#{TIMESTAMP}-failure.log", "#{key}|#{Time.now}|#{error}\n", mode: 'a+')
+
+      CSV.open(failure_log_path, 'a+') do |csv|
+        csv << [
+          path_to_file,
+          md5,
+          Time.now,
+          error
+        ]
+      end
+
       @status[:failure][key] = error
       @status[:success].delete(key)
     end
