@@ -10,14 +10,24 @@ Eivu::Client.new.upload_folder path_to_folder: 'spec/fixtures/samples/audio/'
 Eivu::Client.new.upload_folder_via_multithread path_to_folder: 'spec/fixtures/samples'
 Eivu::Client.new.upload_folder peepy: true, nsfw: true, path_to_folder: 'spec/fixtures/samples'
 Eivu::Client.new.upload_folder peepy: true, nsfw: true, path_to_folder: 'spec/fixtures/samples'
-Eivu::Client::MetadataExtractor.from_audio_file 'spec/fixtures/samples/Piano_brokencrash-Brandondorf-1164520478.mp3', 
+Eivu::Client::MetadataExtractor.from_audio_file 'spec/fixtures/samples/Piano_brokencrash-Brandondorf-1164520478.mp3',
 ```
 
-
-
 Requirements
+
 - node
 - python
 - [yt-dlp](https://github.com/yt-dlp/yt-dlp)
 - Download the [fpcalc binary](https://acoustid.org/chromaprint)
 
+## Installation
+
+### fpcalc binary
+
+Download the [fpcalc binary](https://acoustid.org/chromaprint)
+
+(mac/linux) move the binary to `/usr/local/bin`
+
+### Mime Magic Support
+
+(mac) run `brew install shared-mime-info` before you run `bundle install`
