@@ -10,6 +10,12 @@ module Eivu
       RATING_425_REGEX = /^`/
 
       class << self
+        def online?(uri)
+          url = URI.parse(uri)
+          req = Net::HTTP.new(url.host, url.port)
+          req.request_head(url.path).code == '200'
+        end
+
         def generate_remote_url(configuration, cloud_file, path_to_file)
           # the value s3.wasabisys.com should retrieved from the eivu server
           # on boot so it is not hard coded

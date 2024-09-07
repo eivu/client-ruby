@@ -72,8 +72,9 @@ module Eivu
 
       process_reservation_and_transfer(cloud_file:, path_to_file:, md5:, asset:)
 
-      # If the file is offline, we can not proceed
-      raise "File #{md5} is offline" unless cloud_file.online?
+      # Generate remote URL and raise error if file offline
+      file_url = Eivu::Client::Utils.generate_remote_url(configuration, cloud_file, path_to_file)
+      raise "File #{md5} is offline" unless Utils.online? file_url
 
       if cloud_file.transfered?
         Eivu::Logger.info 'Completing', tags: log_tag, label: Eivu::Client
@@ -147,7 +148,7 @@ module Eivu
       return unless cloud_file.reserved?
 
       filesize = File.size(path_to_file)
-      remote_path_to_file = "#{cloud_file.s3_folder}/#{Utils.sanitize(File.basename(path_to_file))}"
+      remote_path_to_file = Eivu::Client::Utils.generate_remote_path(cloud_file, path_to_file)
 
       log_tag = "#{md5.first(5)}:#{asset}"
       Eivu::Logger.info 'Writing to S3', tags: log_tag, label: Eivu::Client
@@ -161,9 +162,10 @@ module Eivu
       end
 
       validate_remote_md5!(remote_path_to_file:, path_to_file:, md5:)
+      file_url = Eivu::Client::Utils.generate_remote_url(configuration, cloud_file, path_to_file)
 
       Eivu::Logger.info 'Transfering', tags: log_tag, label: Eivu::Client
-      cloud_file.transfer!(asset:, filesize:) if cloud_file.online?
+      cloud_file.transfer!(asset:, filesize:) if Utils.online? file_url
     end
 
     def retrieve_remote_md5(remote_path_to_file)
