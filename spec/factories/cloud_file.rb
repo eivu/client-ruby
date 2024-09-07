@@ -15,6 +15,10 @@ FactoryBot.define do
     filesize { rand((100.kilobytes)..(2.gigabytes)) }
     state_history { [:reserved] }
 
+    trait :delicate do
+      peepy { true }
+    end
+
     trait :peepy do
       peepy { true }
     end

@@ -4,6 +4,51 @@
 # require 'eivu'
 
 describe Eivu::Client::Utils do
+  describe '.md5_as_folders' do
+    subject(:md5_as_folders) { described_class.md5_as_folders(md5) }
+
+    context 'F45C04D717F3ED6720AE0A3A67981FE4' do
+      let(:md5) { 'F45C04D717F3ED6720AE0A3A67981FE4' }
+
+      it { is_expected.to eq('F4/5C/04/D7/17/F3/ED/67/20/AE/0A/3A/67/98/1F/E4') }
+    end
+
+    context 'f45c04d717f3ed6720ae0a3a67981fe4' do
+      let(:md5) { 'f45c04d717f3ed6720ae0a3a67981fe4' }
+
+      it { is_expected.to eq('F4/5C/04/D7/17/F3/ED/67/20/AE/0A/3A/67/98/1F/E4') }
+    end
+  end
+
+  describe '.generate_remote_path' do
+    subject(:remote_path) { described_class.generate_remote_path(cloud_file, path_to_file) }
+
+    let(:cloud_file) { build(:cloud_file) }
+    let(:path_to_file) { 'path/to/file.xyz' }
+    let(:md5_as_folders) { described_class.md5_as_folders(cloud_file.md5) }
+
+    context 'audio content' do
+      it { is_expected.to eq("audio/#{md5_as_folders}/file.xyz") }
+    end
+
+    context 'video content' do
+      it { is_expected.to eq("video/#{md5_as_folders}/file.xyz") }
+    end
+
+    context 'image content' do
+      it { is_expected.to eq("image/#{md5_as_folders}/file.xyz") }
+    end
+
+    # context 'archive content' do
+    # end
+
+    context 'delicate content' do
+      let(:cloud_file) { build(:cloud_file, :delicate) }
+
+      it { is_expected.to eq("delicates/#{md5_as_folders}/file.xyz") }
+    end
+  end
+
   describe '.prune_metadata' do
     subject(:pruning) { described_class.prune_metadata(string) }
 
