@@ -46,10 +46,16 @@ module Eivu
       attribute? :year, Types::Coercible::Integer.optional
       attribute? :duration, Types::Coercible::Integer.optional
       attribute? :info_url, Types::String.optional
+      attribute? :url, Types::String.optional
       attribute? :metadata, Types::JSON::Array.of(Types::JSON::Hash)
+      attribute? :date_aquired, Types::JSON::DateTime.optional
+      attribute? :deletable, Types::Bool.default(false)
+      attribute? :shared, Types::Bool.default(false)
+      attribute? :delicate, Types::Bool.default(false)
 
       class << self
-        def reserve_or_fetch_by(path_to_file:, peepy: false, nsfw: false, bucket_uuid: Eivu::Client.configuration.bucket_uuid)
+        def reserve_or_fetch_by(path_to_file:, peepy: false, nsfw: false,
+                                bucket_uuid: Eivu::Client.configuration.bucket_uuid)
           reserve(path_to_file:, peepy:, nsfw:, bucket_uuid:)
         rescue Errors::Server::InvalidCloudFileState
           md5 = generate_md5(path_to_file)
@@ -60,22 +66,22 @@ module Eivu
 
         def fetch(md5, bucket_uuid: Eivu::Client.configuration.bucket_uuid)
           response = RestClient.get(
-            "#{Eivu::Client.configuration.host}/api/v1/buckets/#{bucket_uuid}/cloud_files/#{md5}",
+            "#{Eivu::Client.configuration.host}/api/upload/v1/buckets/#{bucket_uuid}/cloud_files/#{md5}",
             { 'Authorization' => "Token #{Eivu::Client.configuration.user_token}" }
           )
-
           cloud_file = CloudFile.new Oj.load(response.body).symbolize_keys
           cloud_file.infer_state_history!
           cloud_file
         rescue RestClient::Forbidden
-          raise Errors::CloudStorage::MissingResource, "No bucket found with uuid: #{Eivu::Client.configuration.bucket_uuid}"
+          raise Errors::CloudStorage::MissingResource,
+                "No bucket found with uuid: #{Eivu::Client.configuration.bucket_uuid}"
         rescue RestClient::NotFound
           raise Errors::CloudStorage::MissingResource, "Cloud file #{md5} not found"
         end
 
         def post_request(action:, md5:, payload:, bucket_uuid: Eivu::Client.configuration.bucket_uuid)
           response = RestClient.post(
-            "#{Eivu::Client.configuration.host}/api/v1/buckets/#{bucket_uuid}/cloud_files/#{md5}/#{action}",
+            "#{Eivu::Client.configuration.host}/api/upload/v1/buckets/#{bucket_uuid}/cloud_files/#{md5}/#{action}",
             payload,
             { 'Authorization' => "Token #{Eivu::Client.configuration.user_token}" }
           )
@@ -84,11 +90,13 @@ module Eivu
 
           Oj.load(response.body).deep_symbolize_keys
         rescue RestClient::Forbidden
-          raise Errors::CloudStorage::MissingResource, "No bucket found with uuid: #{Eivu::Client.configuration.bucket_uuid}"
+          raise Errors::CloudStorage::MissingResource,
+                "No bucket found with uuid: #{Eivu::Client.configuration.bucket_uuid}"
         rescue RestClient::UnprocessableEntity
           raise Errors::Server::InvalidCloudFileState, "Failed to reserve file: #{md5}"
         rescue Errno::ECONNREFUSED
-          raise Errors::Server::Connection, "Failed to connect to eivu server: #{Eivu::Client.configuration.host}"
+          raise Errors::Server::Connection,
+                "Failed to connect to eivu server: #{Eivu::Client.configuration.host}"
         end
 
         def generate_md5(path_to_file)
@@ -104,6 +112,12 @@ module Eivu
           instance.state_history = [STATE_RESERVED]
           instance
         end
+      end
+
+      def online?
+        parsed_url = URI.parse(url)
+        req = Net::HTTP.new(parsed_url.host, parsed_url.port)
+        req.request_head(parsed_url.path).code == '200'
       end
 
       def transfer!(asset:, filesize:)
