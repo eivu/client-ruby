@@ -151,15 +151,14 @@ module Eivu
         system "open #{url}"
       end
 
-      def s3_folder
-        folder =
-          if peepy
-            'delicates'
-          else
-            content_type.to_s.split('/')&.first
-          end
+      def grouping
+        return 'delicates' if peepy
 
-        "#{folder}/#{md5.upcase.scan(/.{2}|.+/).join('/')}"
+        content_type.to_s.split('/')&.first
+      end
+
+      def s3_folder
+        "#{grouping}/#{Client::Utils.md5_as_folders(md5)}"
       end
 
       def reserved?
