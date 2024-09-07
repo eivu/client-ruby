@@ -21,31 +21,40 @@ describe Eivu::Client::Utils do
   end
 
   describe '.generate_remote_path' do
-    subject(:remote_path) { described_class.generate_remote_path(cloud_file, path_to_file) }
+    subject(:generated_remote_path) { described_class.generate_remote_path(cloud_file, path_to_file) }
 
-    let(:cloud_file) { build(:cloud_file) }
-    let(:path_to_file) { 'path/to/file.xyz' }
+    let(:path_to_file) { "Faker::File.dir/#{cloud_file.asset}" }
     let(:md5_as_folders) { described_class.md5_as_folders(cloud_file.md5) }
+    let(:remote_path) { "#{cloud_file.grouping}/#{md5_as_folders}/#{described_class.sanitize(cloud_file.asset)}" }
 
     context 'audio content' do
-      it { is_expected.to eq("audio/#{md5_as_folders}/file.xyz") }
+      let(:cloud_file) { build(:cloud_file, :audio) }
+
+      it { is_expected.to eq(remote_path) }
     end
 
     context 'video content' do
-      it { is_expected.to eq("video/#{md5_as_folders}/file.xyz") }
+      let(:cloud_file) { build(:cloud_file, :video) }
+
+      it { is_expected.to eq(remote_path) }
     end
 
     context 'image content' do
-      it { is_expected.to eq("image/#{md5_as_folders}/file.xyz") }
+      let(:cloud_file) { build(:cloud_file, :image) }
+
+      it { is_expected.to eq(remote_path) }
     end
 
-    # context 'archive content' do
-    # end
+    context 'archive content' do
+      let(:cloud_file) { build(:cloud_file, :other) }
+
+      it { is_expected.to eq(remote_path) }
+    end
 
     context 'delicate content' do
       let(:cloud_file) { build(:cloud_file, :delicate) }
 
-      it { is_expected.to eq("delicates/#{md5_as_folders}/file.xyz") }
+      it { is_expected.to eq(remote_path) }
     end
   end
 

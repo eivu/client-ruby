@@ -49,6 +49,12 @@ FactoryBot.define do
       asset { "#{Faker::Lorem.word.downcase}.mp4" }
     end
 
+    trait :image do
+      content_type { 'image/png' }
+      filesize { rand((750.kilobytes)..(10.megabytes)) }
+      asset { "#{Faker::Lorem.word.downcase}.png" }
+    end
+
     trait :other do
       content_type { 'application/pdf' }
       filesize { rand((750.kilobytes)..(10.megabytes)) }
