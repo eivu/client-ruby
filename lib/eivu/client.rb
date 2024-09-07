@@ -72,6 +72,7 @@ module Eivu
 
       process_reservation_and_transfer(cloud_file:, path_to_file:, md5:, asset:)
 
+      # If the file is offline, we can not proceed
       raise "File #{md5} is offline" unless cloud_file.online?
 
       if cloud_file.transfered?
