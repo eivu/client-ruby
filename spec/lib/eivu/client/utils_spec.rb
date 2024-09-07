@@ -20,6 +20,51 @@ describe Eivu::Client::Utils do
     end
   end
 
+  describe '.generate_remote_url' do
+    before do
+      stub_const 'ENV', ENV.to_h.merge('EIVU_BUCKET_NAME' => bucket_name)
+    end
+
+    subject(:generated_remote_url) do
+      described_class.generate_remote_url(Eivu::Client::Configuration.new, cloud_file, path_to_file)
+    end
+
+    let(:bucket_name) { 'eivu-test-bucket' }
+    let(:path_to_file) { "Faker::File.dir/#{cloud_file.asset}" }
+    let(:md5_as_folders) { described_class.md5_as_folders(cloud_file.md5) }
+    let(:remote_url) { "http://#{bucket_name}.s3.wasabisys.com/#{cloud_file.grouping}/#{md5_as_folders}/#{described_class.sanitize(cloud_file.asset)}" }
+
+    context 'video content' do
+      let(:cloud_file) { build(:cloud_file, :video) }
+
+      it { is_expected.to eq(remote_url) }
+    end
+
+    context 'audio content' do
+      let(:cloud_file) { build(:cloud_file, :audio) }
+
+      it { is_expected.to eq(remote_url) }
+    end
+
+    context 'image content' do
+      let(:cloud_file) { build(:cloud_file, :image) }
+
+      it { is_expected.to eq(remote_url) }
+    end
+
+    context 'archive content' do
+      let(:cloud_file) { build(:cloud_file, :other) }
+
+      it { is_expected.to eq(remote_url) }
+    end
+
+    context 'delicate content' do
+      let(:cloud_file) { build(:cloud_file, :delicate) }
+
+      it { is_expected.to eq(remote_url) }
+    end
+  end
+
   describe '.generate_remote_path' do
     subject(:generated_remote_path) { described_class.generate_remote_path(cloud_file, path_to_file) }
 

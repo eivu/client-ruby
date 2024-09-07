@@ -11,10 +11,9 @@ module Eivu
 
       class << self
         def generate_remote_url(configuration, cloud_file, path_to_file)
-          file_url = 'http://'
-          file_url << configuration.bucket_name
-          file_url << 's3.wasabisys.com/'
-          file_url << generate_remote_path(cloud_file, path_to_file)
+          # the value s3.wasabisys.com should retrieved from the eivu server
+          # on boot so it is not hard coded
+          "http://#{configuration.bucket_name}.s3.wasabisys.com/#{generate_remote_path(cloud_file, path_to_file)}"
         end
 
         def generate_remote_path(cloud_file, path_to_file)
