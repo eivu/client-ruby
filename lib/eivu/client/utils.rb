@@ -23,7 +23,9 @@ module Eivu
         end
 
         def generate_remote_path(cloud_file, path_to_file)
-          "#{cloud_file.s3_folder}/#{Utils.sanitize(File.basename(path_to_file))}"
+          filename = File.basename(path_to_file)
+          filename = 'cover-art.png' if filename.starts_with?(Client::MetadataExtractor::COVERART_PREFIX)
+          "#{cloud_file.s3_folder}/#{Utils.sanitize(filename)}"
         end
 
         def md5_as_folders(md5)

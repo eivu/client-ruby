@@ -55,6 +55,12 @@ FactoryBot.define do
       asset { "#{Faker::Lorem.word.downcase}.png" }
     end
 
+    trait :coverart do
+      content_type { 'image/png' }
+      filesize { rand((750.kilobytes)..(1.megabytes)) }
+      asset { "#{Eivu::Client::MetadataExtractor::COVERART_PREFIX}-#{Faker::Lorem.word.downcase}.png" }
+    end
+
     trait :other do
       content_type { 'application/pdf' }
       filesize { rand((750.kilobytes)..(10.megabytes)) }

@@ -34,6 +34,13 @@ describe Eivu::Client::Utils do
     let(:md5_as_folders) { described_class.md5_as_folders(cloud_file.md5) }
     let(:remote_url) { "http://#{bucket_name}.s3.wasabisys.com/#{cloud_file.grouping}/#{md5_as_folders}/#{described_class.sanitize(cloud_file.asset)}" }
 
+    context 'coverart' do
+      let(:cloud_file) { build(:cloud_file, :coverart) }
+      let(:remote_url) { "http://#{bucket_name}.s3.wasabisys.com/image/#{md5_as_folders}/cover-art.png" }
+
+      it { is_expected.to eq(remote_url) }
+    end
+
     context 'video content' do
       let(:cloud_file) { build(:cloud_file, :video) }
 
@@ -71,6 +78,13 @@ describe Eivu::Client::Utils do
     let(:path_to_file) { "Faker::File.dir/#{cloud_file.asset}" }
     let(:md5_as_folders) { described_class.md5_as_folders(cloud_file.md5) }
     let(:remote_path) { "#{cloud_file.grouping}/#{md5_as_folders}/#{described_class.sanitize(cloud_file.asset)}" }
+
+    context 'coverart' do
+      let(:cloud_file) { build(:cloud_file, :coverart) }
+      let(:remote_path) { "image/#{md5_as_folders}/cover-art.png" }
+
+      it { is_expected.to eq(remote_path) }
+    end
 
     context 'audio content' do
       let(:cloud_file) { build(:cloud_file, :audio) }
