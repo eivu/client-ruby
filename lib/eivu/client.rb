@@ -41,7 +41,7 @@ module Eivu
       # def upload_file(*args)
       #   new.upload_file(*args)
       # end
-      def upload_file(path_to_file:, peepy: false, nsfw: false, metadata_list: [], override:)
+      def upload_file(path_to_file:, override:, peepy: false, nsfw: false, metadata_list: [])
         new.upload_file(path_to_file:, peepy:, nsfw:, metadata_list:, override:)
       end
 
@@ -71,6 +71,8 @@ module Eivu
                                                  path_to_file:, peepy:, nsfw:)
 
       process_reservation_and_transfer(cloud_file:, path_to_file:, md5:, asset:)
+
+      raise "File #{md5} is offline" unless cloud_file.online?
 
       if cloud_file.transfered?
         Eivu::Logger.info 'Completing', tags: log_tag, label: Eivu::Client
@@ -143,7 +145,7 @@ module Eivu
     def process_reservation_and_transfer(cloud_file:, path_to_file:, md5:, asset:)
       return unless cloud_file.reserved?
 
-      filesize      = File.size(path_to_file)
+      filesize = File.size(path_to_file)
       remote_path_to_file = "#{cloud_file.s3_folder}/#{Utils.sanitize(File.basename(path_to_file))}"
 
       log_tag = "#{md5.first(5)}:#{asset}"
@@ -160,7 +162,7 @@ module Eivu
       validate_remote_md5!(remote_path_to_file:, path_to_file:, md5:)
 
       Eivu::Logger.info 'Transfering', tags: log_tag, label: Eivu::Client
-      cloud_file.transfer!(asset:, filesize:)
+      cloud_file.transfer!(asset:, filesize:) if cloud_file.online?
     end
 
     def retrieve_remote_md5(remote_path_to_file)
@@ -169,7 +171,7 @@ module Eivu
           bucket: configuration.bucket_name,
           key: remote_path_to_file
         }
-      )&.etag&.gsub(/"/, '')
+      )&.etag&.gsub('"', '')
     end
 
     def generate_etag(path_to_file)
