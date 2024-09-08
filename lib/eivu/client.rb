@@ -61,7 +61,7 @@ module Eivu
     def upload_file(path_to_file:, peepy: false, nsfw: false, override: {}, metadata_list: [])
       raise "Can not upload empty file: #{path_to_file}" if File.empty?(path_to_file)
 
-      asset         = Utils.sanitize(File.basename(path_to_file))
+      asset         = Utils.cleansed_asset_name(path_to_file)
       md5           = Eivu::Client::CloudFile.generate_md5(path_to_file)&.downcase
       log_tag       = "#{md5.first(5)}:#{asset}"
       data_profile  = Utils.generate_data_profile(path_to_file:, override:, metadata_list:)
@@ -73,8 +73,10 @@ module Eivu
       process_reservation_and_transfer(cloud_file:, path_to_file:, md5:, asset:)
 
       # Generate remote URL and raise error if file offline
-      file_url = Eivu::Client::Utils.generate_remote_url(configuration, cloud_file, path_to_file)
-      raise "File #{md5} is offline" unless Utils.online? file_url
+      if Utils.online?(cloud_file.url) == false
+        cloud_file.reset # set state back to reserved
+        raise "File #{md5}:#{asset} is offline"
+      end
 
       if cloud_file.transfered?
         Eivu::Logger.info 'Completing', tags: log_tag, label: Eivu::Client

@@ -114,6 +114,13 @@ module Eivu
         end
       end
 
+      def reset
+        parsed_body  = post_request(action: :reset)
+        instance     = CloudFile.new parsed_body.merge(content_type:)
+        instance.state_history = [STATE_RESERVED]
+        instance
+      end
+
       def online?
         parsed_url = URI.parse(url)
         req = Net::HTTP.new(parsed_url.host, parsed_url.port)
@@ -187,7 +194,7 @@ module Eivu
 
       private
 
-      def post_request(action:, payload:)
+      def post_request(action:, payload: {})
         self.class.post_request(action:, md5:, payload:)
       end
     end
