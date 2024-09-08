@@ -22,10 +22,14 @@ module Eivu
           "http://#{configuration.bucket_name}.s3.wasabisys.com/#{generate_remote_path(cloud_file, path_to_file)}"
         end
 
-        def generate_remote_path(cloud_file, path_to_file)
+        def cleansed_asset_name(path_to_file)
           filename = File.basename(path_to_file)
           filename = 'cover-art.png' if filename.starts_with?(Client::MetadataExtractor::COVERART_PREFIX)
-          "#{cloud_file.s3_folder}/#{Utils.sanitize(filename)}"
+          Utils.sanitize(filename)
+        end
+
+        def generate_remote_path(cloud_file, path_to_file)
+          "#{cloud_file.s3_folder}/#{Utils.cleansed_asset_name(path_to_file)}"
         end
 
         def md5_as_folders(md5)

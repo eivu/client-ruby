@@ -20,6 +20,24 @@ describe Eivu::Client::Utils do
     end
   end
 
+  describe '.cleansed_asset_name' do
+    subject(:cleansed_asset_name) { described_class.cleansed_asset_name(path_to_file) }
+
+    let(:path_to_file) { 'path/to/file.xyz' }
+
+    context 'cover-art' do
+      let(:path_to_file) { "path/to/#{Eivu::Client::MetadataExtractor::COVERART_PREFIX}-arctic-blast.png" }
+
+      it { is_expected.to eq('cover-art.png') }
+    end
+
+    context 'non cover-art' do
+      let(:path_to_file) { 'path/to/file.xyz' }
+
+      it { is_expected.to eq('file.xyz') }
+    end
+  end
+
   describe '.generate_remote_url' do
     before do
       stub_const 'ENV', ENV.to_h.merge('EIVU_BUCKET_NAME' => bucket_name)
