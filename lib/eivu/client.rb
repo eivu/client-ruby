@@ -12,6 +12,8 @@ module Eivu
   class Client
     attr_reader :status
 
+    SKIPPABLE_EXTENSIONS = %w[.DS_Store gitignore gitkeep sfz info nfo m3u db.lo db.lo.1].freeze
+
     class << self
       def configuration
         @configuration ||= Configuration.new
@@ -41,7 +43,7 @@ module Eivu
       # def upload_file(*args)
       #   new.upload_file(*args)
       # end
-      def upload_file(path_to_file:, peepy: false, nsfw: false, metadata_list: [], override:)
+      def upload_file(path_to_file:, override:, peepy: false, nsfw: false, metadata_list: [])
         new.upload_file(path_to_file:, peepy:, nsfw:, metadata_list:, override:)
       end
 
@@ -50,6 +52,16 @@ module Eivu
       # end
       def upload_folder(path_to_folder:, peepy: false, nsfw: false)
         new.upload_folder(path_to_folder:, peepy:, nsfw:)
+      end
+
+      def upload_or_fetch_file(path_to_file:, peepy: false, nsfw: false, override: {}, metadata_list: [])
+        upload_file(path_to_file:, peepy:, nsfw:, override:, metadata_list:)
+      rescue Errors::Server::InvalidCloudFileState
+        asset         = Utils.cleansed_asset_name(path_to_file)
+        md5           = Eivu::Client::CloudFile.generate_md5(path_to_file)
+        log_tag       = "#{md5.first(5).downcase}:#{asset}"
+        Eivu::Logger.info 'File exists, skipping to fetch', tags: log_tag, label: Eivu::Client
+        Eivu::Client::CloudFile.fetch(md5)
       end
     end
 
@@ -61,7 +73,7 @@ module Eivu
     def upload_file(path_to_file:, peepy: false, nsfw: false, override: {}, metadata_list: [])
       raise "Can not upload empty file: #{path_to_file}" if File.empty?(path_to_file)
 
-      asset         = Utils.sanitize(File.basename(path_to_file))
+      asset         = Utils.cleansed_asset_name(path_to_file)
       md5           = Eivu::Client::CloudFile.generate_md5(path_to_file)&.downcase
       log_tag       = "#{md5.first(5)}:#{asset}"
       data_profile  = Utils.generate_data_profile(path_to_file:, override:, metadata_list:)
@@ -71,6 +83,12 @@ module Eivu
                                                  path_to_file:, peepy:, nsfw:)
 
       process_reservation_and_transfer(cloud_file:, path_to_file:, md5:, asset:)
+
+      # Generate remote URL and raise error if file offline
+      if Utils.online?(cloud_file.url) == false
+        cloud_file.reset # set state back to reserved
+        raise "File #{md5}:#{asset} is offline"
+      end
 
       if cloud_file.transfered?
         Eivu::Logger.info 'Completing', tags: log_tag, label: Eivu::Client
@@ -85,6 +103,8 @@ module Eivu
 
     def upload_folder(path_to_folder:, peepy: false, nsfw: false)
       Folder.traverse(path_to_folder) do |path_to_file|
+        next if SKIPPABLE_EXTENSIONS.any? { |suffix| path_to_file.end_with?(suffix) }
+
         upload_file(path_to_file:, peepy:, nsfw:)
         if verify_upload!(path_to_file)
           track_success(path_to_file)
@@ -102,6 +122,8 @@ module Eivu
       pool = Concurrent::FixedThreadPool.new(5)
 
       Folder.traverse(path_to_folder) do |path_to_file|
+        next if SKIPPABLE_EXTENSIONS.any? { |suffix| path_to_file.end_with?(suffix) }
+
         pool.post do
           upload_file(path_to_file:, peepy:, nsfw:)
           if verify_upload!(path_to_file)
@@ -143,8 +165,8 @@ module Eivu
     def process_reservation_and_transfer(cloud_file:, path_to_file:, md5:, asset:)
       return unless cloud_file.reserved?
 
-      filesize      = File.size(path_to_file)
-      remote_path_to_file = "#{cloud_file.s3_folder}/#{Utils.sanitize(File.basename(path_to_file))}"
+      filesize = File.size(path_to_file)
+      remote_path_to_file = Eivu::Client::Utils.generate_remote_path(cloud_file, path_to_file)
 
       log_tag = "#{md5.first(5)}:#{asset}"
       Eivu::Logger.info 'Writing to S3', tags: log_tag, label: Eivu::Client
@@ -158,9 +180,10 @@ module Eivu
       end
 
       validate_remote_md5!(remote_path_to_file:, path_to_file:, md5:)
+      file_url = Eivu::Client::Utils.generate_remote_url(configuration, cloud_file, path_to_file)
 
       Eivu::Logger.info 'Transfering', tags: log_tag, label: Eivu::Client
-      cloud_file.transfer!(asset:, filesize:)
+      cloud_file.transfer!(asset:, filesize:) if Utils.online? file_url
     end
 
     def retrieve_remote_md5(remote_path_to_file)
@@ -169,7 +192,7 @@ module Eivu
           bucket: configuration.bucket_name,
           key: remote_path_to_file
         }
-      )&.etag&.gsub(/"/, '')
+      )&.etag&.gsub('"', '')
     end
 
     def generate_etag(path_to_file)

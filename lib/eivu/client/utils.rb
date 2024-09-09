@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require 'active_support/all'
 require 'mimemagic'
 
@@ -7,8 +8,35 @@ module Eivu
     module Utils
       RATING_500_475_REGEX = /^_+/
       RATING_425_REGEX = /^`/
+      UNKNOWN_MIME = 'unknown/unknown'
 
       class << self
+        def online?(uri)
+          url = URI.parse(uri)
+          req = Net::HTTP.new(url.host, url.port)
+          req.request_head(url.path).code == '200'
+        end
+
+        def generate_remote_url(configuration, cloud_file, path_to_file)
+          # the value s3.wasabisys.com should retrieved from the eivu server
+          # on boot so it is not hard coded
+          "http://#{configuration.bucket_name}.s3.wasabisys.com/#{generate_remote_path(cloud_file, path_to_file)}"
+        end
+
+        def cleansed_asset_name(path_to_file)
+          filename = File.basename(path_to_file)
+          filename = 'cover-art.png' if filename.starts_with?(Client::MetadataExtractor::COVERART_PREFIX)
+          Utils.sanitize(filename)
+        end
+
+        def generate_remote_path(cloud_file, path_to_file)
+          "#{cloud_file.s3_folder}/#{Utils.cleansed_asset_name(path_to_file)}"
+        end
+
+        def md5_as_folders(md5)
+          md5.upcase.scan(/.{2}|.+/).join('/')
+        end
+
         def prune_metadata(string)
           output = string.dup
           output.gsub!(' ((', '((')
@@ -21,8 +49,11 @@ module Eivu
 
         def generate_data_profile(path_to_file:, override: {}, metadata_list: [])
           metadata_list += MetadataExtractor.extract(path_to_file)
-          metadata_list << { original_local_path_to_file: path_to_file } unless override[:skip_original_local_path_to_file]
-          year          = MetadataExtractor.extract_year(path_to_file) || prune_from_metadata_list(metadata_list, 'eivu:year')
+          unless override[:skip_original_local_path_to_file]
+            metadata_list << { original_local_path_to_file: path_to_file }
+          end
+          year          = MetadataExtractor.extract_year(path_to_file) || prune_from_metadata_list(metadata_list,
+                                                                                                   'eivu:year')
           name          = override[:name] || Utils.prune_from_metadata_list(metadata_list, 'eivu:name')
           artwork_md5   = prune_from_metadata_list(metadata_list, 'eivu:artwork_md5')
           position      = prune_from_metadata_list(metadata_list, 'eivu:release_pos')
@@ -53,7 +84,7 @@ module Eivu
         end
 
         def prune_from_metadata_list(metadata_list, key)
-          index = metadata_list.index {|hash| hash[key].present? }
+          index = metadata_list.index { |hash| hash[key].present? }
           return nil if index.nil?
 
           metadata_list.delete_at(index).values.first
@@ -62,8 +93,10 @@ module Eivu
         def detect_mime(path_to_file)
           if path_to_file.ends_with?('.m4a')
             MimeMagic.by_extension('m4a')
+          elsif path_to_file.ends_with?('.mp3')
+            MimeMagic.by_extension('mp3')
           else
-            MimeMagic.by_magic(File.open(path_to_file)) || MimeMagic.by_path(path_to_file)
+            MimeMagic.by_magic(File.open(path_to_file)) || MimeMagic.by_path(path_to_file) || UNKNOWN_MIME
           end
         end
 

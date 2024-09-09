@@ -4,6 +4,137 @@
 # require 'eivu'
 
 describe Eivu::Client::Utils do
+  describe '.md5_as_folders' do
+    subject(:md5_as_folders) { described_class.md5_as_folders(md5) }
+
+    context 'F45C04D717F3ED6720AE0A3A67981FE4' do
+      let(:md5) { 'F45C04D717F3ED6720AE0A3A67981FE4' }
+
+      it { is_expected.to eq('F4/5C/04/D7/17/F3/ED/67/20/AE/0A/3A/67/98/1F/E4') }
+    end
+
+    context 'f45c04d717f3ed6720ae0a3a67981fe4' do
+      let(:md5) { 'f45c04d717f3ed6720ae0a3a67981fe4' }
+
+      it { is_expected.to eq('F4/5C/04/D7/17/F3/ED/67/20/AE/0A/3A/67/98/1F/E4') }
+    end
+  end
+
+  describe '.cleansed_asset_name' do
+    subject(:cleansed_asset_name) { described_class.cleansed_asset_name(path_to_file) }
+
+    let(:path_to_file) { 'path/to/file.xyz' }
+
+    context 'cover-art' do
+      let(:path_to_file) { "path/to/#{Eivu::Client::MetadataExtractor::COVERART_PREFIX}-arctic-blast.png" }
+
+      it { is_expected.to eq('cover-art.png') }
+    end
+
+    context 'non cover-art' do
+      let(:path_to_file) { 'path/to/file.xyz' }
+
+      it { is_expected.to eq('file.xyz') }
+    end
+  end
+
+  describe '.generate_remote_url' do
+    before do
+      stub_const 'ENV', ENV.to_h.merge('EIVU_BUCKET_NAME' => bucket_name)
+    end
+
+    subject(:generated_remote_url) do
+      described_class.generate_remote_url(Eivu::Client::Configuration.new, cloud_file, path_to_file)
+    end
+
+    let(:bucket_name) { 'eivu-test-bucket' }
+    let(:path_to_file) { "Faker::File.dir/#{cloud_file.asset}" }
+    let(:md5_as_folders) { described_class.md5_as_folders(cloud_file.md5) }
+    let(:remote_url) { "http://#{bucket_name}.s3.wasabisys.com/#{cloud_file.grouping}/#{md5_as_folders}/#{described_class.sanitize(cloud_file.asset)}" }
+
+    context 'coverart' do
+      let(:cloud_file) { build(:cloud_file, :coverart) }
+      let(:remote_url) { "http://#{bucket_name}.s3.wasabisys.com/image/#{md5_as_folders}/cover-art.png" }
+
+      it { is_expected.to eq(remote_url) }
+    end
+
+    context 'video content' do
+      let(:cloud_file) { build(:cloud_file, :video) }
+
+      it { is_expected.to eq(remote_url) }
+    end
+
+    context 'audio content' do
+      let(:cloud_file) { build(:cloud_file, :audio) }
+
+      it { is_expected.to eq(remote_url) }
+    end
+
+    context 'image content' do
+      let(:cloud_file) { build(:cloud_file, :image) }
+
+      it { is_expected.to eq(remote_url) }
+    end
+
+    context 'archive content' do
+      let(:cloud_file) { build(:cloud_file, :archive) }
+
+      it { is_expected.to eq(remote_url) }
+    end
+
+    context 'delicate content' do
+      let(:cloud_file) { build(:cloud_file, :delicate) }
+
+      it { is_expected.to eq(remote_url) }
+    end
+  end
+
+  describe '.generate_remote_path' do
+    subject(:generated_remote_path) { described_class.generate_remote_path(cloud_file, path_to_file) }
+
+    let(:path_to_file) { "Faker::File.dir/#{cloud_file.asset}" }
+    let(:md5_as_folders) { described_class.md5_as_folders(cloud_file.md5) }
+    let(:remote_path) { "#{cloud_file.grouping}/#{md5_as_folders}/#{described_class.sanitize(cloud_file.asset)}" }
+
+    context 'coverart' do
+      let(:cloud_file) { build(:cloud_file, :coverart) }
+      let(:remote_path) { "image/#{md5_as_folders}/cover-art.png" }
+
+      it { is_expected.to eq(remote_path) }
+    end
+
+    context 'audio content' do
+      let(:cloud_file) { build(:cloud_file, :audio) }
+
+      it { is_expected.to eq(remote_path) }
+    end
+
+    context 'video content' do
+      let(:cloud_file) { build(:cloud_file, :video) }
+
+      it { is_expected.to eq(remote_path) }
+    end
+
+    context 'image content' do
+      let(:cloud_file) { build(:cloud_file, :image) }
+
+      it { is_expected.to eq(remote_path) }
+    end
+
+    context 'archive content' do
+      let(:cloud_file) { build(:cloud_file, :archive) }
+
+      it { is_expected.to eq(remote_path) }
+    end
+
+    context 'delicate content' do
+      let(:cloud_file) { build(:cloud_file, :delicate) }
+
+      it { is_expected.to eq(remote_path) }
+    end
+  end
+
   describe '.prune_metadata' do
     subject(:pruning) { described_class.prune_metadata(string) }
 

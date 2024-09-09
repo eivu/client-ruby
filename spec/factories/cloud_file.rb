@@ -15,6 +15,10 @@ FactoryBot.define do
     filesize { rand((100.kilobytes)..(2.gigabytes)) }
     state_history { [:reserved] }
 
+    trait :delicate do
+      peepy { true }
+    end
+
     trait :peepy do
       peepy { true }
     end
@@ -45,7 +49,19 @@ FactoryBot.define do
       asset { "#{Faker::Lorem.word.downcase}.mp4" }
     end
 
-    trait :other do
+    trait :image do
+      content_type { 'image/png' }
+      filesize { rand((750.kilobytes)..(10.megabytes)) }
+      asset { "#{Faker::Lorem.word.downcase}.png" }
+    end
+
+    trait :coverart do
+      content_type { 'image/png' }
+      filesize { rand((750.kilobytes)..(1.megabytes)) }
+      asset { "#{Eivu::Client::MetadataExtractor::COVERART_PREFIX}-#{Faker::Lorem.word.downcase}.png" }
+    end
+
+    trait :archive do
       content_type { 'application/pdf' }
       filesize { rand((750.kilobytes)..(10.megabytes)) }
       asset { "#{Faker::Lorem.word.downcase}.pdf" }

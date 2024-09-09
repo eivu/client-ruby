@@ -14,6 +14,7 @@ module Eivu
       PERFORMER_REGEX = /\(\(p\ ([^)]+)\)\)/
       STUDIO_REGEX = /\(\(s\ ([^)]+)\)\)/
       YEAR_REGEX = /\(\(y\ ([^)]+)\)\)/
+      COVERART_PREFIX = 'eivu-coverart'
 
       class << self
         def extract(path_to_file)
@@ -118,10 +119,10 @@ module Eivu
           metadata['id3:disc_nr'] = 0
           metadata['eivu:year'] = year
           metadata_list = metadata.compact_blank.map { |k, v| { k => v } }
-          override = { name: "Cover Art for #{label}", skip_original_local_path_to_file: true }
-          file = Tempfile.new(['coverart', '.png'], binmode: true)
+          override = { name: "Cover Art for #{label}", skip_original_local_path_to_file: true, coverart: true }
+          file = Tempfile.new([COVERART_PREFIX, '.png'], binmode: true)
           file.write(wahwah_reader.images&.dig(0, :data))
-          artwork = Client.upload_file(path_to_file: file.path, metadata_list:, override:)
+          artwork = Client.upload_or_fetch_file(path_to_file: file.path, metadata_list:, override:)
           file.close
           artwork
         end
