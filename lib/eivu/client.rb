@@ -53,6 +53,16 @@ module Eivu
       def upload_folder(path_to_folder:, peepy: false, nsfw: false)
         new.upload_folder(path_to_folder:, peepy:, nsfw:)
       end
+
+      def upload_or_fetch_file(path_to_file:, peepy: false, nsfw: false, override: {}, metadata_list: [])
+        upload_file(path_to_file:, peepy:, nsfw:, override:, metadata_list:)
+      rescue Errors::Server::InvalidCloudFileState
+        asset         = Utils.cleansed_asset_name(path_to_file)
+        md5           = Eivu::Client::CloudFile.generate_md5(path_to_file)
+        log_tag       = "#{md5.first(5).downcase}:#{asset}"
+        Eivu::Logger.info 'File exists, skipping to fetch', tags: log_tag, label: Eivu::Client
+        Eivu::Client::CloudFile.fetch(md5)
+      end
     end
 
     def initialize
