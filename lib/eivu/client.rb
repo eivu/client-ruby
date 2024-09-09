@@ -12,6 +12,8 @@ module Eivu
   class Client
     attr_reader :status
 
+    SKIPPABLE_EXTENSIONS = %w[.DS_Store gitignore gitkeep sfz info nfo m3u db.lo db.lo.1].freeze
+
     class << self
       def configuration
         @configuration ||= Configuration.new
@@ -91,6 +93,8 @@ module Eivu
 
     def upload_folder(path_to_folder:, peepy: false, nsfw: false)
       Folder.traverse(path_to_folder) do |path_to_file|
+        next if SKIPPABLE_EXTENSIONS.any? { |suffix| path_to_file.end_with?(suffix) }
+
         upload_file(path_to_file:, peepy:, nsfw:)
         if verify_upload!(path_to_file)
           track_success(path_to_file)
@@ -108,6 +112,8 @@ module Eivu
       pool = Concurrent::FixedThreadPool.new(5)
 
       Folder.traverse(path_to_folder) do |path_to_file|
+        next if SKIPPABLE_EXTENSIONS.any? { |suffix| path_to_file.end_with?(suffix) }
+
         pool.post do
           upload_file(path_to_file:, peepy:, nsfw:)
           if verify_upload!(path_to_file)
