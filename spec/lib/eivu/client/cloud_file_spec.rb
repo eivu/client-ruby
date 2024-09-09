@@ -7,6 +7,34 @@ describe Eivu::Client::CloudFile, vcr: true do
   let(:peepy) { false }
   let(:nsfw) { false }
 
+  describe '.grouping' do
+    subject(:result) { cloud_file.grouping }
+
+    context 'audio content' do
+      let(:cloud_file) { build :cloud_file, :audio }
+
+      it { is_expected.to eq('audio') }
+    end
+
+    context 'video content' do
+      let(:cloud_file) { build :cloud_file, :video }
+
+      it { is_expected.to eq('video') }
+    end
+
+    context 'image content' do
+      let(:cloud_file) { build :cloud_file, :image }
+
+      it { is_expected.to eq('image') }
+    end
+
+    context 'archive content' do
+      let(:cloud_file) { build :cloud_file, :archive }
+
+      it { is_expected.to eq('archive') }
+    end
+  end
+
   describe '.generate_md5' do
     subject(:md5) { described_class.generate_md5(path_to_file) }
 

@@ -161,7 +161,13 @@ module Eivu
       def grouping
         return 'delicates' if peepy
 
-        content_type.to_s.split('/')&.first
+        folder = content_type.to_s.split('/')&.first
+
+        if %w[image audio video].include?(folder)
+          folder
+        else
+          'archive'
+        end
       end
 
       def s3_folder
