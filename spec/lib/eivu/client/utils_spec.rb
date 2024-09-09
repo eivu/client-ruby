@@ -78,7 +78,7 @@ describe Eivu::Client::Utils do
     end
 
     context 'archive content' do
-      let(:cloud_file) { build(:cloud_file, :other) }
+      let(:cloud_file) { build(:cloud_file, :archive) }
 
       it { is_expected.to eq(remote_url) }
     end
@@ -123,7 +123,7 @@ describe Eivu::Client::Utils do
     end
 
     context 'archive content' do
-      let(:cloud_file) { build(:cloud_file, :other) }
+      let(:cloud_file) { build(:cloud_file, :archive) }
 
       it { is_expected.to eq(remote_path) }
     end
