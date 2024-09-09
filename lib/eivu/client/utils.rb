@@ -8,6 +8,7 @@ module Eivu
     module Utils
       RATING_500_475_REGEX = /^_+/
       RATING_425_REGEX = /^`/
+      UNKNOWN_MIME = 'unknown/unknown'
 
       class << self
         def online?(uri)
@@ -95,7 +96,7 @@ module Eivu
           elsif path_to_file.ends_with?('.mp3')
             MimeMagic.by_extension('mp3')
           else
-            MimeMagic.by_magic(File.open(path_to_file)) || MimeMagic.by_path(path_to_file)
+            MimeMagic.by_magic(File.open(path_to_file)) || MimeMagic.by_path(path_to_file) || UNKNOWN_MIME
           end
         end
 
