@@ -159,7 +159,7 @@ module Eivu
       end
 
       def grouping
-        return 'delicates' if peepy
+        return 'secured' if peepy
 
         folder = content_type.to_s.split('/')&.first
 
