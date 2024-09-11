@@ -63,6 +63,37 @@ module Eivu
         Eivu::Logger.info 'File exists, skipping to fetch', tags: log_tag, label: Eivu::Client
         Eivu::Client::CloudFile.fetch(md5)
       end
+
+      def prune_files
+        status = { deleted: [], failed: [] }
+        # iterate through files
+        CSV.read('logs/success.csv').each do |success_log|
+          md5 = success_log[2]
+          path_to_file = success_log[1]
+          next unless File.exist?(path_to_file)
+
+          cloud_file = Client::CloudFile.fetch(md5)
+          puts "Fetching: #{md5}"
+          if Utils.online?(cloud_file.url)
+            puts "  deleting: #{path_to_file}"
+            File.delete(path_to_file)
+            status[:deleted] << path_to_file
+          else
+            puts "  error: #{path_to_file}"
+            status[:failed] << success_log
+          end
+        end
+        # write prune failure logs
+        status[:failed].present? && CSV.open("logs/prune_failures.#{Time.now.to_f}.csv", 'a+') do |prune_log|
+          # loop over each row
+          # unsure if ruby csv has an append method
+          status[:failed].each do |failure_log|
+            prune_log += failure_log
+          end
+        end
+        puts "Pruned: #{status[:deleted].count} files"
+        puts "Failed: #{status[:failed].count} files"
+      end
     end
 
     def initialize
@@ -205,7 +236,7 @@ module Eivu
       @status[:success][key] = 'Upload successful'
       # write to logs
       FileUtils.mkdir_p('logs')
-      CSV.open('logs/success.csv', 'w+') do |success_log|
+      CSV.open('logs/success.csv', 'a+') do |success_log|
         success_log << [
           Time.now,
           path_to_file,
