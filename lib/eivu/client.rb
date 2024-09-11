@@ -107,14 +107,13 @@ module Eivu
 
         upload_file(path_to_file:, peepy:, nsfw:)
         if verify_upload!(path_to_file)
-          track_success(path_to_file)
+          log_success(path_to_file)
         else
-          track_failure(path_to_file, 'upload did not complete')
+          log_failure(path_to_file, 'upload did not complete')
         end
       rescue StandardError => e
-        track_failure(path_to_file, e)
+        log_failure(path_to_file, e)
       end
-      write_logs
       @status
     end
 
@@ -127,18 +126,17 @@ module Eivu
         pool.post do
           upload_file(path_to_file:, peepy:, nsfw:)
           if verify_upload!(path_to_file)
-            track_success(path_to_file)
+            log_success(path_to_file)
           else
-            track_failure(path_to_file, 'upload did not complete')
+            log_failure(path_to_file, 'upload did not complete')
           end
         rescue StandardError => e
-          track_failure(path_to_file, e)
+          log_failure(path_to_file, e)
         end
       end
 
       pool.shutdown
       pool.wait_for_termination
-      write_logs
       @status
     end
 
@@ -199,28 +197,40 @@ module Eivu
       `./bin/s3etag.sh "#{path_to_file}" 5`&.strip
     end
 
-    def write_logs
-      FileUtils.mkdir_p('logs')
-      CSV.open('logs/success.csv', 'a+') do |success_log|
-        @status[:success].each { |v| success_log << [Time.now, v] }
-      end
-      CSV.open('logs/failure.csv', 'a+') do |failure_log|
-        @status[:failure].each { |v| failure_log << [Time.now, v] }
-      end
-    end
-
-    def track_success(path_to_file)
+    def log_success(path_to_file)
+      # update statuses
       md5 = Eivu::Client::CloudFile.generate_md5(path_to_file)
       key = "#{path_to_file}|#{md5}"
       @status[:failure].delete(key)
       @status[:success][key] = 'Upload successful'
+      # write to logs
+      FileUtils.mkdir_p('logs')
+      CSV.open('logs/success.csv', 'w+') do |success_log|
+        success_log << [
+          Time.now,
+          path_to_file,
+          md5,
+          'Upload successful'
+        ]
+      end
     end
 
-    def track_failure(path_to_file, error)
+    def log_failure(path_to_file, error)
+      # update statuses
       md5 = Eivu::Client::CloudFile.generate_md5(path_to_file)
       key = "#{path_to_file}|#{md5}"
       @status[:failure][key] = error
       @status[:success].delete(key)
+      # write to logs
+      FileUtils.mkdir_p('logs')
+      CSV.open('logs/failure.csv', 'a+') do |failure_log|
+        failure_log << [
+          Time.now,
+          path_to_file,
+          md5,
+          error.to_s
+        ]
+      end
     end
 
     def s3_client
