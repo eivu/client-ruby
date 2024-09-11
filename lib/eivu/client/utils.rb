@@ -11,10 +11,20 @@ module Eivu
       UNKNOWN_MIME = 'unknown/unknown'
 
       class << self
-        def online?(uri)
-          url = URI.parse(uri)
-          req = Net::HTTP.new(url.host, url.port)
-          req.request_head(url.path).code == '200'
+        def online?(uri, local_filesize = nil)
+          url  = URI.parse(uri)
+          req  = Net::HTTP.new(url.host, url.port)
+          head = req.request_head(url.path)
+          header_ok = head.code == '200'
+
+          if local_filesize
+            remote_filesize = head.content_length
+            filesize_ok = remote_filesize == local_filesize
+          else
+            filesize_ok = true
+          end
+
+          header_ok && filesize_ok
         end
 
         def generate_remote_url(configuration, cloud_file, path_to_file)

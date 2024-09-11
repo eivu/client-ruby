@@ -74,7 +74,7 @@ module Eivu
 
           cloud_file = Client::CloudFile.fetch(md5)
           puts "Fetching: #{md5}"
-          if Utils.online?(cloud_file.url)
+          if Utils.online?(cloud_file.url, File.size(path_to_file))
             puts "  deleting: #{path_to_file}"
             File.delete(path_to_file)
             status[:deleted] << path_to_file
@@ -116,9 +116,9 @@ module Eivu
       process_reservation_and_transfer(cloud_file:, path_to_file:, md5:, asset:)
 
       # Generate remote URL and raise error if file offline
-      if Utils.online?(cloud_file.url) == false
+      if Utils.online?(cloud_file.url, File.size(path_to_file)) == false
         cloud_file.reset # set state back to reserved
-        raise "File #{md5}:#{asset} is offline"
+        raise "File #{md5}:#{asset} is offline/filesize mismatch"
       end
 
       if cloud_file.transfered?
@@ -209,10 +209,13 @@ module Eivu
       end
 
       validate_remote_md5!(remote_path_to_file:, path_to_file:, md5:)
-      file_url = Eivu::Client::Utils.generate_remote_url(configuration, cloud_file, path_to_file)
 
-      Eivu::Logger.info 'Transfering', tags: log_tag, label: Eivu::Client
-      cloud_file.transfer!(asset:, filesize:) if Utils.online? file_url
+      if Utils.online?(cloud_file.url, File.size(path_to_file))
+        Eivu::Logger.info 'Transfering', tags: log_tag, label: Eivu::Client
+        cloud_file.transfer!(asset:, filesize:)
+      else
+        Eivu::Logger.info 'Error: File not Transferred', tags: log_tag, label: Eivu::Client
+      end
     end
 
     def retrieve_remote_md5(remote_path_to_file)
