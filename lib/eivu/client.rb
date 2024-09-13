@@ -210,12 +210,8 @@ module Eivu
 
       validate_remote_md5!(remote_path_to_file:, path_to_file:, md5:)
 
-      if Utils.online?(cloud_file.url, File.size(path_to_file))
-        Eivu::Logger.info 'Transfering', tags: log_tag, label: Eivu::Client
-        cloud_file.transfer!(asset:, filesize:)
-      else
-        Eivu::Logger.info 'Error: File not Transferred', tags: log_tag, label: Eivu::Client
-      end
+      Eivu::Logger.info 'Transfering', tags: log_tag, label: Eivu::Client
+      cloud_file.transfer!(asset:, filesize:)
     end
 
     def retrieve_remote_md5(remote_path_to_file)
