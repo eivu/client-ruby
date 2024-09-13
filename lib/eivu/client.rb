@@ -12,8 +12,8 @@ module Eivu
   class Client
     attr_reader :status
 
-    SKIPPABLE_EXTENSIONS = %w[.DS_Store gitignore gitkeep sfz info nfo m3u db.lo db.lo.1].freeze
-
+    SKIPPABLE_EXTENSIONS = %w[.ds_store gitignore gitkeep cue log md5 sfz info nfo m3u db.lo db.lo.1].freeze
+    SKIPPABLE_FOLDERS = %w[.git podcasts].freeze
     class << self
       def configuration
         @configuration ||= Configuration.new
@@ -134,7 +134,8 @@ module Eivu
 
     def upload_folder(path_to_folder:, peepy: false, nsfw: false)
       Folder.traverse(path_to_folder) do |path_to_file|
-        next if SKIPPABLE_EXTENSIONS.any? { |suffix| path_to_file.end_with?(suffix) }
+        next if SKIPPABLE_FOLDERS.any? { |folder| path_to_file.downcase.include?(folder) }
+        next if SKIPPABLE_EXTENSIONS.any? { |suffix| path_to_file.downcase.end_with?(suffix) }
 
         upload_file(path_to_file:, peepy:, nsfw:)
         if verify_upload!(path_to_file)
