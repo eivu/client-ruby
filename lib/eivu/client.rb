@@ -12,7 +12,7 @@ module Eivu
   class Client
     attr_reader :status
 
-    SKIPPABLE_EXTENSIONS = %w[.ds_store gitignore gitkeep cue log md5 sfz info nfo m3u db.lo db.lo.1].freeze
+    SKIPPABLE_EXTENSIONS = %w[.ds_store gitignore gitkeep cue m4p log md5 sfv info nfo m3u m3u8 com db.lo db.lo.1].freeze
     SKIPPABLE_FOLDERS = %w[.git podcasts].freeze
     class << self
       def configuration
