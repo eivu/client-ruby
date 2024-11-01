@@ -2,6 +2,7 @@
 
 require 'active_support/all'
 require 'mimemagic'
+require 'faraday'
 
 module Eivu
   class Client
@@ -12,13 +13,11 @@ module Eivu
 
       class << self
         def online?(uri, local_filesize = nil)
-          url  = URI.parse(uri)
-          req  = Net::HTTP.new(url.host, url.port)
-          head = req.request_head(url.path)
-          header_ok = head.code == '200'
+          data = Faraday.head(uri).to_hash
+          header_ok = data[:status] == 200
 
           if local_filesize
-            remote_filesize = head.content_length
+            remote_filesize = data.dig(:response_headers, 'content-length').to_i
             filesize_ok = remote_filesize == local_filesize
           else
             filesize_ok = true
