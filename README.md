@@ -8,7 +8,7 @@ Eivu::Client.new.upload_file path_to_file: 'spec/fixtures/samples/audio/brothers
 Eivu::Client.new.upload_folder path_to_folder: 'spec/fixtures/samples/audio/'
 # multithread uploads are not recommended for audio files with cover art
 Eivu::Client.new.upload_folder_via_multithread path_to_folder: 'spec/fixtures/samples'
-Eivu::Client.new.upload_folder peepy: true, nsfw: true, path_to_folder: 'spec/fixtures/samples'
+Eivu::Client.new.upload_folder_via_multithread peepy: true, nsfw: true, path_to_folder: 'spec/fixtures/secured'
 Eivu::Client.new.upload_folder peepy: true, nsfw: true, path_to_folder: 'spec/fixtures/samples'
 Eivu::Client::MetadataExtractor.from_audio_file 'spec/fixtures/samples/Piano_brokencrash-Brandondorf-1164520478.mp3',
 ```

@@ -73,7 +73,7 @@ module Eivu
           next unless File.exist?(path_to_file)
 
           cloud_file = Client::CloudFile.fetch(md5)
-          puts "Fetching: #{md5}"
+          puts "Fetching: #{md5} - #{path_to_file}"
           if Utils.online?(cloud_file.url, File.size(path_to_file))
             puts "  deleting: #{path_to_file}"
             File.delete(path_to_file)
