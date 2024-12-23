@@ -91,10 +91,18 @@ module Eivu
         end
 
         def post_request(action:, md5:, payload:, bucket_uuid: Eivu::Client.configuration.bucket_uuid)
-          response = RestClient.post(
-            "#{Eivu::Client.configuration.host}/api/upload/v1/buckets/#{bucket_uuid}/cloud_files/#{md5}/#{action}",
-            payload,
-            { 'Authorization' => "Token #{Eivu::Client.configuration.user_token}" }
+          # response = RestClient.post(
+          #   "#{Eivu::Client.configuration.host}/api/upload/v1/buckets/#{bucket_uuid}/cloud_files/#{md5}/#{action}",
+          #   payload,
+          #   { 'Authorization' => "Token #{Eivu::Client.configuration.user_token}" }
+          # )
+
+          response = RestClient::Request.execute(
+            url: "#{Eivu::Client.configuration.host}/api/upload/v1/buckets/#{bucket_uuid}/cloud_files/#{md5}/#{action}",
+            method: :post,
+            payload:,
+            headers: { 'Authorization' => "Token #{Eivu::Client.configuration.user_token}" },
+            verify_ssl: false
           )
 
           raise Errors::Server::Connection, "Failed connection: #{response.code}" unless response.code == 200
