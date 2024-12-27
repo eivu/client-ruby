@@ -77,7 +77,7 @@ module Eivu
             url: "#{Eivu::Client.configuration.host}/api/upload/v1/buckets/#{bucket_uuid}/cloud_files/#{md5}",
             method: :get,
             headers: { 'Authorization' => "Token #{Eivu::Client.configuration.user_token}" },
-            verify_ssl: false
+            verify_ssl: !Eivu::Client.configuration.ignore_ssl_cert
           )
 
           cloud_file = CloudFile.new Oj.load(response.body).symbolize_keys
@@ -102,7 +102,7 @@ module Eivu
             method: :post,
             payload:,
             headers: { 'Authorization' => "Token #{Eivu::Client.configuration.user_token}" },
-            verify_ssl: false
+            verify_ssl: !Eivu::Client.configuration.ignore_ssl_cert
           )
 
           raise Errors::Server::Connection, "Failed connection: #{response.code}" unless response.code == 200

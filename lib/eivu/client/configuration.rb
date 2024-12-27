@@ -59,6 +59,7 @@ module Eivu
         @secret_key      = ENV.fetch('EIVU_SECRET_ACCESS_KEY')
         @bucket_name     = ENV.fetch('EIVU_BUCKET_NAME')
         @bucket_uuid     = ENV.fetch('EIVU_BUCKET_UUID')
+        @ignore_ssl_cert = Eivu::Client::Utils.cast_to_boolean(ENV.fetch('EIVU_IGNORE_SSL_CERT', nil)) || false
         @bucket_location = ENV.fetch('EIVU_BUCKET_LOCATION') || :aws
         @region          = ENV.fetch('EIVU_REGION')
         @user_token      = ENV.fetch('EIVU_USER_TOKEN')
@@ -129,6 +130,10 @@ module Eivu
 
       def endpoint
         @endpoint
+      end
+
+      def ignore_ssl_cert
+        @ignore_ssl_cert
       end
 
       def bucket_location

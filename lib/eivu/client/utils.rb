@@ -10,8 +10,24 @@ module Eivu
       RATING_500_475_REGEX = /^_+/
       RATING_425_REGEX = /^`/
       UNKNOWN_MIME = 'unknown/unknown'
+      FALSE_VALUES = [
+        false, 0,
+        '0', :'0',
+        'f', :f,
+        'F', :F,
+        'false', :false,
+        'FALSE', :FALSE,
+        'off', :off,
+        'OFF', :OFF,
+      ].to_set.freeze
 
       class << self
+        def cast_to_boolean(value)
+          return value if value.nil?
+
+          !FALSE_VALUES.include?(value)
+        end
+
         def online?(uri, local_filesize = nil)
           data = Faraday.head(uri).to_hash
           header_ok = data[:status] == 200
