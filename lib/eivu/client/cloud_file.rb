@@ -69,10 +69,17 @@ module Eivu
         end
 
         def fetch(md5, bucket_uuid: Eivu::Client.configuration.bucket_uuid)
-          response = RestClient.get(
-            "#{Eivu::Client.configuration.host}/api/upload/v1/buckets/#{bucket_uuid}/cloud_files/#{md5}",
-            { 'Authorization' => "Token #{Eivu::Client.configuration.user_token}" }
+          # response = RestClient.get(
+          #   "#{Eivu::Client.configuration.host}/api/upload/v1/buckets/#{bucket_uuid}/cloud_files/#{md5}",
+          #   { 'Authorization' => "Token #{Eivu::Client.configuration.user_token}" }
+          # )
+          response = RestClient::Request.execute(
+            url: "#{Eivu::Client.configuration.host}/api/upload/v1/buckets/#{bucket_uuid}/cloud_files/#{md5}",
+            method: :get,
+            headers: { 'Authorization' => "Token #{Eivu::Client.configuration.user_token}" },
+            verify_ssl: !Eivu::Client.configuration.ignore_ssl_cert
           )
+
           cloud_file = CloudFile.new Oj.load(response.body).symbolize_keys
           cloud_file.infer_state_history!
           cloud_file
@@ -84,10 +91,18 @@ module Eivu
         end
 
         def post_request(action:, md5:, payload:, bucket_uuid: Eivu::Client.configuration.bucket_uuid)
-          response = RestClient.post(
-            "#{Eivu::Client.configuration.host}/api/upload/v1/buckets/#{bucket_uuid}/cloud_files/#{md5}/#{action}",
-            payload,
-            { 'Authorization' => "Token #{Eivu::Client.configuration.user_token}" }
+          # response = RestClient.post(
+          #   "#{Eivu::Client.configuration.host}/api/upload/v1/buckets/#{bucket_uuid}/cloud_files/#{md5}/#{action}",
+          #   payload,
+          #   { 'Authorization' => "Token #{Eivu::Client.configuration.user_token}" }
+          # )
+
+          response = RestClient::Request.execute(
+            url: "#{Eivu::Client.configuration.host}/api/upload/v1/buckets/#{bucket_uuid}/cloud_files/#{md5}/#{action}",
+            method: :post,
+            payload:,
+            headers: { 'Authorization' => "Token #{Eivu::Client.configuration.user_token}" },
+            verify_ssl: !Eivu::Client.configuration.ignore_ssl_cert
           )
 
           raise Errors::Server::Connection, "Failed connection: #{response.code}" unless response.code == 200
