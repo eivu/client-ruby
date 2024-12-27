@@ -1,3 +1,10 @@
+# [2.1.0](https://github.com/eivu/client-ruby/compare/v2.0.0...v2.1.0) (2024-12-27)
+
+
+### Features
+
+* Improved logging ([88bbb95](https://github.com/eivu/client-ruby/commit/88bbb95903e950487bba2cd54eee1068abb0fbdf))
+
 # [1.1.0](https://github.com/eivu/client-ruby/compare/v1.0.0...v1.1.0) (2024-02-02)
 
 
