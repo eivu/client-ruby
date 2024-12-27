@@ -12,8 +12,8 @@ module Eivu
   class Client
     attr_reader :status
 
-    SKIPPABLE_EXTENSIONS = %w[.DS_Store gitignore gitkeep sfz info nfo m3u db.lo db.lo.1].freeze
-
+    SKIPPABLE_EXTENSIONS = %w[.ds_store gitignore gitkeep cue m4p log md5 sfv info nfo m3u m3u8 com db.lo db.lo.1].freeze
+    SKIPPABLE_FOLDERS = %w[.git podcasts].freeze
     class << self
       def configuration
         @configuration ||= Configuration.new
@@ -63,6 +63,37 @@ module Eivu
         Eivu::Logger.info 'File exists, skipping to fetch', tags: log_tag, label: Eivu::Client
         Eivu::Client::CloudFile.fetch(md5)
       end
+
+      def prune_files
+        status = { deleted: [], failed: [] }
+        # iterate through files
+        CSV.read('logs/success.csv').each do |success_log|
+          md5 = success_log[2]
+          path_to_file = success_log[1]
+          next unless File.exist?(path_to_file)
+
+          cloud_file = Client::CloudFile.fetch(md5)
+          puts "Fetching: #{md5} - #{path_to_file}"
+          if Utils.online?(cloud_file.url, File.size(path_to_file))
+            puts "  deleting: #{path_to_file}"
+            File.delete(path_to_file)
+            status[:deleted] << path_to_file
+          else
+            puts "  error: #{path_to_file}"
+            status[:failed] << success_log
+          end
+        end
+        # write prune failure logs
+        status[:failed].present? && CSV.open("logs/prune_failures.#{Time.now.to_f}.csv", 'a+') do |prune_log|
+          # loop over each row
+          # unsure if ruby csv has an append method
+          status[:failed].each do |failure_log|
+            prune_log += failure_log
+          end
+        end
+        puts "Pruned: #{status[:deleted].count} files"
+        puts "Failed: #{status[:failed].count} files"
+      end
     end
 
     def initialize
@@ -85,9 +116,9 @@ module Eivu
       process_reservation_and_transfer(cloud_file:, path_to_file:, md5:, asset:)
 
       # Generate remote URL and raise error if file offline
-      if Utils.online?(cloud_file.url) == false
+      if Utils.online?(cloud_file.url, File.size(path_to_file)) == false
         cloud_file.reset # set state back to reserved
-        raise "File #{md5}:#{asset} is offline"
+        raise "File #{md5}:#{asset} is offline/filesize mismatch"
       end
 
       if cloud_file.transfered?
@@ -103,18 +134,18 @@ module Eivu
 
     def upload_folder(path_to_folder:, peepy: false, nsfw: false)
       Folder.traverse(path_to_folder) do |path_to_file|
-        next if SKIPPABLE_EXTENSIONS.any? { |suffix| path_to_file.end_with?(suffix) }
+        next if SKIPPABLE_FOLDERS.any? { |folder| path_to_file.downcase.include?(folder) }
+        next if SKIPPABLE_EXTENSIONS.any? { |suffix| path_to_file.downcase.end_with?(suffix) }
 
         upload_file(path_to_file:, peepy:, nsfw:)
         if verify_upload!(path_to_file)
-          track_success(path_to_file)
+          log_success(path_to_file)
         else
-          track_failure(path_to_file, 'upload did not complete')
+          log_failure(path_to_file, 'upload did not complete')
         end
       rescue StandardError => e
-        track_failure(path_to_file, e)
+        log_failure(path_to_file, e)
       end
-      write_logs
       @status
     end
 
@@ -127,18 +158,17 @@ module Eivu
         pool.post do
           upload_file(path_to_file:, peepy:, nsfw:)
           if verify_upload!(path_to_file)
-            track_success(path_to_file)
+            log_success(path_to_file)
           else
-            track_failure(path_to_file, 'upload did not complete')
+            log_failure(path_to_file, 'upload did not complete')
           end
         rescue StandardError => e
-          track_failure(path_to_file, e)
+          log_failure(path_to_file, e)
         end
       end
 
       pool.shutdown
       pool.wait_for_termination
-      write_logs
       @status
     end
 
@@ -180,10 +210,9 @@ module Eivu
       end
 
       validate_remote_md5!(remote_path_to_file:, path_to_file:, md5:)
-      file_url = Eivu::Client::Utils.generate_remote_url(configuration, cloud_file, path_to_file)
 
       Eivu::Logger.info 'Transfering', tags: log_tag, label: Eivu::Client
-      cloud_file.transfer!(asset:, filesize:) if Utils.online? file_url
+      cloud_file.transfer!(asset:, filesize:)
     end
 
     def retrieve_remote_md5(remote_path_to_file)
@@ -199,28 +228,40 @@ module Eivu
       `./bin/s3etag.sh "#{path_to_file}" 5`&.strip
     end
 
-    def write_logs
-      FileUtils.mkdir_p('logs')
-      CSV.open('logs/success.csv', 'a+') do |success_log|
-        @status[:success].each { |v| success_log << [Time.now, v] }
-      end
-      CSV.open('logs/failure.csv', 'a+') do |failure_log|
-        @status[:failure].each { |v| failure_log << [Time.now, v] }
-      end
-    end
-
-    def track_success(path_to_file)
+    def log_success(path_to_file)
+      # update statuses
       md5 = Eivu::Client::CloudFile.generate_md5(path_to_file)
       key = "#{path_to_file}|#{md5}"
       @status[:failure].delete(key)
       @status[:success][key] = 'Upload successful'
+      # write to logs
+      FileUtils.mkdir_p('logs')
+      CSV.open('logs/success.csv', 'a+') do |success_log|
+        success_log << [
+          Time.now,
+          path_to_file,
+          md5,
+          'Upload successful'
+        ]
+      end
     end
 
-    def track_failure(path_to_file, error)
+    def log_failure(path_to_file, error)
+      # update statuses
       md5 = Eivu::Client::CloudFile.generate_md5(path_to_file)
       key = "#{path_to_file}|#{md5}"
       @status[:failure][key] = error
       @status[:success].delete(key)
+      # write to logs
+      FileUtils.mkdir_p('logs')
+      CSV.open('logs/failure.csv', 'a+') do |failure_log|
+        failure_log << [
+          Time.now,
+          path_to_file,
+          md5,
+          error.to_s
+        ]
+      end
     end
 
     def s3_client

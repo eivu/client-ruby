@@ -21,6 +21,8 @@ module Eivu
       attribute  :md5, Types::String
       attribute  :state, Types::String
       attribute  :state_history, Types::Strict::Array.of(Types::Strict::Symbol).default([])
+      attribute? :artists, Types::Nominal::Hash.optional
+      attribute? :releases, Types::Nominal::Hash.optional
       attribute? :user_uuid, Types::String
       attribute? :folder_uuid, Types::String.optional
       attribute? :bucket_uuid, Types::String
@@ -35,12 +37,14 @@ module Eivu
       attribute? :description, Types::String.optional
       attribute? :rating, Types::Coercible::Float.optional
       attribute? :nsfw, Types::Bool.default(false)
+      attribute? :secured, Types::Bool.default(false)
       attribute? :peepy, Types::Bool.default(false)
       attribute? :folder_id, Types::Coercible::Integer.optional
       attribute? :ext_id, Types::String.optional
       attribute? :data_source_id, Types::Coercible::Integer.optional
       attribute? :release_id, Types::Coercible::Integer.optional
       attribute? :artwork_md5, Types::Coercible::String.optional
+      attribute? :artwork_url, Types::Coercible::String.optional
       attribute? :release_pos, Types::Coercible::Integer.optional
       attribute? :num_plays, Types::Coercible::Integer.optional
       attribute? :year, Types::Coercible::Integer.optional
@@ -48,7 +52,7 @@ module Eivu
       attribute? :info_url, Types::String.optional
       attribute? :url, Types::String.optional
       attribute? :metadata, Types::JSON::Array.of(Types::JSON::Hash)
-      attribute? :date_aquired, Types::JSON::DateTime.optional
+      attribute? :date_aquired_at, Types::JSON::DateTime.optional
       attribute? :deletable, Types::Bool.default(false)
       attribute? :shared, Types::Bool.default(false)
       attribute? :delicate, Types::Bool.default(false)
@@ -65,10 +69,17 @@ module Eivu
         end
 
         def fetch(md5, bucket_uuid: Eivu::Client.configuration.bucket_uuid)
-          response = RestClient.get(
-            "#{Eivu::Client.configuration.host}/api/upload/v1/buckets/#{bucket_uuid}/cloud_files/#{md5}",
-            { 'Authorization' => "Token #{Eivu::Client.configuration.user_token}" }
+          # response = RestClient.get(
+          #   "#{Eivu::Client.configuration.host}/api/upload/v1/buckets/#{bucket_uuid}/cloud_files/#{md5}",
+          #   { 'Authorization' => "Token #{Eivu::Client.configuration.user_token}" }
+          # )
+          response = RestClient::Request.execute(
+            url: "#{Eivu::Client.configuration.host}/api/upload/v1/buckets/#{bucket_uuid}/cloud_files/#{md5}",
+            method: :get,
+            headers: { 'Authorization' => "Token #{Eivu::Client.configuration.user_token}" },
+            verify_ssl: !Eivu::Client.configuration.ignore_ssl_cert
           )
+
           cloud_file = CloudFile.new Oj.load(response.body).symbolize_keys
           cloud_file.infer_state_history!
           cloud_file
@@ -80,10 +91,18 @@ module Eivu
         end
 
         def post_request(action:, md5:, payload:, bucket_uuid: Eivu::Client.configuration.bucket_uuid)
-          response = RestClient.post(
-            "#{Eivu::Client.configuration.host}/api/upload/v1/buckets/#{bucket_uuid}/cloud_files/#{md5}/#{action}",
-            payload,
-            { 'Authorization' => "Token #{Eivu::Client.configuration.user_token}" }
+          # response = RestClient.post(
+          #   "#{Eivu::Client.configuration.host}/api/upload/v1/buckets/#{bucket_uuid}/cloud_files/#{md5}/#{action}",
+          #   payload,
+          #   { 'Authorization' => "Token #{Eivu::Client.configuration.user_token}" }
+          # )
+
+          response = RestClient::Request.execute(
+            url: "#{Eivu::Client.configuration.host}/api/upload/v1/buckets/#{bucket_uuid}/cloud_files/#{md5}/#{action}",
+            method: :post,
+            payload:,
+            headers: { 'Authorization' => "Token #{Eivu::Client.configuration.user_token}" },
+            verify_ssl: !Eivu::Client.configuration.ignore_ssl_cert
           )
 
           raise Errors::Server::Connection, "Failed connection: #{response.code}" unless response.code == 200

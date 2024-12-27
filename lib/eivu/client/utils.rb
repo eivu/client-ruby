@@ -2,6 +2,7 @@
 
 require 'active_support/all'
 require 'mimemagic'
+require 'faraday'
 
 module Eivu
   class Client
@@ -9,12 +10,36 @@ module Eivu
       RATING_500_475_REGEX = /^_+/
       RATING_425_REGEX = /^`/
       UNKNOWN_MIME = 'unknown/unknown'
+      FALSE_VALUES = [
+        false, 0,
+        '0', :'0',
+        'f', :f,
+        'F', :F,
+        'false', :false,
+        'FALSE', :FALSE,
+        'off', :off,
+        'OFF', :OFF,
+      ].to_set.freeze
 
       class << self
-        def online?(uri)
-          url = URI.parse(uri)
-          req = Net::HTTP.new(url.host, url.port)
-          req.request_head(url.path).code == '200'
+        def cast_to_boolean(value)
+          return value if value.nil?
+
+          !FALSE_VALUES.include?(value)
+        end
+
+        def online?(uri, local_filesize = nil)
+          data = Faraday.head(uri).to_hash
+          header_ok = data[:status] == 200
+
+          if local_filesize
+            remote_filesize = data.dig(:response_headers, 'content-length').to_i
+            filesize_ok = remote_filesize == local_filesize
+          else
+            filesize_ok = true
+          end
+
+          header_ok && filesize_ok
         end
 
         def generate_remote_url(configuration, cloud_file, path_to_file)
