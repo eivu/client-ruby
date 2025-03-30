@@ -22,10 +22,42 @@ module Eivu
           case mime.mediatype
           when 'audio'
             from_audio_file(path_to_file, mime:)
+          when 'application'
+            from_application_file(path_to_file, mime:)
           else
             extract_metadata_list(File.basename(path_to_file))
           end
         end
+
+        def from_application_file(path_to_file, mime:)
+          if mime.subtype.end_with?('rom')
+            info = Eivu::VgData::Models::Game.fetch_info(path_to_file)
+            info[:regions] ||= []
+            info[:genres]  ||= []
+            metadata_array = []
+            metadata_array << { 'vg:max players' => info[:max_players] }
+            metadata_array << { 'vg:release type' => info[:release_type] }
+            metadata_array << { 'vg:platform' => info[:platform] }
+            metadata_array << { 'vg:developer' => info[:developer] }
+            metadata_array << { 'vg:publisher' => info[:publisher] }
+            metadata_array << { 'vg:database_id' => info[:database_id] }
+            metadata_array << { 'vg:coop' => info[:cooperative]&.to_s }
+            metadata_array << { 'vg:esrb' => info[:esrb] }
+            metadata_array << { 'vg:video_url' => info[:video_url] } if info[:video_url].present?
+            metadata_array << { 'vg:platform manufacturer' => info[:platform_manufacturer] }
+            info[:regions].each { |region| metadata_array << { 'vg:region' => region } }
+            info[:genres].each { |genre| metadata_array << { 'vg:genre' => genre } }
+            metadata_array << { 'eivu:description' => info[:overview] }
+            metadata_array << { 'eivu:rating' => info[:bayesian_rating] }
+            metadata_array << { 'eivu:info_url' => info[:wikipedia_url] }
+            metadata_array << { 'eivu:year' => info[:release_year] }
+            metadata_array << { 'eivu:name' => info[:name] }
+            metadata_array.reject { |h| h.values[0].blank? }
+          else
+            extract_metadata_list(mime.subtype)
+          end
+        end
+
 
         def from_audio_file(path_to_file, mime: nil)
           mime ||= Client::Utils.detect_mime(path_to_file)

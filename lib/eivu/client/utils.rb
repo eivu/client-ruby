@@ -87,6 +87,10 @@ module Eivu
           artist_name   = prune_from_metadata_list(metadata_list, 'eivu:artist_name')
           release_name  = prune_from_metadata_list(metadata_list, 'eivu:release_name')
           album_artist  = prune_from_metadata_list(metadata_list, 'eivu:album_artist')
+          description   = prune_from_metadata_list(metadata_list, 'eivu:description')
+          info_url      = prune_from_metadata_list(metadata_list, 'eivu:info_url')
+
+
           matched_recording  = nil
           param_path_to_file = override[:skip_original_local_path_to_file].present? ? nil : path_to_file
 
@@ -95,6 +99,8 @@ module Eivu
             rating: MetadataExtractor.extract_rating(path_to_file),
             name:,
             year:,
+            description:,
+            info_url:,
             duration:,
             artists: [{ name: artist_name }],
             release: {
@@ -116,6 +122,13 @@ module Eivu
         end
 
         def detect_mime(path_to_file)
+          # adding custom formarts on every call as i don't know to add them
+          # on boot/load of gem
+          MimeMagic.add 'application/x-atari-5200-rom', extensions: 'a52'
+          MimeMagic.add 'application/x-atari-jaguar-rom', extensions: %w[j64 jag]
+          MimeMagic.add 'application/x-nes-rom', extensions: 'bsv'
+          MimeMagic.add 'application/x-colecovision-rom', extensions: 'col'
+
           if path_to_file.ends_with?('.m4a')
             MimeMagic.by_extension('m4a')
           elsif path_to_file.ends_with?('.mp3')
