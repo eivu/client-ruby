@@ -6,13 +6,19 @@ module Eivu
     class Folder
       class << self
         def traverse(path_to_dir, options: {})
+          traversable_objects(path_to_dir, options:).map do |path_to_item|
+            yield path_to_item
+          end.compact
+        end
+
+        def traversable_objects(path_to_dir, options: {})
           options[:ignore] = path_to_dir.strip
           options[:ignore] += '/' unless options[:ignore].ends_with?('/')
 
           Dir.glob("#{path_to_dir}/**/*").map do |path_to_item|
             next if skippable?(path_to_item, **options.slice(:skipable_filetypes))
 
-            yield path_to_item
+            path_to_item
           end.compact
         end
 
