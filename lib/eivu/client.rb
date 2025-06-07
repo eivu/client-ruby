@@ -54,6 +54,7 @@ module Eivu
         new.upload_folder(path_to_folder:, peepy:, nsfw:)
       end
 
+      # used by artwork uploader
       def upload_or_fetch_file(path_to_file:, peepy: false, nsfw: false, override: {}, metadata_list: [])
         upload_file(path_to_file:, peepy:, nsfw:, override:, metadata_list:)
       rescue Errors::Server::InvalidCloudFileState
@@ -94,11 +95,37 @@ module Eivu
         puts "Pruned: #{status[:deleted].count} files"
         puts "Failed: #{status[:failed].count} files"
       end
+
+      def upload(path_to_file:, multithread: true, peepy: false, nsfw: false)
+        new.upload(path_to_file:, multithread:, peepy:, nsfw:, metadata_list:)
+      end
     end
 
     def initialize
       SemanticLogger.add_appender(io: $stdout)
       @status = { success: {}, failure: {} }
+    end
+
+    def upload(upload_object, multithread: true, peepy: false, nsfw: false)
+      if multithread
+        upload_object = [upload_object] unless upload_object.is_a?(Array)
+        upload_set    = Set.new
+        upload_object.each do |object|
+          if File.directory?(object)
+            upload_set.merge(Folder.traversable_objects(object))
+          elsif File.file?(object)
+            upload_set << object
+          end
+        end
+
+        upload_objects_via_multithread(upload_objects: upload_object, peepy:, nsfw:)
+      elsif File.directory?(path_to_file)
+        upload_folder(path_to_folder: path_to_file, peepy:, nsfw:)
+      elsif File.file?(path_to_file)
+        upload_file(path_to_file:, peepy:, nsfw:, override:, metadata_list:)
+      else
+        raise ArgumentError, "Only files, directories, or arrays of both are allowed"
+      end
     end
 
     def upload_file(path_to_file:, peepy: false, nsfw: false, override: {}, metadata_list: [])
@@ -149,10 +176,10 @@ module Eivu
       @status
     end
 
-    def upload_folder_via_multithread(path_to_folder:, peepy: false, nsfw: false)
-      pool = Concurrent::FixedThreadPool.new(5)
+    def upload_objects_via_multithread(upload_objects:, peepy: false, nsfw: false, pool_size: 5)
+      pool = Concurrent::FixedThreadPool.new(pool_size)
 
-      Folder.traverse(path_to_folder) do |path_to_file|
+      upload_objects.each do |path_to_file|
         next if SKIPPABLE_EXTENSIONS.any? { |suffix| path_to_file.end_with?(suffix) }
 
         pool.post do

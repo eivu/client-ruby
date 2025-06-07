@@ -1,25 +1,3 @@
-GIT
-  remote: https://github.com/eivu/fingerprinter-acoustid-ruby
-  revision: 57064422db752eade86bffc0c2e128de9838c9c5
-  tag: v0.1.3
-  specs:
-    eivu-fingerprinter-acoustid (0.1.2)
-      activesupport (>= 6.1.4, < 8.0)
-      amatch (~> 0.4.0)
-      colorize (~> 0.8.1)
-      factory_bot (~> 6.2)
-      faker (~> 2.18)
-      fuzzy_match (~> 2.1)
-      id3tag (~> 1.1)
-      levenshtein-ffi (~> 1.1)
-      oj (~> 3.3, >= 3.3.5)
-      pry (~> 0.14.1)
-      rest-client (~> 2.1)
-      rspec (~> 3.10)
-      rubocop (~> 1.17)
-      vcr (~> 6.0)
-      webmock (~> 3.13)
-
 GEM
   remote: https://rubygems.org/
   specs:
@@ -64,6 +42,7 @@ GEM
     connection_pool (2.4.1)
     crack (0.4.5)
       rexml
+    damerau-levenshtein (1.3.3)
     diff-lcs (1.5.1)
     domain_name (0.5.20190701)
       unf (>= 0.0.5, < 1.0.0)
@@ -90,8 +69,24 @@ GEM
       dry-inflector (~> 1.0, < 2)
       dry-logic (>= 1.4, < 2)
       zeitwerk (~> 2.6)
-    factory_bot (6.2.1)
-      activesupport (>= 5.0.0)
+    eivu_fingerprinter_acoustid (1.0.0)
+      activesupport (>= 6.1.4, < 8.0)
+      amatch (~> 0.4.0)
+      colorize (~> 0.8.1)
+      damerau-levenshtein (~> 1.3, >= 1.3.3)
+      factory_bot (~> 6.5, >= 6.5.1)
+      faker (~> 2.18)
+      fuzzy_match (~> 2.1)
+      id3tag (~> 1.1)
+      oj (~> 3.3, >= 3.3.5)
+      pry (~> 0.14.1)
+      rest-client (~> 2.1)
+      rspec (~> 3.10)
+      rubocop (~> 1.17)
+      vcr (~> 6.0)
+      webmock (~> 3.13)
+    factory_bot (6.5.3)
+      activesupport (>= 6.1.0)
     faker (2.19.0)
       i18n (>= 1.6, < 2)
     faraday (2.12.0)
@@ -100,7 +95,6 @@ GEM
       logger
     faraday-net_http (3.3.0)
       net-http
-    ffi (1.16.3)
     fuzzy_match (2.1.0)
     hashdiff (1.0.1)
     http-accept (1.7.0)
@@ -115,8 +109,6 @@ GEM
     jmespath (1.6.1)
     json (2.6.3)
     language_server-protocol (3.17.0.3)
-    levenshtein-ffi (1.1.0)
-      ffi (~> 1.9)
     logger (1.6.1)
     method_source (1.0.0)
     mime-types (3.4.1)
@@ -127,8 +119,7 @@ GEM
       rake
     mini_portile2 (2.8.8)
     minitest (5.20.0)
-    mize (0.4.1)
-      protocol (~> 2.0)
+    mize (0.6.1)
     mutex_m (0.2.0)
     net-http (0.4.1)
       uri
@@ -143,8 +134,6 @@ GEM
     parser (3.2.2.4)
       ast (~> 2.4.1)
       racc
-    protocol (2.0.0)
-      ruby_parser (~> 3.0)
     pry (0.14.1)
       coderay (~> 1.1)
       method_source (~> 1.0)
@@ -187,14 +176,11 @@ GEM
       parser (>= 3.2.1.0)
     ruby-progressbar (1.13.0)
     ruby2_keywords (0.0.5)
-    ruby_parser (3.21.0)
-      racc (~> 1.5)
-      sexp_processor (~> 4.16)
     semantic_logger (4.15.0)
       concurrent-ruby (~> 1.0)
-    sexp_processor (4.17.1)
     sync (0.5.0)
-    tins (1.32.1)
+    tins (1.38.0)
+      bigdecimal
       sync
     tzinfo (2.0.6)
       concurrent-ruby (~> 1.0)
@@ -221,8 +207,8 @@ DEPENDENCIES
   concurrent-ruby (~> 1.2, >= 1.2.2)
   dry-struct (~> 1.6)
   dry-struct-setters (~> 0.4.0)
-  eivu-fingerprinter-acoustid!
-  factory_bot (~> 6.2.1)
+  eivu_fingerprinter_acoustid (~> 1.0)
+  factory_bot (~> 6.5, >= 6.5.1)
   faker (~> 2.18)
   faraday (~> 2.12)
   id3tag (~> 1.1)
@@ -241,7 +227,7 @@ DEPENDENCIES
   zeitwerk (~> 2.6, >= 2.6.12)
 
 RUBY VERSION
-   ruby 3.1.2p20
+   ruby 3.3.1p55
 
 BUNDLED WITH
    2.3.16

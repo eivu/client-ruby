@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 source 'https://rubygems.org'
-ruby '3.1.2'
+ruby '3.3.1'
 
 gem 'activesupport', '~> 7.1', '>= 7.1.2', require: 'active_support/all' # handy rails functions
 gem 'amazing_print', '~> 1.5' # Pretty print your Ruby objects with style -- in full color and with proper indentation
@@ -9,8 +9,8 @@ gem 'aws-sdk-s3', '~> 1.111', '>= 1.111.1'
 gem 'concurrent-ruby', '~> 1.2', '>= 1.2.2' # Modern concurrency tools including agents, futures, promises, thread pools, supervisors, and more. Inspired by Erlang, Clojure, Scala, Haskell, F#, C#, Java, and classic concurrency patterns.
 gem 'dry-struct', '~> 1.6' # structs with default values
 gem 'dry-struct-setters', '~> 0.4.0' # an extension to the Dry::Struct library
-gem 'eivu-fingerprinter-acoustid', git: 'https://github.com/eivu/fingerprinter-acoustid-ruby', tag: 'v0.1.3'
-gem 'factory_bot', '~> 6.2.1' # factory_bot provides a framework and DSL for defining and using factories
+gem 'eivu_fingerprinter_acoustid', '~> 1.0' # ruby wrapper for the AcoustID service
+gem 'factory_bot', '~> 6.5', '>= 6.5.1' # factory_bot provides a framework and DSL for defining and using factories
 gem 'faker', '~> 2.18' # Faker, a port of Data::Faker from Perl, is used to easily generate fake data: names, addresses, phone numbers, etc.
 gem 'faraday', '~> 2.12' # HTTP/REST client library
 gem 'id3tag', '~> 1.1' # Native Ruby ID3 tag reader that aims for 100% coverage of ID3v2.x and ID3v1.x standards
