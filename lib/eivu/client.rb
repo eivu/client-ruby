@@ -119,10 +119,10 @@ module Eivu
         end
 
         upload_objects_via_multithread(upload_objects: upload_object, peepy:, nsfw:)
-      elsif File.directory?(path_to_file)
-        upload_folder(path_to_folder: path_to_file, peepy:, nsfw:)
-      elsif File.file?(path_to_file)
-        upload_file(path_to_file:, peepy:, nsfw:, override:, metadata_list:)
+      elsif File.directory?(upload_object)
+        upload_folder(path_to_folder: upload_object, peepy:, nsfw:)
+      elsif File.file?(upload_object)
+        upload_file(path_to_file: upload_object, peepy:, nsfw:)
       else
         raise ArgumentError, "Only files, directories, or arrays of both are allowed"
       end

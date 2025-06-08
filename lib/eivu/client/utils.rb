@@ -144,7 +144,7 @@ module Eivu
           name = File.basename(name)
           name = name.gsub(/[^a-zA-Z0-9.\-+_]/, '_')
           name = "_#{name}" if name =~ /\A\.+\z/
-          name = 'unnamed' if name.size.zero?
+          name = 'unnamed' if name&.empty?
           name.mb_chars.to_s
         end
       end

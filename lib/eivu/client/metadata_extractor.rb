@@ -154,6 +154,7 @@ module Eivu
           override = { name: "Cover Art for #{label}", skip_original_local_path_to_file: true, coverart: true }
           file = Tempfile.new([COVERART_PREFIX, '.png'], binmode: true)
           file.write(wahwah_reader.images&.dig(0, :data))
+          file.close
           artwork = Client.upload_or_fetch_file(path_to_file: file.path, metadata_list:, override:)
           file.close
           artwork
