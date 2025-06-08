@@ -5,7 +5,7 @@ require 'wahwah'
 require 'active_support/core_ext/hash/keys'
 require 'active_support/core_ext/enumerable'
 require 'active_support/core_ext/object/blank'
-require 'eivu-fingerprinter-acoustid'
+require 'eivu_fingerprinter_acoustid'
 
 module Eivu
   class Client
