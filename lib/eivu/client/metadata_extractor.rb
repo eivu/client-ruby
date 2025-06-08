@@ -61,7 +61,7 @@ module Eivu
 
         def from_audio_file(path_to_file, mime: nil)
           mime ||= Client::Utils.detect_mime(path_to_file)
-          acoustid_client = Eivu::Fingerprinter::Acoustid.new
+          acoustid_client = EivuFingerprinterAcoustid::Engine.new
           acoustid_client.generate(path_to_file)
           metadata_hash =
             if mime.type == 'audio/mpeg'
