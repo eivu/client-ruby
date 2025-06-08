@@ -96,8 +96,8 @@ module Eivu
         puts "Failed: #{status[:failed].count} files"
       end
 
-      def upload(path_to_file:, multithread: true, peepy: false, nsfw: false)
-        new.upload(path_to_file:, multithread:, peepy:, nsfw:, metadata_list:)
+      def upload(path_to_file, multithread: true, peepy: false, nsfw: false)
+        new.upload(path_to_file, multithread:, peepy:, nsfw:)
       end
     end
 
