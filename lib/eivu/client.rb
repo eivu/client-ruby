@@ -118,7 +118,7 @@ module Eivu
           end
         end
 
-        upload_objects_via_multithread(upload_objects: upload_object, peepy:, nsfw:)
+        upload_objects_via_multithread(upload_objects: upload_set, peepy:, nsfw:)
       elsif File.directory?(upload_object)
         upload_folder(path_to_folder: upload_object, peepy:, nsfw:)
       elsif File.file?(upload_object)

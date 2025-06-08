@@ -58,7 +58,6 @@ module Eivu
           end
         end
 
-
         def from_audio_file(path_to_file, mime: nil)
           mime ||= Client::Utils.detect_mime(path_to_file)
           acoustid_client = EivuFingerprinterAcoustid::Engine.new
@@ -141,8 +140,13 @@ module Eivu
         end
 
         def upload_audio_artwork(path_to_file, metadata = {})
-          wahwah_reader = WahWah.open(path_to_file)
-          return if wahwah_reader.images&.dig(0, :data).blank? # not all audio files have artwork
+          begin
+            # whahwah errors out on some files
+            wahwah_reader = WahWah.open(path_to_file)
+            return if wahwah_reader.images&.dig(0, :data).blank? # not all audio files have artwork
+          rescue StandardError
+            return
+          end
 
           label = [metadata['id3:artist'], metadata['id3:album']].join(' - ')
           year  = metadata['id3:year']

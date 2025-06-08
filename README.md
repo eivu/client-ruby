@@ -15,7 +15,7 @@ Eivu::Client.upload 'spec/fixtures/samples/audio/brothers_grimm/the_frog_prince/
 Eivu::Client.upload 'spec/fixtures/samples/'
 Eivu::Client.upload 'spec/fixtures/secured/', peepy: true, nsfw: true,
 
-# Multithread upload is on by default, but can be turned off, it is not recommended for audio files with cover art
+# Multithread upload is on by default, but can be turned off
 Eivu::Client.upload 'spec/fixtures/samples', multithread: false
 
 # Extract metadata from audio file
