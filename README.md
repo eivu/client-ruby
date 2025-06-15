@@ -26,8 +26,19 @@ Requirements
 
 - node
 - python
+  remote file download
 - [yt-dlp](https://github.com/yt-dlp/yt-dlp)
+
+audio uploads
+
 - Download the [fpcalc binary](https://acoustid.org/chromaprint)
+
+comic uploads
+
+- [the unarchiver](https://theunarchiver.com/command-line)
+- Imagemagick
+- (Un)Rar
+- (Un)Zip
 
 ## Installation
 
@@ -35,7 +46,29 @@ Requirements
 
 Download the [fpcalc binary](https://acoustid.org/chromaprint)
 
+chmod +x fpcalc
+
 (mac/linux) move the binary to `/usr/local/bin`
+
+### The Unarchiver
+
+Download the [the unarchiver](https://theunarchiver.com/command-line)
+
+chmod +x the binaries
+
+(mac/linux) move the binary to `/usr/local/bin`
+
+### (Un)Zip
+
+included with MacOs
+
+### (Un)Rar
+
+brew install rar
+
+### Imagemagick
+
+brew install Imagemagick
 
 ### Mime Magic Support
 
