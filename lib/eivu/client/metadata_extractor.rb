@@ -80,7 +80,13 @@ module Eivu
           metadata_hash['eivu:album_artist']    = metadata_hash['id3:band']
           artwork = upload_audio_artwork(path_to_file, metadata_hash.dup)
           metadata_hash['eivu:artwork_md5'] = artwork.md5 if artwork.present?
-          metadata_hash.compact_blank.map { |k, v| { k => v } }
+          metadata_hash.compact_blank.map do |k, v|
+            { k => v.to_s.encode(Encoding.find('UTF-8'), invalid: :replace, undef: :replace, replace: '').
+                    gsub(
+                      /[^[:print:]]/, ''
+                    ).strip
+            }
+          end
         end
 
         def from_non_mp3_file(path_to_file)

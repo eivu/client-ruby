@@ -77,8 +77,8 @@ module Eivu
           unless override[:skip_original_local_path_to_file]
             metadata_list << { original_local_path_to_file: path_to_file }
           end
-          year          = MetadataExtractor.extract_year(path_to_file) || prune_from_metadata_list(metadata_list,
-                                                                                                   'eivu:year')
+          year          = MetadataExtractor.extract_year(path_to_file) ||
+                            prune_from_metadata_list(metadata_list, 'eivu:year')
           name          = override[:name] || Utils.prune_from_metadata_list(metadata_list, 'eivu:name')
           artwork_md5   = prune_from_metadata_list(metadata_list, 'eivu:artwork_md5')
           position      = prune_from_metadata_list(metadata_list, 'eivu:release_pos')
