@@ -14,8 +14,8 @@ module Eivu
         def traversable_objects(path_to_dir, options: {})
           options[:ignore] = path_to_dir.strip
           options[:ignore] += '/' unless options[:ignore].ends_with?('/')
-
-          Dir.glob("#{path_to_dir}/**/*").map do |path_to_item|
+          cleansed_path_to_dir = path_to_dir.gsub('[', '\[').gsub(']', '\]')
+          Dir.glob("#{cleansed_path_to_dir}/**/*").map do |path_to_item|
             next if skippable?(path_to_item, **options.slice(:skipable_filetypes))
 
             path_to_item
