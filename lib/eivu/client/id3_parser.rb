@@ -23,10 +23,14 @@ module Eivu
         return {} if @mp3_info.v2_frames.empty?
 
         @mp3_info.v2_frames.each_with_object({}) do |tag, hash|
-          parsed_tag_id = V2_FRAMES[tag.id]
-          next if parsed_tag_id.blank?
+          begin
+            parsed_tag_id = V2_FRAMES[tag.id]
+            next if parsed_tag_id.blank?
 
-          hash["id3:#{parsed_tag_id}"] = tag.content if tag.content.present?
+            hash["id3:#{parsed_tag_id}"] = tag.content if tag.content.present?
+          rescue StandardError
+            next
+          end
         end.compact
       end
 
@@ -111,7 +115,7 @@ module Eivu
         TMOO: 'mood',
         MVNM: 'movement name',
         MVIN: 'movement number',
-        MCDI: 'music cd identifier',
+        # MCDI: 'music cd identifier',
         TMCL: 'musician credits',
         XOLY: 'olympus dss',
         TOT: 'original album',

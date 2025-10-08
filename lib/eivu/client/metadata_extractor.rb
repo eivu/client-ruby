@@ -5,7 +5,7 @@ require 'wahwah'
 require 'active_support/core_ext/hash/keys'
 require 'active_support/core_ext/enumerable'
 require 'active_support/core_ext/object/blank'
-require 'eivu-fingerprinter-acoustid'
+require 'eivu_fingerprinter_acoustid'
 
 module Eivu
   class Client
@@ -22,14 +22,45 @@ module Eivu
           case mime.mediatype
           when 'audio'
             from_audio_file(path_to_file, mime:)
+          when 'application'
+            from_application_file(path_to_file, mime:)
           else
             extract_metadata_list(File.basename(path_to_file))
           end
         end
 
+        def from_application_file(path_to_file, mime:)
+          if mime.subtype.end_with?('rom')
+            info = Eivu::VgData::Models::Game.fetch_info(path_to_file)
+            info[:regions] ||= []
+            info[:genres]  ||= []
+            metadata_array = []
+            metadata_array << { 'vg:max players' => info[:max_players] }
+            metadata_array << { 'vg:release type' => info[:release_type] }
+            metadata_array << { 'vg:platform' => info[:platform] }
+            metadata_array << { 'vg:developer' => info[:developer] }
+            metadata_array << { 'vg:publisher' => info[:publisher] }
+            metadata_array << { 'vg:database_id' => info[:database_id] }
+            metadata_array << { 'vg:coop' => info[:cooperative]&.to_s }
+            metadata_array << { 'vg:esrb' => info[:esrb] }
+            metadata_array << { 'vg:video_url' => info[:video_url] } if info[:video_url].present?
+            metadata_array << { 'vg:platform manufacturer' => info[:platform_manufacturer] }
+            info[:regions].each { |region| metadata_array << { 'vg:region' => region } }
+            info[:genres].each { |genre| metadata_array << { 'vg:genre' => genre } }
+            metadata_array << { 'eivu:description' => info[:overview] }
+            metadata_array << { 'eivu:rating' => info[:bayesian_rating] }
+            metadata_array << { 'eivu:info_url' => info[:wikipedia_url] }
+            metadata_array << { 'eivu:year' => info[:release_year] }
+            metadata_array << { 'eivu:name' => info[:name] }
+            metadata_array.reject { |h| h.values[0].blank? }
+          else
+            extract_metadata_list(mime.subtype)
+          end
+        end
+
         def from_audio_file(path_to_file, mime: nil)
           mime ||= Client::Utils.detect_mime(path_to_file)
-          acoustid_client = Eivu::Fingerprinter::Acoustid.new
+          acoustid_client = EivuFingerprinterAcoustid::Engine.new
           acoustid_client.generate(path_to_file)
           metadata_hash =
             if mime.type == 'audio/mpeg'
@@ -49,7 +80,13 @@ module Eivu
           metadata_hash['eivu:album_artist']    = metadata_hash['id3:band']
           artwork = upload_audio_artwork(path_to_file, metadata_hash.dup)
           metadata_hash['eivu:artwork_md5'] = artwork.md5 if artwork.present?
-          metadata_hash.compact_blank.map { |k, v| { k => v } }
+          metadata_hash.compact_blank.map do |k, v|
+            { k => v.to_s.encode(Encoding.find('UTF-8'), invalid: :replace, undef: :replace, replace: '').
+                    gsub(
+                      /[^[:print:]]/, ''
+                    ).strip
+            }
+          end
         end
 
         def from_non_mp3_file(path_to_file)
@@ -109,8 +146,13 @@ module Eivu
         end
 
         def upload_audio_artwork(path_to_file, metadata = {})
-          wahwah_reader = WahWah.open(path_to_file)
-          return if wahwah_reader.images&.dig(0, :data).blank? # not all audio files have artwork
+          begin
+            # whahwah errors out on some files
+            wahwah_reader = WahWah.open(path_to_file)
+            return if wahwah_reader.images&.dig(0, :data).blank? # not all audio files have artwork
+          rescue StandardError
+            return
+          end
 
           label = [metadata['id3:artist'], metadata['id3:album']].join(' - ')
           year  = metadata['id3:year']
@@ -122,6 +164,7 @@ module Eivu
           override = { name: "Cover Art for #{label}", skip_original_local_path_to_file: true, coverart: true }
           file = Tempfile.new([COVERART_PREFIX, '.png'], binmode: true)
           file.write(wahwah_reader.images&.dig(0, :data))
+          file.close
           artwork = Client.upload_or_fetch_file(path_to_file: file.path, metadata_list:, override:)
           file.close
           artwork
